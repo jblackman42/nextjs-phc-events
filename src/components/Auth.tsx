@@ -30,6 +30,8 @@ export default function Auth({ children }: Readonly<{ children: React.ReactNode;
           }
         })
           .then(response => response.data);
+
+        console.log({ ...userInfo, user_type: "Admin" });
         setUser(userInfo);
       } catch (error) {
         evictUnauthorized(window.location.pathname, router);

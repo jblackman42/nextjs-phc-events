@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { NextPage } from 'next';
 import axios from 'axios';
 
-import { getOAuthConfig, AuthData, evictUnauthorized, saveAuthData, UserContext, User } from "@/lib/utils";
+import { getOAuthConfig, AuthData, evictUnauthorized, saveAuthData, UserContext, User, getUserType } from "@/lib/utils";
 
 // Update the generic type T to extend JSX.IntrinsicAttributes for compatibility with React's intrinsic attributes.
 export default function WithAuth<T extends object>(WrappedComponent: ComponentType<T> | NextPage<T>): NextPage<T> {
@@ -20,7 +20,8 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
 
     const handleLoggedIn = (userData: any): void => {
       setIsAuthenticated(true);
-      setUser(userData);
+      const user_type = getUserType(userData.roles);
+      setUser({ ...userData, user_type: user_type });
       console.log('user is logged in.');
     }
     const handleLoggedOut = (): void => {

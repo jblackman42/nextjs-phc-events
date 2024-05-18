@@ -69,6 +69,7 @@ export interface User {
   name: string;
   nickname: string;
   roles: Array<string>;
+  user_type: string;
   sub: string;
   userid: string;
   zoneinfo: string;
@@ -142,6 +143,14 @@ export function deleteAuthData(): void {
   window.localStorage.removeItem('refresh_token');
   window.localStorage.removeItem('expires_in');
   window.localStorage.removeItem('session_state');
+}
+
+export function getUserType(roles: Array<string>): string {
+  if (roles.includes('Administrators')) {
+    return "Admin";
+  } else {
+    return "Member";
+  }
 }
 
 interface UserContextType {

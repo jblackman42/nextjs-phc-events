@@ -19,6 +19,6 @@ export async function GET(request: NextRequest, { params }: { params: { guid: st
       headers,
     });
   } catch (error: any) {
-    return NextResponse.json(error.response.data ?? { error: "Internal server error" }, { status: error.response.status ?? 500 });
+    return NextResponse.json(error);
   }
 }

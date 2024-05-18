@@ -1,9 +1,8 @@
 "use client";
 import { useContext, useState } from "react";
-import { Login, WithAuth, Navbar, AccountPopup } from "@/components";
-import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { WithAuth, Navbar, AccountPopup, Calendar } from "@/components";
 import { faCalendar, faGear, faRightToBracket, faSun, faMoon } from '@awesome.me/kit-10a739193a/icons/classic/light';
-import { User, ThemeContext, NavbarItem } from "@/lib/utils";
+import { ThemeContext, NavbarItem } from "@/lib/utils";
 
 interface Props {
   isAuthenticated: boolean;
@@ -43,12 +42,7 @@ const Home: React.FC<Props> = ({ isAuthenticated }) => {
     <main className="bg-background flex min-h-screen gap-2 md:gap-4 md:p-4">
       <AccountPopup open={pOpen} setOpen={() => setPOpen(false)} />
       <Navbar navLinks={navLinks} />
-      <article className="flex flex-col gap-2 md:gap-4 w-full">
-        <div className="w-full bg-primary p-4 flex items-center md:rounded-sm shadow-sm h-12">
-          <h1 className="h-max">test</h1>
-        </div>
-        <div className="w-full h-full bg-primary md:rounded-sm shadow-sm p-4"></div>
-      </article>
+      <Calendar />
     </main>
   );
 };
