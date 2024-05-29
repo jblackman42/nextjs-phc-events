@@ -21,6 +21,7 @@ const config = {
       colors: {
         textPrimary: "var(--text-primary)",
         textSecondary: "var(--text-secondary)",
+        textHeading: "var(--heading-text)",
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",

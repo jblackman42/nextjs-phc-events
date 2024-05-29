@@ -1,14 +1,19 @@
 "use client";
 import { useEffect, useState, useCallback } from 'react';
 import { Quicksand } from 'next/font/google';
+import { Toaster } from "@/components/ui/toaster";
+import { Loading } from '@/components';
 import './globals.css';
 
-import { ThemeContext } from '@/lib/utils';
+import { ThemeContext, LoadingContext } from '@/lib/utils';
 
 const quicksand = Quicksand({ weight: ['500'], subsets: ['latin'] });
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   const [theme, setTheme] = useState<string>('light'); // This will now be set correctly at start
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const updateLoading = (value: boolean) => setLoading(value);
 
   useEffect(() => {
     const preferredTheme = localStorage.getItem('preferred-color-scheme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -39,9 +44,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         }} />
       </head>
       <ThemeContext.Provider value={{ theme, toggleTheme }}>
-        <html lang="en" suppressHydrationWarning>
-          <body className={quicksand.className}>{children}</body>
-        </html>
+        <LoadingContext.Provider value={{ loading, updateLoading }}>
+          <html lang="en" suppressHydrationWarning>
+            <body className={quicksand.className}>
+              <Toaster />
+              {loading && <Loading />}
+              {children}
+            </body>
+          </html>
+        </LoadingContext.Provider>
       </ThemeContext.Provider>
     </>
   );

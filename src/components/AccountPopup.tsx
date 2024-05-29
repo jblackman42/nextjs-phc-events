@@ -18,7 +18,7 @@ function AccountPopup({ open = null, setOpen }: { open: Boolean | null, setOpen:
             <AvatarFallback>{user.ext_First_Name[0] + user.ext_Last_Name[0]}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col justify-center mx-4">
-            <p className="font-bold text-white">{user.ext_Nickname} {user.ext_Last_Name}</p>
+            <p className="font-bold">{user.ext_Nickname} {user.ext_Last_Name}</p>
             <p>{user.email}</p>
             <p>{user.user_type}</p>
           </div>

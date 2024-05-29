@@ -1,5 +1,5 @@
 "use client";
-import { createContext } from "react";
+import { SetStateAction, createContext } from "react";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import axios from 'axios';
@@ -27,6 +27,25 @@ export interface OAuthConfig {
   id_token_signing_alg_values_supported: Array<string>;
   code_challenge_methods_supported: Array<string>;
   token_endpoint_auth_methods_supported: Array<string>;
+}
+
+export interface MPEvent {
+  Event_ID: number;
+  Event_Title: string;
+  Event_Type: string;
+  Congregation_Name: string;
+  Location_Name: string;
+  Meeting_Instructions: string;
+  Description: string;
+  Program_Name: string;
+  Display_Name: string;
+  Participants_Expected: number;
+  Minutes_for_Setup: number;
+  Minutes_for_Cleanup: number;
+  Event_Start_Date: Date;
+  Event_End_Date: Date;
+  Cancelled: boolean;
+  Featured_On_Calendar: boolean;
 }
 
 export interface User {
@@ -158,6 +177,10 @@ interface UserContextType {
   updateGlobalUser: (userData: User) => void
 }
 
+export const LoadingContext = createContext({
+  loading: false,
+  updateLoading: (value: boolean) => { }
+});
 export const ThemeContext = createContext({
   theme: '',
   toggleTheme: () => { }
