@@ -22,10 +22,10 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
       setIsAuthenticated(true);
       const user_type = getUserType(userData.roles);
       setUser({ ...userData, user_type: user_type });
-      console.log('user is logged in.');
+      // console.log('user is logged in.');
     }
     const handleLoggedOut = (): void => {
-      console.log('user is logged out.');
+      // console.log('user is logged out.');
     }
 
     useEffect(() => {
@@ -92,7 +92,7 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
 
     // Return the wrapped component with all its props
     return <UserContext.Provider value={{ user, updateGlobalUser }}>
-      <WrappedComponent {...props} isAuthenticated={isAuthenticated} />;
+      <WrappedComponent {...props} isAuthenticated={isAuthenticated} />
     </UserContext.Provider>
   };
 

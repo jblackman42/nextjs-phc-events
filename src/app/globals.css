@@ -9,7 +9,7 @@
 
   :root {
     --text-primary: #090909;
-    --text-secondary: #b8bdc2;
+    --text-secondary: #ccd1d6;
     --heading-text: #000000;
 
     --background: #e0e9f8;
@@ -23,7 +23,10 @@
 
     --muted: #f5f5f5;
 
+    --accent-0: #214965;
     --accent: #355a8c;
+    --accent-2: #4885ae;
+    --accent-3: #6ca6cd;
     --accent-foreground: #ffffff;
 
     --destructive: #d9372b;
@@ -37,11 +40,11 @@
   }
 
   .dark {
-    --text-primary: #b8bdc2;
+    --text-primary: #ccd1d6;
     --text-secondary: #090909;
     --heading-text: #ffffff;
 
-    --background: #242324;
+    --background: #1a191a;
     --foreground: #ffffff;
 
     --primary: #353535;
@@ -69,6 +72,10 @@
     font-weight: bold;
     text-transform: capitalize;
     @apply text-2xl;
+  }
+
+  .day-column:has(div[data-state="open"]) {
+    @apply z-50;
   }
 
   .nav-label {
@@ -194,7 +201,7 @@
   --animationDuration: calc(8s / (11 - var(--n)));
   --borderWidth: 10px;
   /* --borderWidth: 60px; */
-  --strokeColor: var(--accent);
+  --strokeColor: white;
 
   width: var(--width);
   aspect-ratio: 2;
@@ -240,6 +247,15 @@
 .load-spinner::before {
   right: 0;
   transform: translate(100%, 100%);
+}
+
+.custom-scroller::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scroller::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 2.5px;
 }
 
 @keyframes spinner {

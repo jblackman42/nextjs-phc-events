@@ -30,6 +30,7 @@ export interface OAuthConfig {
 }
 
 export interface MPEvent {
+  Booked_Rooms: string;
   Event_ID: number;
   Event_Title: string;
   Event_Type: string;
@@ -38,14 +39,21 @@ export interface MPEvent {
   Meeting_Instructions: string;
   Description: string;
   Program_Name: string;
-  Display_Name: string;
+  Primary_Contact: string;
   Participants_Expected: number;
   Minutes_for_Setup: number;
   Minutes_for_Cleanup: number;
-  Event_Start_Date: Date;
-  Event_End_Date: Date;
+  Event_Start_Date: string;
+  Event_End_Date: string;
   Cancelled: boolean;
   Featured_On_Calendar: boolean;
+  Created_By: string;
+}
+
+export interface MPLocation {
+  Location_ID: number;
+  Location_Name: string;
+  Congregation_Name: string;
 }
 
 export interface User {
@@ -169,6 +177,55 @@ export function getUserType(roles: Array<string>): string {
     return "Admin";
   } else {
     return "Member";
+  }
+}
+
+export function correctForTimezone(date: string): Date {
+  const result = new Date(date);
+  result.setMinutes(result.getMinutes() + result.getTimezoneOffset());
+  return result;
+}
+export function getOrdinalSuffix(value: number | string): string {
+  const num = typeof value === 'string' ? parseInt(value, 10) : value;
+
+  if (isNaN(num)) {
+    throw new Error('Invalid input: not a number');
+  }
+
+  const remainder = num % 100;
+
+  if (remainder >= 11 && remainder <= 13) {
+    return 'th';
+  }
+
+  switch (num % 10) {
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
+  }
+}
+export function getFormattedDate(date: Date): string {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export class CalendarDate extends Date {
+  getWeek(this: CalendarDate): number {
+    var date = new Date(this.getTime());
+    date.setHours(0, 0, 0, 0);
+    // Thursday in current week decides the year.
+    date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+    // January 4 is always in week 1.
+    var week1 = new Date(date.getFullYear(), 0, 4);
+    // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+    return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
   }
 }
 

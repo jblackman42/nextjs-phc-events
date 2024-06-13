@@ -1,152 +1,232 @@
 import axios from 'axios';
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useEffect, useState, useCallback, useContext, useRef } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faArrowRight } from '@awesome.me/kit-10a739193a/icons/classic/light';
+import { LoadingContext, MPEvent, MPLocation, correctForTimezone, CalendarDate, getFormattedDate } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import WeekCalendar from './WeekCalendar';
+import MonthCalendar from './MonthCalendar';
 
-import { LoadingContext, MPEvent } from '@/lib/utils';
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-function getOrdinalSuffix(value: number | string): string {
-  const num = typeof value === 'string' ? parseInt(value, 10) : value;
-
-  if (isNaN(num)) {
-    throw new Error('Invalid input: not a number');
-  }
-
-  const remainder = num % 100;
-
-  if (remainder >= 11 && remainder <= 13) {
-    return 'th';
-  }
-
-  switch (num % 10) {
-    case 1:
-      return 'st';
-    case 2:
-      return 'nd';
-    case 3:
-      return 'rd';
-    default:
-      return 'th';
-  }
-}
-
-function getCalendarDates(year?: number, month?: number): string[] {
-  const now = new Date();
-  const currYear = year ?? now.getFullYear();
-  const currMonth = month ?? now.getMonth();
-  const startDate = new Date(currYear, currMonth, 1);
-
+function getCalendarDates(year: number, month: number): string[] {
+  const startDate = new Date(Date.UTC(year, month, 1));
   const dates: string[] = [];
-
-  while (startDate.getMonth() === currMonth) {
+  while (startDate.getUTCMonth() === month) {
     dates.push(startDate.toISOString());
-    startDate.setDate(startDate.getDate() + 1);
+    startDate.setUTCDate(startDate.getUTCDate() + 1);
   }
-
   const currDate = new Date(dates[0]);
-  const daysToGoBack = currDate.getDay();
+  const daysToGoBack = currDate.getUTCDay();
   for (let i = 0; i < daysToGoBack; i++) {
-    currDate.setDate(currDate.getDate() - 1);
+    currDate.setUTCDate(currDate.getUTCDate() - 1);
     dates.unshift(currDate.toISOString());
   }
-
   return dates;
 }
 
-function getFormattedDate(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+function getDatesOfWeek(weekNumber: number, year: number): string[] {
+  if (weekNumber < 1 || weekNumber > 53) {
+    throw new Error('Week number must be between 1 and 53.');
+  }
+  const firstDayOfYear = new Date(Date.UTC(year, 0, 1));
+  const firstThursday = new Date(firstDayOfYear);
+  firstThursday.setUTCDate(firstDayOfYear.getUTCDate() + (4 - (firstDayOfYear.getUTCDay() || 7)));
+  const firstDayOfWeek = new Date(firstThursday);
+  firstDayOfWeek.setUTCDate(firstThursday.getUTCDate() + 7 * (weekNumber - 1) - 3);
+  const firstDayOfWeekSunday = new Date(firstDayOfWeek);
+  firstDayOfWeekSunday.setUTCDate(firstDayOfWeek.getUTCDate() - 1);
+  const weekDates: string[] = [];
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(firstDayOfWeekSunday);
+    day.setUTCDate(firstDayOfWeekSunday.getUTCDate() + i);
+    weekDates.push(day.toISOString());
+  }
+  return weekDates;
 }
-
 
 export default function Calendar() {
   const { toast } = useToast();
   const { updateLoading } = useContext(LoadingContext);
+  const updateLoadingRef = useRef(updateLoading);
 
-  const initialized = useRef(false);
+  const today = new CalendarDate();
+  const [week, setWeek] = useState<number>(today.getWeek());
+  const [month, setMonth] = useState<number>(today.getMonth());
+  const [year, setYear] = useState<number>(today.getFullYear());
   const [monthDates, setMonthDates] = useState<Array<string>>([]);
+  const [weekDates, setWeekDates] = useState<Array<string>>([]);
+  const [allEvents, setAllEvents] = useState<Array<MPEvent>>([]);
   const [events, setEvents] = useState<Array<MPEvent>>([]);
+  const [locations, setLocations] = useState<Array<MPLocation>>([]);
+  const [selectedLocation, setSelectedLocation] = useState<string>("All Locations");
+  const [calendarView, setCalendarView] = useState<string>('month');
 
-  async function getEvents(startDate: string, endDate: string) {
+  const [earliestEventDate, setEarliestEventDate] = useState<Date | null>(null);
+  const [latestEventDate, setLatestEventDate] = useState<Date | null>(null);
+
+  const prevMonth = () => {
+    setMonthDates([]);
+    if (month > 0) {
+      setWeek(new CalendarDate(Date.UTC(year, month - 1, 1)).getWeek());
+      setMonth(month - 1);
+    } else {
+      setWeek(52);
+      setMonth(11);
+      setYear(year - 1);
+    }
+  }
+
+  const nextMonth = () => {
+    setMonthDates([]);
+    if (month < 11) {
+      setWeek(new CalendarDate(Date.UTC(year, month + 1, 1)).getWeek());
+      setMonth(month + 1);
+    } else {
+      setWeek(1);
+      setMonth(0);
+      setYear(year + 1);
+    }
+  }
+
+  const prevWeek = () => {
+    setWeekDates([]);
+    if (week > 1) {
+      setWeek(v => v - 1);
+    } else {
+      setWeek(53);
+      setYear(v => v - 1);
+    }
+  }
+
+  const nextWeek = () => {
+    setWeekDates([]);
+    if (week < 53) {
+      setWeek(v => v + 1);
+    } else {
+      setWeek(1);
+      setYear(v => v + 1);
+    }
+  }
+
+  const fetchEvents = useCallback(async (startDate: string, endDate: string) => {
     return await axios({
       method: "GET",
       url: "/api/events",
-      params: {
-        startDate: startDate,
-        endDate: endDate
-      }
-    })
-      .then(response => response.data);
-  };
+      params: { startDate, endDate }
+    }).then(response => response.data);
+  }, []);
 
+  const fetchLocations = useCallback(async () => {
+    return await axios({
+      method: "GET",
+      url: "/api/locations"
+    }).then(response => response.data);
+  }, []);
+
+
+  const getCalendarInformation = useCallback(async () => {
+    updateLoadingRef.current(true);
+    try {
+      const dates = calendarView === "month"
+        ? getCalendarDates(year, month)
+        : calendarView === "week"
+          ? getDatesOfWeek(week, year)
+          : [];
+
+      const startDate = new Date(dates[0]);
+      const lastDate = new Date(dates[dates.length - 1]);
+      const formattedStartDate = getFormattedDate(startDate);
+      const formattedLastDate = getFormattedDate(new Date(lastDate.setDate(lastDate.getDate() + 1)));
+
+      setMonthDates(dates);
+      setWeekDates(getDatesOfWeek(week, year));
+
+      const locations = await fetchLocations();
+      setLocations(locations);
+
+      const events: MPEvent[] = await fetchEvents(formattedStartDate, formattedLastDate);
+      setAllEvents(events);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+        action: <ToastAction altText="Try Again" onClick={getCalendarInformation}>Try Again</ToastAction>,
+        variant: "destructive"
+      });
+    }
+    updateLoadingRef.current(false);
+  }, [calendarView, year, month, week, fetchEvents, fetchLocations, toast]);
 
   useEffect(() => {
-    async function getCalendarInformation() {
-      updateLoading(true);
-      try {
-        const dates = getCalendarDates();
-        console.log(dates);
-        const startDate = dates[0];
-        const lastDate = new Date(dates[dates.length - 1]);
-        const endDate = getFormattedDate(new Date(lastDate.setDate(lastDate?.getDate() + 1)));
+    getCalendarInformation();
+  }, [getCalendarInformation]);
 
-        const events = await getEvents(startDate, endDate);
-
-        setMonthDates(dates);
-        setEvents(events);
-        console.log(events);
-      } catch (error) {
-        console.error(error);
-        toast({
-          title: "Uh oh! Something went wrong.",
-          description: "There was a problem with your request.",
-          action: <ToastAction altText="Try Again" onClick={getCalendarInformation}>Try Again</ToastAction>,
-          variant: "destructive"
-        })
-      }
-      updateLoading(false);
-    }
-
-    if (initialized.current) return;
-    (async () => {
-      initialized.current = true;
-
-      await getCalendarInformation();
-    })();
-  }, [toast, updateLoading]);
+  useEffect(() => {
+    setEvents(allEvents.filter(e => selectedLocation === 'All Locations' || e.Location_Name === selectedLocation));
+  }, [selectedLocation, allEvents]);
 
   return (
-    <article className="flex flex-col gap-2 md:gap-4 w-full">
-      <div className="w-full bg-primary p-4 flex items-center md:rounded-sm shadow-sm h-12">
-        <h1 className="h-max">test</h1>
-      </div>
-      <div className="w-full h-full bg-primary md:rounded-sm shadow-sm p-4">
-        <div className="mb-4 text-center grid grid-cols-7 gap-1 lg:gap-4 max-w-screen-xl mx-auto">
-          {
-            ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-              .map((day, i) => <div key={i}><h1 className="uppercase text-xl">{day}</h1></div>)
-          }
-        </div>
-        <div className="grid grid-cols-7 gap-1 lg:gap-4 max-w-screen-xl mx-auto">
-          {monthDates.map((date, i) => {
-            const currDate = new Date(date);
-            const dateNum = currDate.getDate();
-            const eventCount = events.filter(event => getFormattedDate(new Date(event.Event_Start_Date)) === getFormattedDate(currDate)).length;
+    <>
+      <article className="grid grid-rows-12 gap-2 md:gap-4 w-full">
+        <div className="row-span-1 w-full h-full bg-primary p-4 flex items-center md:rounded-sm shadow-sm">
+          {calendarView === "month" && <>
+            <Button variant="icon" onClick={prevMonth}><FontAwesomeIcon icon={faArrowLeft} /></Button>
+            <h1 className="w-52 text-center">{months[month]} {year}</h1>
+            <Button variant="icon" onClick={nextMonth}><FontAwesomeIcon icon={faArrowRight} /></Button>
+          </>}
+          {calendarView === "week" && <>
+            <Button variant="icon" onClick={prevWeek}><FontAwesomeIcon icon={faArrowLeft} /></Button>
+            <h1 className="mx-4 text-center">{correctForTimezone(weekDates[0]).toLocaleDateString('en-us', { month: "short", day: "numeric" })} - {correctForTimezone(weekDates[weekDates.length - 1]).toLocaleDateString('en-us', { month: "short", day: "numeric" })}, {year}</h1>
+            <Button variant="icon" onClick={nextWeek}><FontAwesomeIcon icon={faArrowRight} /></Button>
+          </>}
 
-            const fullDayCount = 21;
+          <div className="mx-4">
+            <Select value={calendarView} onValueChange={(val) => setCalendarView(val)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="month">Month</SelectItem>
+                <SelectItem value="week">Week</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            return <button key={i} style={{ animationDelay: `${20 * i}ms` }} className="opacity-0 animate-fade-slide-down bg-secondary text-secondary-foreground hover:bg-background w-full aspect-square rounded-md shadow-md flex flex-col">
-              <h1 className="m-2 text-sm md:text-lg">{dateNum}<sup>{getOrdinalSuffix(dateNum)}</sup></h1>
-              <p className="mt-auto mx-1">{eventCount} Events</p>
-              <div className="w-full h-1 md:h-2">
-                <div style={{ width: `${Math.floor(eventCount / fullDayCount * 100)}%` }} className={`bg-accent h-full max-w-full rounded-full`}></div>
-              </div>
-            </button>
-          })}
+          <div className="mx-4">
+            <Select value={selectedLocation} onValueChange={(val) => setSelectedLocation(val)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All Locations">All Locations</SelectItem>
+                {locations.map((location, i) => <SelectItem key={i} value={location.Location_Name}>{location.Location_Name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-      </div>
-    </article>
+
+        <div className="row-span-11 w-full h-full bg-primary md:rounded-sm shadow-sm p-4">
+          <div className="w-full h-full overflow-hidden">
+            {calendarView === "month" && <MonthCalendar
+              monthDates={monthDates}
+              events={events}
+              handleClick={() => console.log('yeet')}
+            />}
+            {calendarView === "week" && <WeekCalendar
+              weekDates={weekDates}
+              events={events}
+              getFormattedDate={getFormattedDate}
+              handleClick={() => console.log('yeet')}
+            />
+            }
+          </div>
+        </div>
+      </article>
+    </>
   );
 };

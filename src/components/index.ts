@@ -4,6 +4,7 @@ import Navbar from "./Navbar";
 import AccountPopup from "./AccountPopup";
 import Calendar from "./Calendar";
 import Loading from "./Loading";
+import DayPopup from "./DayPopup";
 
 export {
   WithAuth,
@@ -11,5 +12,6 @@ export {
   Navbar,
   AccountPopup,
   Calendar,
-  Loading
+  Loading,
+  DayPopup
 }

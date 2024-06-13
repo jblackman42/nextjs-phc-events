@@ -39,7 +39,10 @@ const config = {
         },
         accent: {
           DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)"
+          foreground: "var(--accent-foreground)",
+          0: "var(--accent-0)",
+          2: "var(--accent-2)",
+          3: "var(--accent-3)"
         },
         destructive: "var(--destructive)",
         muted: "var(--muted)",

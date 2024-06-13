@@ -1,12 +1,12 @@
-import { useContext } from 'react';
-import Popup from './Popup';
-import { UserContext } from '@/lib/utils';
-import { Button } from "@/components/ui/button";
+import { useContext } from 'react'
+import Popup from './Popup'
+import { UserContext } from '@/lib/utils'
+import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import Link from 'next/link';
+import Link from 'next/link'
 
 function AccountPopup({ open = null, setOpen }: { open: Boolean | null, setOpen: Function }) {
-  const { user } = useContext(UserContext);
+  const { user } = useContext(UserContext)
 
   return user && <Popup open={open} setOpen={setOpen}>
     <div>
@@ -33,4 +33,4 @@ function AccountPopup({ open = null, setOpen }: { open: Boolean | null, setOpen:
   </Popup>
 }
 
-export default AccountPopup;
+export default AccountPopup

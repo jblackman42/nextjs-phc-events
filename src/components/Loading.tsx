@@ -13,7 +13,7 @@ function Loading() {
       <div className="load-spinner"></div>
       <div className="load-spinner"></div>
     </div>
-  </div>;
+  </div>
 }
 
 export default Loading;

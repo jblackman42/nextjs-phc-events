@@ -22,11 +22,11 @@ function Popup({ open = null, setOpen, children }: { open: Boolean | null, setOp
   }
 
   return <div className={`${open === true ? "open" : open === false ? "close" : ""} popup-container absolute inset-0 bg-smoky grid place-items-center`} onClick={handleOutsideClick}>
-    <div className="popup bg-primary text-primary-foreground max-w-[95vw] w-[500px] rounded-sm p-2 md:p-4 shadow-sm relative">
+    <div className="popup bg-primary text-primary-foreground max-w-[95vw] w-[500px] rounded-sm p-2 md:p-4 shadow-sm relative overflow-y-auto custom-scroller">
       <button className="absolute top-0 right-0 m-4 text-2xl leading-none" id="close-btn" onClick={() => setOpen(false)}><FontAwesomeIcon icon={faXmark} /></button>
       {children}
     </div>
-  </div>;
+  </div>
 }
 
 export default Popup;
