@@ -39,7 +39,7 @@ const Home: React.FC<Props> = ({ isAuthenticated }) => {
   ]
 
   return (
-    <main className="bg-background h-[100dvh] flex gap-2 md:gap-4 md:p-4">
+    <main className="bg-background h-[100dvh] max-w-[100vw] flex gap-2 md:gap-4 md:p-4">
       <AccountPopup open={pOpen} setOpen={() => setPOpen(false)} />
       <Navbar navLinks={navLinks} />
       <Calendar />

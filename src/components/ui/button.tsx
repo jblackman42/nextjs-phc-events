@@ -11,13 +11,12 @@ const buttonVariants = cva(
       variant: {
         default: "bg-accent text-accent-foreground border border-2 border-accent hover:bg-transparent hover:text-background-foreground",
         thin: "bg-primary text-textHeading border border-[1px] border-white",
-        icon: "bg-background text-textHeading hover:bg-accent text-xl aspect-square rounded-full"
+        icon: "bg-background text-textHeading hover:bg-accent text-xl w-10 rounded-full"
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-6 rounded-md px-3 text-xs",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        lg: "h-11 rounded-md px-8"
       },
     },
     defaultVariants: {

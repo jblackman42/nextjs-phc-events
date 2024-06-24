@@ -7,13 +7,13 @@ import Link from 'next/link';
 
 
 
-function DayPopup({ open = null, setOpen, date, events }: { open: Boolean | null, setOpen: Function, date: string, events: MPEvent[] }) {
+function DayPopup({ open = null, setOpen, date, events }: { open: Boolean | null, setOpen: Function, date: Date, events: MPEvent[] }) {
   const { user } = useContext(UserContext);
 
   return user && <Popup open={open} setOpen={setOpen}>
     <div className="max-h-[600px]">
       <div>
-        <h1>{date}</h1>
+        <h1>{date.toLocaleDateString('en-us', { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</h1>
         <p>{events.length} Events</p>
         <Separator className="my-4" />
       </div>

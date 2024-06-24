@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   HoverCard,
   HoverCardContent,
@@ -20,7 +20,7 @@ interface WeekEvent {
 }
 
 interface CalendarProps {
-  weekDates: string[];
+  date: Date;
   events: MPEvent[];
   getFormattedDate: (date: Date) => string;
   handleClick: () => void;
@@ -35,15 +35,27 @@ const doEventsOverlap = (event1: MPEvent, event2: MPEvent): boolean => {
   return start1 < end2 && start2 < end1;
 };
 
-const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormattedDate, handleClick }) => {
+const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, handleClick }) => {
   const hourHeightPx = 96;
   const calendarRef = useRef<HTMLDivElement>(null);
+
+  const [daysEvents, setDaysEvents] = useState<Array<WeekEvent>>([]);
 
   useEffect(() => {
     if (calendarRef.current) {
       calendarRef.current.scrollTop = 7 * hourHeightPx;
     }
   }, []);
+
+  useEffect(() => {
+    const currDate = new Date(date);
+    const tempDaysEvents = events.filter(event => getFormattedDate(new Date(event.Event_Start_Date)) === getFormattedDate(currDate));
+    tempDaysEvents.sort((a, b) => correctForTimezone(a.Event_Start_Date).getTime() - correctForTimezone(b.Event_Start_Date).getTime());
+
+    const initialColumnsEvents = placeEventsInColumns(tempDaysEvents, doEventsOverlap);
+    const adjustedDaysEvents = adjustForOverlap(initialColumnsEvents);
+    setDaysEvents(adjustedDaysEvents);
+  }, [events, date, getFormattedDate]);
 
   const placeEventsInColumns = (events: MPEvent[], doEventsOverlap: (event1: MPEvent, event2: MPEvent) => boolean) => {
     const columns: WeekEvent[][] = [];
@@ -164,13 +176,6 @@ const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormatted
   return (
     <div className="w-[1280px] max-w-full h-full mx-auto">
       <div className="h-full flex flex-col">
-        <div className="flex justify-around pl-12">
-          {weekDates.map((day, i) => (
-            <h1 key={i} className="uppercase text-base lg:text-xl xl:text-2xl">
-              {correctForTimezone(day).toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}
-            </h1>
-          ))}
-        </div>
         <div ref={calendarRef} className="overflow-y-auto overflow-x-hidden custom-scroller">
           <div className="flex">
             <div className="w-12 ml-auto">
@@ -186,92 +191,80 @@ const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormatted
                 );
               })}
             </div>
-            <div className="w-full grid grid-cols-7 gap-[2px]">
-              {weekDates.map((date, i) => {
-                const currDate = new Date(date);
-                const daysEvents = events.filter(event => getFormattedDate(new Date(event.Event_Start_Date)) === getFormattedDate(currDate));
+            <div className="w-full">
+              <div className="day-column hover:z-40 relative flex flex-col justify-between bg-secondary text-secondary-foreground w-full rounded-sm">
+                {[...Array(24)].map((_, j) => (
+                  <div key={j} style={{ height: `${hourHeightPx}px` }} className={`w-full border-b border-primary`}></div>
+                ))}
 
-                daysEvents.sort((a, b) => correctForTimezone(a.Event_Start_Date).getTime() - correctForTimezone(b.Event_Start_Date).getTime());
+                {daysEvents.map(eventData => {
+                  const { id, event, width, height, posX, posY } = eventData;
+                  const startDate = correctForTimezone(event.Event_Start_Date);
+                  const endDate = correctForTimezone(event.Event_End_Date);
+                  const weekdayShort = startDate.toLocaleDateString('en-us', { weekday: "short" });
+                  const formattedDate = `${startDate.getUTCMonth()}/${startDate.getUTCDate()}/${startDate.getUTCFullYear()}`;
+                  const startTime = startDate.toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
+                  const endTime = endDate.toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
+                  return (
+                    <HoverCard key={id}>
+                      <HoverCardTrigger asChild>
+                        <div onClick={() => handleClick()} style={{ top: posY, left: posX, height: height, width: width }} className="absolute cursor-pointer rounded-md bg-accent hover:bg-accent-2 shadow-md border-accent-0 border-l-4 border-l-accent-3 border overflow-hidden">
+                          <p className="font-bold text-textHeading text-xs mx-1 whitespace-nowrap overflow-hidden text-clip">{event.Event_Title}</p>
+                          <p className="text-xs mx-1 whitespace-nowrap overflow-hidden text-clip">{event.Location_Name}</p>
+                          <p className="text-xs mx-1 whitespace-nowrap overflow-hidden text-clip">{event.Primary_Contact}</p>
+                        </div>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="overflow-hidden">
+                          <div className="w-full bg-background py-1 px-2 flex justify-between">
+                            <h1 className="font-light text-base overflow-hidden whitespace-nowrap text-ellipsis"><span className="font-semibold">{event.Congregation_Name}</span> - {event.Primary_Contact}</h1>
+                            <button><FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} /></button>
+                          </div>
+                          <div className="p-2">
+                            <h1 className="text-2xl mx-[2px] font-semibold overflow-hidden whitespace-nowrap text-ellipsis">{event.Event_Title}</h1>
+                            <Separator className="my-2 opacity-25 w-full" />
 
-                const weekEvents = placeEventsInColumns(daysEvents, doEventsOverlap);
-                const adjustedWeekEvents = adjustForOverlap(weekEvents);
 
-                return (
-                  <div key={i} style={{ animationDelay: `${20 * i}ms` }} className="day-column hover:z-40 relative flex flex-col justify-between bg-secondary text-secondary-foreground w-full rounded-sm">
-                    {[...Array(24)].map((_, j) => (
-                      <div key={j} style={{ height: `${hourHeightPx}px` }} className={`w-full border-b border-primary`}></div>
-                    ))}
 
-                    {adjustedWeekEvents.map(eventData => {
-                      const { id, event, width, height, posX, posY } = eventData;
-                      const startDate = correctForTimezone(event.Event_Start_Date);
-                      const endDate = correctForTimezone(event.Event_End_Date);
-                      const weekdayShort = startDate.toLocaleDateString('en-us', { weekday: "short" });
-                      const formattedDate = `${startDate.getUTCMonth()}/${startDate.getUTCDate()}/${startDate.getUTCFullYear()}`;
-                      const startTime = startDate.toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
-                      const endTime = endDate.toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
-                      return (
-                        <HoverCard key={id}>
-                          <HoverCardTrigger asChild>
-                            <div onClick={() => handleClick()} style={{ top: posY, left: posX, height: height, width: width }} className="absolute cursor-pointer rounded-md bg-accent hover:bg-accent-2 shadow-md border-accent-0 border-l-4 border-l-accent-3 border overflow-hidden">
-                              <p className="font-bold text-textHeading text-xs mx-1 whitespace-nowrap overflow-hidden text-clip">{event.Event_Title}</p>
-                              <p className="text-xs mx-1 whitespace-nowrap overflow-hidden text-clip">{event.Location_Name}</p>
-                              <p className="text-xs mx-1 whitespace-nowrap overflow-hidden text-clip">{event.Primary_Contact}</p>
-                            </div>
-                          </HoverCardTrigger>
-                          <HoverCardContent className="w-80" align={i < 2 ? "start" : i > 4 ? "end" : "center"}>
-                            <div className="overflow-hidden">
-                              <div className="w-full bg-background py-1 px-2 flex justify-between">
-                                <h1 className="font-light text-base overflow-hidden whitespace-nowrap text-ellipsis"><span className="font-semibold">{event.Congregation_Name}</span> - {event.Primary_Contact}</h1>
-                                <button><FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} /></button>
+                            <div className="flex gap-2 items-center">
+                              <div>
+                                <FontAwesomeIcon icon={faClock} className="text-xl aspect-square mb-2" />
                               </div>
-                              <div className="p-2">
-                                <h1 className="text-2xl mx-[2px] font-semibold overflow-hidden whitespace-nowrap text-ellipsis">{event.Event_Title}</h1>
+                              <div className="w-full overflow-hidden">
+                                <p className="overflow-hidden whitespace-nowrap text-ellipsis">{weekdayShort} {formattedDate} {startTime} - {endTime}</p>
                                 <Separator className="my-2 opacity-25 w-full" />
-
-
-
-                                <div className="flex gap-2 items-center">
-                                  <div>
-                                    <FontAwesomeIcon icon={faClock} className="text-xl aspect-square mb-2" />
-                                  </div>
-                                  <div className="w-full overflow-hidden">
-                                    <p className="overflow-hidden whitespace-nowrap text-ellipsis">{weekdayShort} {formattedDate} {startTime} - {endTime}</p>
-                                    <Separator className="my-2 opacity-25 w-full" />
-                                  </div>
-                                </div>
-
-                                {event.Location_Name && <div className="flex gap-2 items-center">
-                                  <div>
-                                    <FontAwesomeIcon icon={faLocationDot} className="text-xl aspect-square mb-2" />
-                                  </div>
-                                  <div className="w-full overflow-hidden">
-                                    <p className="overflow-hidden whitespace-nowrap text-ellipsis">{event.Location_Name}{event.Booked_Rooms && ` | ${event.Booked_Rooms}`}</p>
-                                    <Separator className="my-2 opacity-25 w-full" />
-                                  </div>
-                                </div>}
-
-                                <div className="flex gap-2 items-center">
-                                  <div>
-                                    <FontAwesomeIcon icon={faFolderOpen} className="text-xl aspect-square" />
-                                  </div>
-                                  <div className="w-full overflow-hidden">
-                                    <p className="overflow-hidden whitespace-nowrap text-ellipsis">{event.Event_Type}</p>
-                                    <Separator className="opacity-0 w-full" />
-                                  </div>
-                                </div>
-
-
-
                               </div>
                             </div>
-                          </HoverCardContent>
-                        </HoverCard>
-                      );
-                    })}
-                  </div>
-                );
-              })}
+
+                            {event.Location_Name && <div className="flex gap-2 items-center">
+                              <div>
+                                <FontAwesomeIcon icon={faLocationDot} className="text-xl aspect-square mb-2" />
+                              </div>
+                              <div className="w-full overflow-hidden">
+                                <p className="overflow-hidden whitespace-nowrap text-ellipsis">{event.Location_Name}{event.Booked_Rooms && ` | ${event.Booked_Rooms}`}</p>
+                                <Separator className="my-2 opacity-25 w-full" />
+                              </div>
+                            </div>}
+
+                            <div className="flex gap-2 items-center">
+                              <div>
+                                <FontAwesomeIcon icon={faFolderOpen} className="text-xl aspect-square" />
+                              </div>
+                              <div className="w-full overflow-hidden">
+                                <p className="overflow-hidden whitespace-nowrap text-ellipsis">{event.Event_Type}</p>
+                                <Separator className="opacity-0 w-full" />
+                              </div>
+                            </div>
+
+
+
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -280,4 +273,4 @@ const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormatted
   );
 };
 
-export default WeekCalendar;
+export default DayCalendar;

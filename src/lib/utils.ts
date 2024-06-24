@@ -6,6 +6,16 @@ import axios from 'axios';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
+
+
+export const settings: CalendarSettings = {
+  showCancelled: false
+}
+
+interface CalendarSettings {
+  showCancelled: boolean;
+}
+
 export interface OAuthConfig {
   issuer: string;
   jwks_uri: string;
@@ -53,7 +63,15 @@ export interface MPEvent {
 export interface MPLocation {
   Location_ID: number;
   Location_Name: string;
-  Congregation_Name: string;
+  Retired: boolean;
+  Buildings: string | null;
+  Rooms: string | null;
+}
+
+export interface MPBuilding {
+  Location_Name: string;
+  Building_Name: string;
+  Rooms: string[]
 }
 
 export interface User {
@@ -218,14 +236,16 @@ export function getFormattedDate(date: Date): string {
 
 export class CalendarDate extends Date {
   getWeek(this: CalendarDate): number {
-    var date = new Date(this.getTime());
+    var date = new Date(this.getUTCFullYear(), this.getUTCMonth(), this.getUTCDate());
     date.setHours(0, 0, 0, 0);
-    // Thursday in current week decides the year.
-    date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-    // January 4 is always in week 1.
-    var week1 = new Date(date.getFullYear(), 0, 4);
-    // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-    return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+    // Set the date to the nearest Sunday (the start of the week)
+    date.setDate(date.getUTCDate() - date.getUTCDay());
+    // January 1 is always in week 1
+    var week1 = new Date(date.getUTCFullYear(), 0, 1);
+    // Adjust to the nearest Sunday in week 1
+    week1.setDate(week1.getUTCDate() - week1.getUTCDay());
+    // Calculate the number of weeks from week1 to the current date
+    return Math.ceil(((date.getTime() - week1.getTime()) / 86400000 + 1) / 7);
   }
 }
 
