@@ -35,66 +35,82 @@ const doEventsOverlap = (event1: MPEvent, event2: MPEvent): boolean => {
   return start1 < end2 && start2 < end1;
 };
 
+const placeEventsInColumns = (events: MPEvent[], doEventsOverlap: (event1: MPEvent, event2: MPEvent) => boolean, hourHeightPx: number) => {
+  const columns: WeekEvent[][] = [];
+  const eventsWithColumns: WeekEvent[] = [];
+
+  events.forEach(event => {
+    const startDate = new Date(event.Event_Start_Date);
+    const endDate = new Date(event.Event_End_Date);
+    const eventLength = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+    const startHours = startDate.getUTCHours() + startDate.getUTCMinutes() / 60;
+
+    const eventData: WeekEvent = {
+      id: event.Event_ID,
+      event: event,
+      width: '',
+      height: `${eventLength * hourHeightPx}px`,
+      posX: '',
+      posY: `${startHours * hourHeightPx}px`
+    };
+
+    let placed = false;
+
+    for (let col = 0; col < columns.length; col++) {
+      if (!columns[col].some(colEvent => doEventsOverlap(colEvent.event, event))) {
+        columns[col].push(eventData);
+        placed = true;
+        break;
+      }
+    }
+
+    if (!placed) {
+      columns.push([eventData]);
+    }
+
+    eventsWithColumns.push(eventData);
+  });
+
+  return eventsWithColumns;
+};
+
 const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, handleClick }) => {
-  const hourHeightPx = 96;
+  const [hourHeightPx, setHourHeightPx] = useState(window.innerWidth < 768 ? 56 : 96);
   const calendarRef = useRef<HTMLDivElement>(null);
 
   const [daysEvents, setDaysEvents] = useState<Array<WeekEvent>>([]);
 
   useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setHourHeightPx(56);
+      } else {
+        setHourHeightPx(96);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
     if (calendarRef.current) {
       calendarRef.current.scrollTop = 7 * hourHeightPx;
     }
-  }, []);
+  }, [hourHeightPx]);
 
   useEffect(() => {
     const currDate = new Date(date);
     const tempDaysEvents = events.filter(event => getFormattedDate(new Date(event.Event_Start_Date)) === getFormattedDate(currDate));
     tempDaysEvents.sort((a, b) => correctForTimezone(a.Event_Start_Date).getTime() - correctForTimezone(b.Event_Start_Date).getTime());
 
-    const initialColumnsEvents = placeEventsInColumns(tempDaysEvents, doEventsOverlap);
+    const initialColumnsEvents = placeEventsInColumns(tempDaysEvents, doEventsOverlap, hourHeightPx);
     const adjustedDaysEvents = adjustForOverlap(initialColumnsEvents);
     setDaysEvents(adjustedDaysEvents);
-  }, [events, date, getFormattedDate]);
-
-  const placeEventsInColumns = (events: MPEvent[], doEventsOverlap: (event1: MPEvent, event2: MPEvent) => boolean) => {
-    const columns: WeekEvent[][] = [];
-    const eventsWithColumns: WeekEvent[] = [];
-
-    events.forEach(event => {
-      const startDate = new Date(event.Event_Start_Date);
-      const endDate = new Date(event.Event_End_Date);
-      const eventLength = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-      const startHours = startDate.getUTCHours() + startDate.getUTCMinutes() / 60;
-
-      const eventData: WeekEvent = {
-        id: event.Event_ID,
-        event: event,
-        width: '',
-        height: `${eventLength * hourHeightPx}px`,
-        posX: '',
-        posY: `${startHours * hourHeightPx}px`
-      };
-
-      let placed = false;
-
-      for (let col = 0; col < columns.length; col++) {
-        if (!columns[col].some(colEvent => doEventsOverlap(colEvent.event, event))) {
-          columns[col].push(eventData);
-          placed = true;
-          break;
-        }
-      }
-
-      if (!placed) {
-        columns.push([eventData]);
-      }
-
-      eventsWithColumns.push(eventData);
-    });
-
-    return eventsWithColumns;
-  };
+  }, [events, date, getFormattedDate, hourHeightPx]);
 
   const adjustForOverlap = (weekEvents: WeekEvent[]) => {
     // Check if two events collide (i.e. overlap).
@@ -172,9 +188,8 @@ const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, 
     return weekEvents;
   };
 
-
   return (
-    <div className="w-[1280px] max-w-full h-full mx-auto">
+    <div className="w-full max-w-screen-xl h-full mx-auto">
       <div className="h-full flex flex-col">
         <div ref={calendarRef} className="overflow-y-auto overflow-x-hidden custom-scroller">
           <div className="flex">
@@ -183,8 +198,8 @@ const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, 
                 const hour = j === 0 ? 12 : j > 12 ? j - 12 : j;
                 const period = j >= 12 ? 'PM' : 'AM';
                 return (
-                  <div key={j} className="h-24">
-                    <p className="text-center text-textHeading px-1 text-xs">
+                  <div key={j} style={{ height: `${hourHeightPx}px` }}>
+                    <p className="text-center text-textHeading px-1 text-xs whitespace-nowrap">
                       {hour} {period}
                     </p>
                   </div>
@@ -202,7 +217,7 @@ const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, 
                   const startDate = correctForTimezone(event.Event_Start_Date);
                   const endDate = correctForTimezone(event.Event_End_Date);
                   const weekdayShort = startDate.toLocaleDateString('en-us', { weekday: "short" });
-                  const formattedDate = `${startDate.getUTCMonth()}/${startDate.getUTCDate()}/${startDate.getUTCFullYear()}`;
+                  const formattedDate = `${startDate.getUTCMonth() + 1}/${startDate.getUTCDate()}/${startDate.getUTCFullYear()}`;
                   const startTime = startDate.toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
                   const endTime = endDate.toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
                   return (
@@ -223,8 +238,6 @@ const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, 
                           <div className="p-2">
                             <h1 className="text-2xl mx-[2px] font-semibold overflow-hidden whitespace-nowrap text-ellipsis">{event.Event_Title}</h1>
                             <Separator className="my-2 opacity-25 w-full" />
-
-
 
                             <div className="flex gap-2 items-center">
                               <div>
@@ -255,8 +268,6 @@ const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, 
                                 <Separator className="opacity-0 w-full" />
                               </div>
                             </div>
-
-
 
                           </div>
                         </div>

@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback, useContext, useRef } from 'rea
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight, faMagnifyingGlass } from '@awesome.me/kit-10a739193a/icons/classic/light';
+import { faArrowLeft, faArrowRight, faBars, faClose, faCross, faHamburger, faMagnifyingGlass } from '@awesome.me/kit-10a739193a/icons/classic/light';
 import { LoadingContext, MPEvent, MPLocation, correctForTimezone, CalendarDate, getFormattedDate, MPBuilding, settings } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -83,8 +83,10 @@ export default function Calendar() {
   const [selectedRoom, setSelectedRoom] = useState<string>("All Rooms");
   const [calendarView, setCalendarView] = useState<string>('month');
 
-  const [isDayPopupOpen, setIsDayPopupOpen] = useState<boolean>(false);
+  const [isDayPopupOpen, setIsDayPopupOpen] = useState<boolean>(true);
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
+
+  const [mobileFilterDropdownOpen, setMobileFilterDropdownOpen] = useState<boolean>(false);
 
   const setDateValuesFromDate = (date: CalendarDate): void => {
     // console.log(year
@@ -234,49 +236,54 @@ export default function Calendar() {
   return (
     <>
       <DayPopup open={isDayPopupOpen} setOpen={setIsDayPopupOpen} date={selectedDay} events={events.filter(e => sameDay(correctForTimezone(e.Event_Start_Date), selectedDay))} />
-      <article className="flex flex-col gap-2 md:gap-4 w-full">
-        <div className="w-full h-max bg-primary p-4 md:rounded-sm shadow-sm">
-          <div className="mx-auto max-w-screen-xl grid grid-cols-2 gap-2">
+      <article className="flex flex-col gap-2 md:gap-4 w-full overflow-hidden">
+        <div className="w-full h-max bg-primary p-2 md:p-4 md:rounded-sm shadow-sm">
+          <div className="mx-auto max-w-screen-xl grid grid-cols-4 md:grid-cols-2 overflow-hidden">
 
-            <div className="flex">
+            <div className="flex col-span-3 md:col-span-1 items-center">
               {calendarView === "month" && <>
                 <Button variant="icon" onClick={prevMonth}><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                <h1 className="md:w-52 text-center whitespace-nowrap">{months[month]} {year}</h1>
+                <h1 className="md:text-xl text-lg mx-2 text-center whitespace-nowrap">{months[month]} {year}</h1>
                 <Button variant="icon" onClick={nextMonth}><FontAwesomeIcon icon={faArrowRight} /></Button>
               </>}
               {calendarView === "week" && <>
                 <Button variant="icon" onClick={prevWeek}><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                <h1 className="mx-4 text-center whitespace-nowrap">{correctForTimezone(weekDates[0]).toLocaleDateString('en-us', { month: "short", day: "numeric" })} - {correctForTimezone(weekDates[weekDates.length - 1]).toLocaleDateString('en-us', { month: "short", day: "numeric" })}, {year}</h1>
+                <h1 className="md:text-xl text-base mx-2 text-center whitespace-nowrap">{correctForTimezone(weekDates[0]).toLocaleDateString('en-us', { month: "short", day: "numeric" })} - {correctForTimezone(weekDates[weekDates.length - 1]).toLocaleDateString('en-us', { month: "short", day: "numeric" })}, {year}</h1>
                 <Button variant="icon" onClick={nextWeek}><FontAwesomeIcon icon={faArrowRight} /></Button>
               </>}
               {calendarView === "day" && <>
                 <Button variant="icon" onClick={prevDay}><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                <h1 className="mx-4 text-center whitespace-nowrap">{new Date(year, month, day).toLocaleDateString('en-us', { weekday: "short", month: "short", day: "numeric" })}, {year}</h1>
+                <h1 className="md:text-xl text-base mx-2 text-center whitespace-nowrap">{new Date(year, month, day).toLocaleDateString('en-us', { weekday: "short", month: "short", day: "numeric" })}, {year}</h1>
                 <Button variant="icon" onClick={nextDay}><FontAwesomeIcon icon={faArrowRight} /></Button>
               </>}
             </div>
 
-            <div className="bg-background rounded-full w-10 h-10 ml-auto overflow-hidden relative">
-              <input type="text" placeholder="Search Events..." className="w-full h-full scale-x-0 outline-none bg-transparent pl-4 pr-8 text-textHeading" />
+            <div className="hidden md:block bg-background rounded-full h-10 min-w-[294px] ml-auto overflow-hidden relative" onClick={() => setMobileFilterDropdownOpen(v => !v)}>
+              <input type="text" placeholder="Search Events..." className="w-full h-full outline-none bg-transparent pl-4 pr-8 text-textHeading" />
               <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute top-0 right-0 text-textHeading grid place-items-center h-4 p-3 aspect-square" />
             </div>
 
-            <div className="w-full col-span-2 custom-scroller overflow-x-auto">
+            <div className="md:hidden bg-background rounded-full w-10 h-10 ml-auto overflow-hidden relative" onClick={() => setMobileFilterDropdownOpen(v => !v)}>
+              <FontAwesomeIcon icon={mobileFilterDropdownOpen ? faClose : faBars} className="absolute top-0 right-0 text-textHeading grid place-items-center h-4 p-3 aspect-square" />
+            </div>
 
-              <div className="w-max flex  py-1 gap-2 order-3 xl:order-2">
+            <div style={{ gridTemplateRows: mobileFilterDropdownOpen ? "1fr" : "0fr" }} className="md:block w-full col-span-4 grid transition-[grid-template-rows]">
+
+              <div className="grid gap-2 order-3 overflow-hidden md:flex md:mt-2">
+                <div className="md:hidden"></div>
                 <Select value={calendarView} onValueChange={(val) => setCalendarView(val)}>
-                  <SelectTrigger className="w-[150px]">
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="month">Month</SelectItem>
-                    <SelectItem value="week">Week</SelectItem>
+                    <SelectItem value="week" className="hidden md:block">Week</SelectItem>
                     <SelectItem value="day">Day</SelectItem>
                   </SelectContent>
                 </Select>
 
                 <Select value={selectedLocation} onValueChange={(val) => setSelectedLocation(val)}>
-                  <SelectTrigger className="w-[150px]">
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -286,7 +293,7 @@ export default function Calendar() {
                 </Select>
 
                 <Select value={selectedBuilding} onValueChange={(val) => setSelectedBuilding(val)}>
-                  <SelectTrigger className="w-[150px]">
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -296,7 +303,7 @@ export default function Calendar() {
                 </Select>
 
                 <Select value={selectedRoom} onValueChange={(val) => setSelectedRoom(val)}>
-                  <SelectTrigger className="w-[150px]">
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -310,26 +317,24 @@ export default function Calendar() {
 
         </div>
 
-        <div className="row-span-11 w-full h-full bg-primary md:rounded-sm shadow-sm p-4">
-          {/* <div className="w-full h-full overflow-hidden">
-            {calendarView === "month" && <MonthCalendar
-              monthDates={monthDates}
-              events={events}
-              handleClick={(date: Date) => { setIsDayPopupOpen(true); setSelectedDay(date) }}
-            />}
-            {calendarView === "week" && <WeekCalendar
-              weekDates={weekDates}
-              events={events}
-              getFormattedDate={getFormattedDate}
-              handleClick={() => console.log('yeet')}
-            />}
-            {calendarView === "day" && <DayCalendar
-              date={new Date(Date.UTC(year, month, day))}
-              events={events}
-              getFormattedDate={getFormattedDate}
-              handleClick={() => console.log('yeet')}
-            />}
-          </div> */}
+        <div className="bg-primary grow md:rounded-sm shadow-sm p-2 md:p-4 overflow-auto">
+          {calendarView === "month" && <MonthCalendar
+            monthDates={monthDates}
+            events={events}
+            handleClick={(date: Date) => { setIsDayPopupOpen(true); setSelectedDay(date) }}
+          />}
+          {calendarView === "week" && <WeekCalendar
+            weekDates={weekDates}
+            events={events}
+            getFormattedDate={getFormattedDate}
+            handleClick={() => console.log('yeet')}
+          />}
+          {calendarView === "day" && <DayCalendar
+            date={new Date(Date.UTC(year, month, day))}
+            events={events}
+            getFormattedDate={getFormattedDate}
+            handleClick={() => console.log('yeet')}
+          />}
         </div>
       </article>
     </>

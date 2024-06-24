@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   HoverCard,
   HoverCardContent,
@@ -35,54 +35,70 @@ const doEventsOverlap = (event1: MPEvent, event2: MPEvent): boolean => {
   return start1 < end2 && start2 < end1;
 };
 
+const placeEventsInColumns = (events: MPEvent[], doEventsOverlap: (event1: MPEvent, event2: MPEvent) => boolean, hourHeightPx: number) => {
+  const columns: WeekEvent[][] = [];
+  const eventsWithColumns: WeekEvent[] = [];
+
+  events.forEach(event => {
+    const startDate = new Date(event.Event_Start_Date);
+    const endDate = new Date(event.Event_End_Date);
+    const eventLength = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+    const startHours = startDate.getUTCHours() + startDate.getUTCMinutes() / 60;
+
+    const eventData: WeekEvent = {
+      id: event.Event_ID,
+      event: event,
+      width: '',
+      height: `${eventLength * hourHeightPx}px`,
+      posX: '',
+      posY: `${startHours * hourHeightPx}px`
+    };
+
+    let placed = false;
+
+    for (let col = 0; col < columns.length; col++) {
+      if (!columns[col].some(colEvent => doEventsOverlap(colEvent.event, event))) {
+        columns[col].push(eventData);
+        placed = true;
+        break;
+      }
+    }
+
+    if (!placed) {
+      columns.push([eventData]);
+    }
+
+    eventsWithColumns.push(eventData);
+  });
+
+  return eventsWithColumns;
+};
+
 const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormattedDate, handleClick }) => {
-  const hourHeightPx = 96;
+  const [hourHeightPx, setHourHeightPx] = useState(window.innerWidth < 768 ? 56 : 96);
   const calendarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setHourHeightPx(56);
+      } else {
+        setHourHeightPx(96);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (calendarRef.current) {
       calendarRef.current.scrollTop = 7 * hourHeightPx;
     }
   }, []);
-
-  const placeEventsInColumns = (events: MPEvent[], doEventsOverlap: (event1: MPEvent, event2: MPEvent) => boolean) => {
-    const columns: WeekEvent[][] = [];
-    const eventsWithColumns: WeekEvent[] = [];
-
-    events.forEach(event => {
-      const startDate = new Date(event.Event_Start_Date);
-      const endDate = new Date(event.Event_End_Date);
-      const eventLength = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
-      const startHours = startDate.getUTCHours() + startDate.getUTCMinutes() / 60;
-
-      const eventData: WeekEvent = {
-        id: event.Event_ID,
-        event: event,
-        width: '',
-        height: `${eventLength * hourHeightPx}px`,
-        posX: '',
-        posY: `${startHours * hourHeightPx}px`
-      };
-
-      let placed = false;
-
-      for (let col = 0; col < columns.length; col++) {
-        if (!columns[col].some(colEvent => doEventsOverlap(colEvent.event, event))) {
-          columns[col].push(eventData);
-          placed = true;
-          break;
-        }
-      }
-
-      if (!placed) {
-        columns.push([eventData]);
-      }
-
-      eventsWithColumns.push(eventData);
-    });
-
-    return eventsWithColumns;
-  };
 
   const adjustForOverlap = (weekEvents: WeekEvent[]) => {
     // Check if two events collide (i.e. overlap).
@@ -178,8 +194,8 @@ const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormatted
                 const hour = j === 0 ? 12 : j > 12 ? j - 12 : j;
                 const period = j >= 12 ? 'PM' : 'AM';
                 return (
-                  <div key={j} className="h-24">
-                    <p className="text-center text-textHeading px-1 text-xs">
+                  <div key={j} style={{ height: `${hourHeightPx}px` }}>
+                    <p className="text-center text-textHeading px-1 text-xs whitespace-nowrap">
                       {hour} {period}
                     </p>
                   </div>
@@ -193,7 +209,7 @@ const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormatted
 
                 daysEvents.sort((a, b) => correctForTimezone(a.Event_Start_Date).getTime() - correctForTimezone(b.Event_Start_Date).getTime());
 
-                const weekEvents = placeEventsInColumns(daysEvents, doEventsOverlap);
+                const weekEvents = placeEventsInColumns(daysEvents, doEventsOverlap, hourHeightPx);
                 const adjustedWeekEvents = adjustForOverlap(weekEvents);
 
                 return (

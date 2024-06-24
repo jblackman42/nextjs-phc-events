@@ -1,38 +1,27 @@
-import { useContext, useEffect } from 'react';
 import Popup from './Popup';
-import { UserContext, MPEvent, correctForTimezone } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-
-
+import { MPEvent, correctForTimezone } from '@/lib/utils';
 
 function DayPopup({ open = null, setOpen, date, events }: { open: Boolean | null, setOpen: Function, date: Date, events: MPEvent[] }) {
-  const { user } = useContext(UserContext);
-
-  return user && <Popup open={open} setOpen={setOpen}>
-    <div className="max-h-[600px]">
-      <div>
+  return <Popup open={open} setOpen={setOpen}>
+    <div className="max-h-[90dvh] h-max flex flex-col overflow-hidden">
+      <div className="sticky top-0 bg-secondary p-2 border-b-4 border-primary shadow-md">
         <h1>{date.toLocaleDateString('en-us', { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</h1>
-        <p>{events.length} Events</p>
-        <Separator className="my-4" />
+        <p>{events.length} Event{events.length !== 1 ? "s" : ""}</p>
       </div>
-      <div>
+      <div className="max-h-[550px] grid gap-2 p-2 bg-secondary custom-scroller overflow-auto">
         {events.map((event, i) => {
           const startTime = correctForTimezone(event.Event_Start_Date).toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
           const endTime = correctForTimezone(event.Event_End_Date).toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
-          return <div key={i}>
-            {i !== 0 && <Separator className="my-4" />}
-            <div className="flex justify-between items-center">
-              <h1 className="text-textHeading text-lg">{event.Event_Title}</h1>
-              <Button variant="thin" size="sm">More Info</Button>
+          const pcDisplayName = `${event.Primary_Contact.split(', ')[1]} ${event.Primary_Contact.split(', ')[0]}`
+          return <button key={i}>
+            <div style={{ borderColor: event.Featured_On_Calendar ? "#fcc200" : "" }} className="grid grid-cols-2 text-sm bg-primary p-2 rounded-sm border-l-4 border-accent transition-[border-width] hover:border-l-8 shadow-md text-left">
+              <p className="col-start-1">{event.Event_Type}</p>
+              <p className="col-start-2 text-right">{pcDisplayName}</p>
+              <p className="col-span-2 text-textHeading text-lg font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{event.Event_Title}</p>
+              <p className="col-start-1">{startTime} - {endTime}</p>
+              <p className="col-start-2 text-right">{event.Location_Name}</p>
             </div>
-            <div className="grid grid-cols-3">
-              <p className="w-max">{startTime} - {endTime}</p>
-              <p className="text-center">{event.Event_Type}</p>
-              <p className="text-right">{event.Location_Name}</p>
-            </div>
-          </div>
+          </button>
         })}
       </div>
     </div>
