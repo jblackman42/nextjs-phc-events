@@ -3,16 +3,9 @@ import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   const keyword = request.nextUrl.searchParams.get('keyword');
-  // const startDate = request.nextUrl.searchParams.get('startDate');
-  // const endDate = request.nextUrl.searchParams.get('endDate');
-
-  // if (!startDate || !endDate) {
-  //   return NextResponse.json({ error: "Missing required query parameters" }, { status: 400 });
-  // }
-
+  const targetDate = request.nextUrl.searchParams.get('targetDate') ?? new Date();
   try {
-    // const result = await db.queryFromPath('search', { startDate, endDate });
-    const result = await db.queryFromPath('search', { keyword });
+    const result = await db.queryFromPath('search', { keyword, targetDate });
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
     console.error('Error fetching events:', error);

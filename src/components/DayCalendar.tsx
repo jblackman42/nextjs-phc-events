@@ -23,7 +23,7 @@ interface CalendarProps {
   date: Date;
   events: MPEvent[];
   getFormattedDate: (date: Date) => string;
-  handleClick: () => void;
+  handleClick: (event: MPEvent) => void;
 }
 
 const doEventsOverlap = (event1: MPEvent, event2: MPEvent): boolean => {
@@ -223,7 +223,7 @@ const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, 
                   return (
                     <HoverCard key={id}>
                       <HoverCardTrigger asChild>
-                        <div onClick={() => handleClick()} style={{ top: posY, left: posX, height: height, width: width }} className="absolute cursor-pointer rounded-md bg-accent hover:bg-accent-2 shadow-md border-accent-0 border-l-4 border-l-accent-3 border overflow-hidden">
+                        <div onClick={() => handleClick(event)} style={{ top: posY, left: posX, height: height, width: width }} className="absolute cursor-pointer rounded-md bg-accent hover:bg-accent-2 shadow-md border-accent-0 border-l-4 border-l-accent-3 border overflow-hidden">
                           <p className="font-bold text-textHeading text-xs mx-1 whitespace-nowrap overflow-hidden text-clip">{event.Event_Title}</p>
                           <p className="text-xs mx-1 whitespace-nowrap overflow-hidden text-clip">{event.Location_Name}</p>
                           <p className="text-xs mx-1 whitespace-nowrap overflow-hidden text-clip">{event.Primary_Contact}</p>
@@ -233,10 +233,10 @@ const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, 
                         <div className="overflow-hidden">
                           <div className="w-full bg-background py-1 px-2 flex justify-between">
                             <h1 className="font-light text-base overflow-hidden whitespace-nowrap text-ellipsis"><span className="font-semibold">{event.Congregation_Name}</span> - {event.Primary_Contact}</h1>
-                            <button><FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} /></button>
+                            <button onClick={() => handleClick(event)}><FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} /></button>
                           </div>
                           <div className="p-2">
-                            <h1 className="text-2xl mx-[2px] font-semibold overflow-hidden whitespace-nowrap text-ellipsis">{event.Event_Title}</h1>
+                            <h1 className="text-2xl mx-[2px] font-semibold overflow-hidden whitespace-nowrap text-ellipsis" title={event.Event_Title}>{event.Event_Title}</h1>
                             <Separator className="my-2 opacity-25 w-full" />
 
                             <div className="flex gap-2 items-center">
@@ -254,7 +254,7 @@ const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, 
                                 <FontAwesomeIcon icon={faLocationDot} className="text-xl aspect-square mb-2" />
                               </div>
                               <div className="w-full overflow-hidden">
-                                <p className="overflow-hidden whitespace-nowrap text-ellipsis">{event.Location_Name}{event.Booked_Rooms && ` | ${event.Booked_Rooms}`}</p>
+                                <p className="overflow-hidden whitespace-nowrap text-ellipsis">{event.Location_Name}</p>
                                 <Separator className="my-2 opacity-25 w-full" />
                               </div>
                             </div>}

@@ -36,7 +36,7 @@
     --ring: #090909;
 
     --radius: 0.5rem;
-    --smoky: #000000bb;
+    --smoky: #000000de;
   }
 
   .dark {
@@ -69,7 +69,7 @@
   h5,
   h6 {
     color: var(--heading-text);
-    font-weight: bold;
+    font-weight: 600;
     text-transform: capitalize;
     @apply text-2xl;
   }
@@ -112,11 +112,8 @@
   }
 
   .popup-container {
-    z-index: -1;
-
 
     &.open {
-      z-index: 50;
       opacity: 1;
 
       .popup {
@@ -125,7 +122,6 @@
     }
 
     &.close {
-      z-index: 999;
       animation:
         fadeOut 100ms linear forwards,
         hide 1ms linear 100ms forwards;

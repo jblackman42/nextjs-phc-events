@@ -4,6 +4,7 @@ SELECT
   ET.Event_Type,
   CO.Congregation_Name,
   L.Location_Name,
+  L.Location_ID,
   E.Meeting_Instructions,
   E.Description,
   P.Program_Name,
@@ -15,18 +16,45 @@ SELECT
   E.Event_End_Date,
   E.Cancelled,
   E.Featured_On_Calendar,
+  VL.Visibility_Level,
   UC.Display_Name AS "Created_By",
-  CONCAT((SELECT Base_URI FROM dp_Domains WHERE Domain_ID = 1), (SELECT TOP 1 Page_ID FROM dp_Pages PG WHERE PG.Display_Name = 'Events'), '/', E.Event_ID) AS "Event_Path",
-  STUFF(
-    (
-      SELECT ', ' + R.Room_Name
-      FROM Event_Rooms ER
-      JOIN Rooms R ON R.Room_ID = ER.Room_ID
-      WHERE ER.Event_ID = E.Event_ID AND ER.Cancelled = 0
-      ORDER BY R.Room_Name
-      FOR XML PATH(''), TYPE
-    ).value('.', 'NVARCHAR(MAX)'), 1, 2, ''
-  ) AS Booked_Rooms
+  CONCAT(
+    (SELECT Base_URI FROM dp_Domains WHERE Domain_ID = 1),
+    (SELECT TOP 1 Page_ID FROM dp_Pages PG WHERE PG.Display_Name = 'Events'),
+    '/', E.Event_ID
+  ) AS "Event_Path",
+  COALESCE((
+    SELECT DISTINCT
+      B.Building_ID,
+      B.Building_Name
+    FROM Event_Rooms ER
+    JOIN Rooms R ON R.Room_ID = ER.Room_ID
+    JOIN Buildings B ON B.Building_ID = R.Building_ID
+    WHERE ER.Event_ID = E.Event_ID AND ER.Cancelled = 0
+    FOR JSON PATH
+  ), '[]') AS Booked_Buildings,
+  COALESCE((
+    SELECT DISTINCT
+      R.Room_ID,
+      R.Room_Name
+    FROM Event_Rooms ER
+    JOIN Rooms R ON R.Room_ID = ER.Room_ID
+    WHERE ER.Event_ID = E.Event_ID AND ER.Cancelled = 0
+    ORDER BY R.Room_Name
+    FOR JSON PATH
+  ), '[]') AS Booked_Rooms,
+  COALESCE((
+    SELECT DISTINCT
+      S.Service_Name,
+      C.Display_Name AS 'Service_Contact',
+      ES._Approved AS 'Approved'
+    FROM Event_Services ES
+    JOIN Servicing S ON S.Service_ID = ES.Service_ID
+    JOIN Contacts C ON C.Contact_ID = S.Contact_ID
+    WHERE ES.Event_ID = E.Event_ID AND ES.Cancelled = 0
+    ORDER BY S.Service_Name
+    FOR JSON PATH
+  ), '[]') AS Requested_Services
 FROM Events E
 LEFT JOIN Programs P ON P.Program_ID = E.Program_ID
 LEFT JOIN Contacts C ON C.Contact_ID = E.Primary_Contact
@@ -35,6 +63,7 @@ LEFT JOIN Contacts UC ON UC.Contact_ID = U.Contact_ID
 LEFT JOIN Congregations CO ON CO.Congregation_ID = E.Congregation_ID
 LEFT JOIN Locations L ON L.Location_ID = E.Location_ID
 LEFT JOIN Event_Types ET ON ET.Event_Type_ID = E.Event_Type_ID
+LEFT JOIN Visibility_Levels VL ON VL.Visibility_Level_ID = E.Visibility_Level_ID
 WHERE
   E.Event_Start_Date BETWEEN @startDate AND @endDate
 ORDER BY E.Event_Start_Date;

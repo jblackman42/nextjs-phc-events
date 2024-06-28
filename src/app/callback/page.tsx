@@ -1,21 +1,22 @@
-"use client"
-import { useSearchParams, useRouter } from 'next/navigation'
-import { useEffect, useRef } from 'react'
-import { AuthData, saveAuthData } from "@/lib/utils"
-import axios from 'axios'
+"use client";
+import { Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
+import { AuthData, saveAuthData } from "@/lib/utils";
+import axios from 'axios';
 
-export default function Callback() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const initialized = useRef(false)
+function CallbackComponent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialized = useRef(false);
 
   useEffect(() => {
-    if (initialized.current) return
+    if (initialized.current) return;
     (async () => {
       try {
-        initialized.current = true
-        const code = searchParams.get('code')
-        const session_state = searchParams.get('session_state')
+        initialized.current = true;
+        const code = searchParams.get('code');
+        const session_state = searchParams.get('session_state');
         const auth: AuthData = await axios({
           method: 'POST',
           url: '/api/token',
@@ -25,23 +26,28 @@ export default function Callback() {
             code: code,
             session_state: session_state
           }
-        })
-          .then(response => response.data)
+        }).then(response => response.data);
 
-        const desiredPath = window.sessionStorage.getItem('desired_path') ?? '/'
+        const desiredPath = window.sessionStorage.getItem('desired_path') ?? '/';
 
-        saveAuthData(auth, session_state ?? '')
+        saveAuthData(auth, session_state ?? '');
 
-        router.push(desiredPath)
+        router.push(desiredPath);
       } catch (error) {
         // console.log(error)
-        router.push('/')
+        router.push('/');
         // handle the error
       }
-    })()
-  }, [searchParams, router])
+    })();
+  }, [searchParams, router]);
 
+  return <h1>Loading...</h1>;
+}
+
+export default function Callback() {
   return (
-    <h1>Loading...</h1>
-  )
+    <Suspense fallback={<h1>Loading...</h1>}>
+      <CallbackComponent />
+    </Suspense>
+  );
 }

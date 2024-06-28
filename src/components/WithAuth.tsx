@@ -6,9 +6,13 @@ import axios from 'axios';
 
 import { getOAuthConfig, AuthData, evictUnauthorized, saveAuthData, UserContext, User, getUserType } from "@/lib/utils";
 
-// Update the generic type T to extend JSX.IntrinsicAttributes for compatibility with React's intrinsic attributes.
-export default function WithAuth<T extends object>(WrappedComponent: ComponentType<T> | NextPage<T>): NextPage<T> {
-  const WithAuth: NextPage<T> = (props: T) => {
+// Define the extended props type
+interface WithAuthProps {
+  isAuthenticated: boolean;
+}
+
+export default function WithAuth<T extends object>(WrappedComponent: ComponentType<T & WithAuthProps> | NextPage<T & WithAuthProps>): NextPage<T & WithAuthProps> {
+  const WithAuth: NextPage<T & WithAuthProps> = (props) => {
     const router = useRouter();
     const initialized = useRef(false);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -22,10 +26,11 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
       setIsAuthenticated(true);
       const user_type = getUserType(userData.roles);
       setUser({ ...userData, user_type: user_type });
-      // console.log('user is logged in.');
     }
+
     const handleLoggedOut = (): void => {
-      // console.log('user is logged out.');
+      setIsAuthenticated(false);
+      setUser(null);
     }
 
     useEffect(() => {
@@ -41,10 +46,8 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
           return;
         }
 
-
         try {
           if (new Date() > new Date(expires_in) && refresh_token) {
-
             const auth: AuthData = await axios({
               method: 'POST',
               url: '/api/token',
@@ -52,8 +55,7 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
                 grant_type: 'refresh_token',
                 refresh_token: refresh_token
               }
-            })
-              .then(response => response.data);
+            }).then(response => response.data);
 
             saveAuthData(auth);
             access_token = auth.token_type + ' ' + auth.access_token;
@@ -65,38 +67,22 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
             headers: {
               Authorization: access_token
             }
-          })
-            .then(response => response.data);
+          }).then(response => response.data);
 
           handleLoggedIn(userInfo);
         } catch (error) {
           handleLoggedOut();
         }
       })();
-      // Pseudo-code: Check authentication status
-      // If not authenticated:
-      //   - Redirect to login page or handle token refresh
+    }, [router]);
 
-      // If authenticated:
-      //   - Optionally fetch additional user data or perform other actions
-
-      // Example:
-      // const token = localStorage.getItem('accessToken');
-      // if (!token) {
-      //   router.push('/login');
-      // } else {
-      //   // Verify token and handle result
-      // }
-
-    }, [router]); // Dependency array includes router to react to changes in routing
-
-    // Return the wrapped component with all its props
-    return <UserContext.Provider value={{ user, updateGlobalUser }}>
-      <WrappedComponent {...props} isAuthenticated={isAuthenticated} />
-    </UserContext.Provider>
+    return (
+      <UserContext.Provider value={{ user, updateGlobalUser }}>
+        <WrappedComponent {...props} isAuthenticated={isAuthenticated} />
+      </UserContext.Provider>
+    );
   };
 
-  // If the WrappedComponent has getInitialProps, we need to copy it over
   if ('getInitialProps' in WrappedComponent) {
     WithAuth.getInitialProps = WrappedComponent.getInitialProps;
   }

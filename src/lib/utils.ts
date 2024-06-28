@@ -9,11 +9,13 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 
 
 export const settings: CalendarSettings = {
-  showCancelled: false
+  showCancelledEvents: false,
+  showRetiredLocations: false
 }
 
 interface CalendarSettings {
-  showCancelled: boolean;
+  showCancelledEvents: boolean;
+  showRetiredLocations: boolean;
 }
 
 export interface OAuthConfig {
@@ -40,38 +42,52 @@ export interface OAuthConfig {
 }
 
 export interface MPEvent {
-  Booked_Rooms: string;
+  Booked_Buildings: MPBuilding[];
+  Booked_Rooms: MPRoom[];
+  Requested_Services: MPService[];
   Event_ID: number;
   Event_Title: string;
   Event_Type: string;
   Congregation_Name: string;
   Location_Name: string;
-  Meeting_Instructions: string;
-  Description: string;
+  Location_ID: number;
+  Meeting_Instructions: string | null;
+  Description: string | null;
   Program_Name: string;
   Primary_Contact: string;
-  Participants_Expected: number;
+  Participants_Expected: number | null;
   Minutes_for_Setup: number;
   Minutes_for_Cleanup: number;
   Event_Start_Date: string;
   Event_End_Date: string;
   Cancelled: boolean;
   Featured_On_Calendar: boolean;
-  Created_By: string;
+  Visibility_Level: string;
+  Created_By: string | null;
+}
+
+export interface MPService {
+  Service_Name: string;
+  Service_Contact: string;
+  Approved: boolean;
 }
 
 export interface MPLocation {
   Location_ID: number;
   Location_Name: string;
   Retired: boolean;
-  Buildings: string | null;
-  Rooms: string | null;
+  Buildings: MPBuilding[];
 }
 
 export interface MPBuilding {
-  Location_Name: string;
+  Building_ID: number;
   Building_Name: string;
-  Rooms: string[]
+  Rooms: MPRoom[]
+}
+
+export interface MPRoom {
+  Room_ID: number;
+  Room_Name: string;
 }
 
 export interface User {

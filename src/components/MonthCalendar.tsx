@@ -16,17 +16,7 @@ const MonthCalendar: React.FC<CalendarProps> = ({ monthDates, events, handleClic
       {monthDates.map((date, i) => {
         const currDate = correctForTimezone(date);
         const dateNum = currDate.getUTCDate();
-        const daysEvents = events.filter(
-          event =>
-            getFormattedDate(new Date(event.Event_Start_Date)) === getFormattedDate(currDate)
-          // && (selectedLocation === 'All Locations' || event.Location_Name === selectedLocation)
-        );
-
-        // const handleClick = () => {
-        //   setSelectedDate(currDate.toLocaleDateString('en-us', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }))
-        //   setSelectedDayEvents(daysEvents);
-        //   setDayPopupOpen(true);
-        // }
+        const daysEvents = events.filter(event => getFormattedDate(new Date(event.Event_Start_Date)) === getFormattedDate(currDate));
 
         const fullDayCount = 21;
 

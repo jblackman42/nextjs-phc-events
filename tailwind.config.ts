@@ -65,12 +65,18 @@ const config = {
         "fade-slide-down": {
           from: { opacity: "0", transform: "translate(5%, 20%)" },
           to: { opacity: "1", transform: "translate(0,0)" }
+        },
+        "skeleton-breathe": {
+          "0%": { backgroundColor: "var(--primary)" },
+          "50%": { backgroundColor: "var(--secondary)" },
+          "100%": { backgroundColor: "var(--primary)" }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-slide-down": "fade-slide-down 500ms ease-in-out forwards"
+        "fade-slide-down": "fade-slide-down 500ms ease-in-out forwards",
+        "skeleton-breathe": "skeleton-breathe 2s ease-in-out infinite"
       },
     },
   },

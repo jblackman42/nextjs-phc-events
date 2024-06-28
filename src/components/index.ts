@@ -5,6 +5,9 @@ import AccountPopup from "./AccountPopup";
 import Calendar from "./Calendar";
 import Loading from "./Loading";
 import DayPopup from "./DayPopup";
+import EventPopup from "./EventPopup";
+import SearchBar from "./SearchBar";
+import DatePicker from "./DatePicker";
 
 export {
   WithAuth,
@@ -13,5 +16,8 @@ export {
   AccountPopup,
   Calendar,
   Loading,
-  DayPopup
+  DayPopup,
+  EventPopup,
+  SearchBar,
+  DatePicker
 }
