@@ -238,23 +238,23 @@ export default function Calendar() {
               <div className="w-max flex items-center relative">
                 {calendarView === "month" && <>
                   <Button variant="icon" onClick={prevMonth}><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                  <button onClick={() => setIsDatePickerOpen(true)} className="mx-2"><h1 className="date-picker-trigger md:text-xl text-lg mx-2 min-w-40 text-center whitespace-nowrap hover:underline">{months[month]} {year}</h1></button>
+                  <button onClick={() => setIsDatePickerOpen(x => !x)} className="mx-2"><h1 className="date-picker-trigger md:text-xl text-lg mx-2 min-w-40 text-center whitespace-nowrap hover:underline">{months[month]} {year}</h1></button>
                   <Button variant="icon" onClick={nextMonth}><FontAwesomeIcon icon={faArrowRight} /></Button>
                 </>}
                 {calendarView === "week" && <>
                   <Button variant="icon" onClick={prevWeek}><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                  <h1 className="md:text-xl text-base mx-2 text-center whitespace-nowrap">{correctForTimezone(weekDates[0]).toLocaleDateString('en-us', { month: "short", day: "numeric" })} - {correctForTimezone(weekDates[weekDates.length - 1]).toLocaleDateString('en-us', { month: "short", day: "numeric" })}, {year}</h1>
+                  <button onClick={() => setIsDatePickerOpen(x => !x)} className="mx-2"><h1 className="date-picker-trigger md:text-xl text-base mx-2 text-center whitespace-nowrap hover:underline">{correctForTimezone(weekDates[0]).toLocaleDateString('en-us', { month: "short", day: "numeric" })} - {correctForTimezone(weekDates[weekDates.length - 1]).toLocaleDateString('en-us', { month: "short", day: "numeric" })}, {year}</h1></button>
                   <Button variant="icon" onClick={nextWeek}><FontAwesomeIcon icon={faArrowRight} /></Button>
                 </>}
                 {calendarView === "day" && <>
                   <Button variant="icon" onClick={prevDay}><FontAwesomeIcon icon={faArrowLeft} /></Button>
-                  <h1 className="md:text-xl text-base mx-2 text-center whitespace-nowrap">{new Date(year, month, day).toLocaleDateString('en-us', { weekday: "short", month: "short", day: "numeric" })}, {year}</h1>
+                  <button onClick={() => setIsDatePickerOpen(x => !x)} className="mx-2"><h1 className="date-picker-trigger md:text-xl text-base mx-2 text-center whitespace-nowrap hover:underline">{new Date(year, month, day).toLocaleDateString('en-us', { weekday: "short", month: "short", day: "numeric" })}, {year}</h1></button>
                   <Button variant="icon" onClick={nextDay}><FontAwesomeIcon icon={faArrowRight} /></Button>
                 </>}
 
                 {isDatePickerOpen && (
-                  <div id="date-picker-container" className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 z-50">
-                    <DatePicker year={year} month={month} day={day} handleSubmit={(d) => console.log(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())} />
+                  <div id="date-picker-container" className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 z-[999]">
+                    <DatePicker year={year} month={month} week={week} day={day} calendarView={calendarView} handleSubmit={(d) => console.log(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())} />
                   </div>
                 )}
               </div>

@@ -133,6 +133,10 @@
   }
 }
 
+.week-picker:hover button {
+  background-color: var(--primary) !important;
+}
+
 .loading-container {
   position: fixed;
   inset: 0;

@@ -10,7 +10,7 @@ interface CalendarProps {
 const MonthCalendar: React.FC<CalendarProps> = ({ monthDates, events, handleClick }) => {
   return (<>
     <div className="w-full mb-2 text-center grid grid-cols-7 gap-1 lg:gap-2 max-w-screen-xl mx-auto">
-      {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, i) => <div key={i}><h1 className="uppercase font-normal text-base xl:text-xl"><span>{day[0]}</span><span className="hidden lg:inline-block">{day.slice(1, day.length)}</span></h1></div>)}
+      {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, i) => <div key={i}><h1 className="lg:uppercase font-normal text-base xl:text-xl"><span>{day.slice(0, 2)}</span><span className="hidden lg:inline-block">{day.slice(2, day.length)}</span></h1></div>)}
     </div>
     <div className="grid grid-cols-7 gap-1 lg:gap-2 max-w-screen-xl mx-auto">
       {monthDates.map((date, i) => {
