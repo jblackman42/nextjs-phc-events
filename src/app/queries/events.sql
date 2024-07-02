@@ -22,7 +22,7 @@ SELECT
     (SELECT Base_URI FROM dp_Domains WHERE Domain_ID = 1),
     (SELECT TOP 1 Page_ID FROM dp_Pages PG WHERE PG.Display_Name = 'Events'),
     '/', E.Event_ID
-  ) AS "Event_Path",
+  ) AS Event_Path,
   COALESCE((
     SELECT DISTINCT
       B.Building_ID,
@@ -54,7 +54,18 @@ SELECT
     WHERE ES.Event_ID = E.Event_ID AND ES.Cancelled = 0
     ORDER BY S.Service_Name
     FOR JSON PATH
-  ), '[]') AS Requested_Services
+  ), '[]') AS Requested_Services,
+  COALESCE((
+    SELECT DISTINCT
+      EQ.Equipment_Name,
+      EE.Quantity,
+      EE._Approved AS 'Approved'
+    FROM Event_Equipment EE
+    JOIN Equipment EQ ON EQ.Equipment_ID = EE.Equipment_ID
+    WHERE EE.Event_ID = E.Event_ID AND EE.Cancelled = 0
+    ORDER BY EQ.Equipment_Name
+    FOR JSON PATH
+  ), '[]') AS Requested_Equipment
 FROM Events E
 LEFT JOIN Programs P ON P.Program_ID = E.Program_ID
 LEFT JOIN Contacts C ON C.Contact_ID = E.Primary_Contact

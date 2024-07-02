@@ -254,7 +254,7 @@ export default function Calendar() {
 
                 {isDatePickerOpen && (
                   <div id="date-picker-container" className="absolute top-full left-1/2 -translate-x-1/2 translate-y-1 z-[999]">
-                    <DatePicker year={year} month={month} week={week} day={day} calendarView={calendarView} handleSubmit={(d) => console.log(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())} />
+                    <DatePicker year={year} month={month} week={week} day={day} calendarView={calendarView} handleSubmit={(d) => setDateValuesFromDate(d)} />
                   </div>
                 )}
               </div>

@@ -32,7 +32,7 @@ function getCalendarDates(year: number, month: number): string[] {
   return dates;
 }
 
-export default function DatePicker({ year, month, week, day, calendarView, handleSubmit }: { year: number, month: number, week: number, day: number, calendarView: string, handleSubmit: (date: Date) => void }) {
+export default function DatePicker({ year, month, week, day, calendarView, handleSubmit }: { year: number, month: number, week: number, day: number, calendarView: string, handleSubmit: (date: CalendarDate) => void }) {
   const [tempYear, setTempYear] = useState(year);
   const [tempMonth, setTempMonth] = useState(month);
 
@@ -64,7 +64,7 @@ export default function DatePicker({ year, month, week, day, calendarView, handl
   const MonthPicker = () => {
     return (
       <div className="grid grid-cols-4 gap-1 group">
-        {months.map((m, i) => <button key={i} onClick={() => handleSubmit(new Date(Date.UTC(tempYear, i, 1)))} data-selected={tempYear === year && month === i} className="bg-primary rounded-[2px] py-2 hover:!bg-accent group-hover:bg-primary data-[selected=true]:bg-accent">{m}</button>)}
+        {months.map((m, i) => <button key={i} onClick={() => handleSubmit(new CalendarDate(Date.UTC(tempYear, i, 1)))} data-selected={tempYear === year && month === i} className="bg-primary rounded-[2px] py-2 hover:!bg-accent group-hover:bg-primary data-[selected=true]:bg-accent">{m}</button>)}
       </div>
     )
   };
@@ -84,7 +84,7 @@ export default function DatePicker({ year, month, week, day, calendarView, handl
           <p>Sa</p>
         </div>
         {datesByWeek.map((weekArr, i) => {
-          const weekStart = new Date(weekArr[0]);
+          const weekStart = new CalendarDate(weekArr[0]);
           return <div key={i} className="grid grid-cols-7 gap-1 group">
             {weekArr.map((dateStr, i) => {
               const currDate = new CalendarDate(dateStr);
@@ -109,7 +109,7 @@ export default function DatePicker({ year, month, week, day, calendarView, handl
         <p className="text-center text-sm">Fr</p>
         <p className="text-center text-sm">Sa</p>
         {dates.map((dateStr, i) => {
-          const currDate = new Date(dateStr);
+          const currDate = new CalendarDate(dateStr);
           const isSelected = currDate.getUTCFullYear() === year && currDate.getUTCMonth() === month && currDate.getUTCDate() === day;
           return <button key={i} onClick={() => handleSubmit(currDate)} data-selected={isSelected} className="group-hover:bg-primary hover:!bg-accent bg-primary aspect-square grid place-items-center rounded-sm data-[selected=true]:bg-accent">{new CalendarDate(dateStr).getUTCDate()}</button>
         })}
