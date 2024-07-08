@@ -90,7 +90,7 @@ function SearchBar({ targetDate, handleClick }: { targetDate?: string, handleCli
 
   return (
     <div
-      className="bg-background rounded-full h-10 w-full relative"
+      className="bg-background rounded-full h-10 w-full relative border border-input"
       onFocus={handleFocus}
       onBlur={handleBlur}
       tabIndex={-1}

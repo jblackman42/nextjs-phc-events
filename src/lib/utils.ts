@@ -1,21 +1,18 @@
 "use client";
-import { SetStateAction, createContext } from "react";
+import { createContext } from "react";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import axios from 'axios';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import Cookies from 'js-cookie';
 
-
-
-export const settings: CalendarSettings = {
-  showCancelledEvents: false,
-  showRetiredLocations: false
-}
-
-interface CalendarSettings {
-  showCancelledEvents: boolean;
-  showRetiredLocations: boolean;
+export interface AuthData {
+  id_token: string;
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
 }
 
 export interface OAuthConfig {
@@ -39,6 +36,15 @@ export interface OAuthConfig {
   id_token_signing_alg_values_supported: Array<string>;
   code_challenge_methods_supported: Array<string>;
   token_endpoint_auth_methods_supported: Array<string>;
+}
+
+export interface WeekEvent {
+  id: number;
+  event: MPEvent;
+  width: string;
+  height: string;
+  posX: string;
+  posY: string;
 }
 
 export interface MPEvent {
@@ -200,18 +206,23 @@ export function saveAuthData(authData: AuthData, session_state?: string): void {
   const token_expire_date = new Date();
   token_expire_date.setSeconds(token_expire_date.getSeconds() + expires_in);
 
-  window.localStorage.setItem('id_token', id_token);
-  window.localStorage.setItem('access_token', token_type + ' ' + access_token);
-  window.localStorage.setItem('refresh_token', refresh_token);
-  window.localStorage.setItem('expires_in', token_expire_date.toISOString());
-  if (session_state) window.localStorage.setItem('session_state', session_state);
+  const isSecure = window.location.protocol === 'https:';
+
+  Cookies.set('id_token', id_token, { path: '/', secure: isSecure, sameSite: 'Strict' });
+  Cookies.set('access_token', `${token_type} ${access_token}`, { path: '/', secure: isSecure, sameSite: 'Strict' });
+  Cookies.set('refresh_token', refresh_token, { path: '/', secure: isSecure, sameSite: 'Strict' });
+  Cookies.set('expires_in', token_expire_date.toISOString(), { path: '/', secure: isSecure, sameSite: 'Strict' });
+  if (session_state) {
+    Cookies.set('session_state', session_state, { path: '/', secure: isSecure, sameSite: 'Strict' });
+  }
 }
+
 export function deleteAuthData(): void {
-  window.localStorage.removeItem('id_token');
-  window.localStorage.removeItem('access_token');
-  window.localStorage.removeItem('refresh_token');
-  window.localStorage.removeItem('expires_in');
-  window.localStorage.removeItem('session_state');
+  Cookies.remove('id_token', { path: '/' });
+  Cookies.remove('access_token', { path: '/' });
+  Cookies.remove('refresh_token', { path: '/' });
+  Cookies.remove('expires_in', { path: '/' });
+  Cookies.remove('session_state', { path: '/' });
 }
 
 export function getUserType(roles: Array<string>): string {
@@ -278,18 +289,58 @@ interface UserContextType {
   updateGlobalUser: (userData: User) => void
 }
 
+interface ThemeType {
+  theme: string | null,
+  toggleTheme: () => void
+}
+const Theme: ThemeType = {
+  theme: '',
+  toggleTheme: () => { }
+}
+export const ThemeContext = createContext(Theme);
+
 export const LoadingContext = createContext({
   loading: false,
   updateLoading: (value: boolean) => { }
-});
-export const ThemeContext = createContext({
-  theme: '',
-  toggleTheme: () => { }
 });
 export const UserContext = createContext<UserContextType>({
   user: null,
   updateGlobalUser: () => { }
 });
+
+export interface CalendarSettings {
+  showCancelledEvents: Function;
+  showRetiredLocations: Function;
+}
+
+interface CalendarSettingsType {
+  settings: CalendarSettings | null,
+  updateSettings: (value: CalendarSettings) => void
+}
+
+export const SettingsContext = createContext<CalendarSettingsType>({
+  settings: null,
+  updateSettings: (value: CalendarSettings) => { }
+})
+
+export const createSetting = (value: boolean, name: string, id?: string) => {
+  return (() => {
+    const func = () => func.value;
+    func.value = value;
+    func.id = id ?? generateUid();
+    Object.defineProperty(func, 'name', {
+      value: name,
+      writable: true,
+      configurable: true,
+    });
+
+    return func;
+  })();
+}
+
+export const generateUid = () => {
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
+}
 
 export function copy(text: string): Promise<void> {
   return new Promise((resolve, reject): void => {

@@ -31,7 +31,6 @@ const LinkOrButton: React.FC<LinkOrButtonProps> = ({ navLink }) => {
 };
 
 const Navbar: React.FC<{ navLinks: NavbarItem[] }> = ({ navLinks }) => {
-  const { theme, toggleTheme } = useContext(ThemeContext);
   return (
     <nav className="bg-primary p-2 md:p-4 md:rounded-sm shadow-sm">
       <ul className="flex flex-col gap-2 md:gap-4 h-full">

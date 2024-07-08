@@ -1,4 +1,5 @@
 SELECT TOP 10
+
   E.Event_ID,
   E.Event_Title,
   ET.Event_Type,
@@ -75,5 +76,6 @@ LEFT JOIN Congregations CO ON CO.Congregation_ID = E.Congregation_ID
 LEFT JOIN Locations L ON L.Location_ID = E.Location_ID
 LEFT JOIN Event_Types ET ON ET.Event_Type_ID = E.Event_Type_ID
 LEFT JOIN Visibility_Levels VL ON VL.Visibility_Level_ID = E.Visibility_Level_ID
+
 WHERE Event_Title LIKE '%' + @keyword + '%'
 ORDER BY ABS(DATEDIFF(DAY, Event_Start_Date, @targetDate)), Event_Title

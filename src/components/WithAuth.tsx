@@ -1,20 +1,17 @@
 "use client";
-import { useState, useEffect, useRef, ComponentType } from 'react';
+import { useState, useEffect, ComponentType } from 'react';
 import { useRouter } from 'next/navigation';
 import { NextPage } from 'next';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+import { getOAuthConfig, AuthData, saveAuthData, UserContext, User, getUserType } from "@/lib/utils";
 
-import { getOAuthConfig, AuthData, evictUnauthorized, saveAuthData, UserContext, User, getUserType } from "@/lib/utils";
-
-// Define the extended props type
 interface WithAuthProps {
   isAuthenticated: boolean;
 }
 
 export default function WithAuth<T extends object>(WrappedComponent: ComponentType<T & WithAuthProps> | NextPage<T & WithAuthProps>): NextPage<T & WithAuthProps> {
   const WithAuth: NextPage<T & WithAuthProps> = (props) => {
-    const router = useRouter();
-    const initialized = useRef(false);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [user, setUser] = useState<User | null>(null);
 
@@ -29,25 +26,26 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
     }
 
     const handleLoggedOut = (): void => {
+      console.log("user not logged in");
       setIsAuthenticated(false);
       setUser(null);
     }
 
     useEffect(() => {
-      if (initialized.current) return;
-      (async () => {
-        initialized.current = true;
+      const authenticate = async () => {
         const { userinfo_endpoint } = await getOAuthConfig();
-        let access_token = window.localStorage.getItem('access_token');
-        const expires_in = window.localStorage.getItem('expires_in');
-        const refresh_token = window.localStorage.getItem('refresh_token');
+        let access_token = Cookies.get('access_token');
+        const expires_in = Cookies.get('expires_in');
+        const refresh_token = Cookies.get('refresh_token');
+
         if (!access_token || !expires_in) {
           handleLoggedOut();
           return;
         }
 
         try {
-          if (new Date() > new Date(expires_in) && refresh_token) {
+          const expires_in_value = new Date(expires_in);
+          if (new Date() > expires_in_value && refresh_token) {
             const auth: AuthData = await axios({
               method: 'POST',
               url: '/api/token',
@@ -73,8 +71,12 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
         } catch (error) {
           handleLoggedOut();
         }
-      })();
-    }, [router]);
+      };
+
+      if (typeof window !== "undefined") {
+        authenticate();
+      }
+    }, []);
 
     return (
       <UserContext.Provider value={{ user, updateGlobalUser }}>

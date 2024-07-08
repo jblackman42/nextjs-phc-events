@@ -13,7 +13,7 @@ function DayPopup({ open = null, setOpen, date, handleClick, events }: { open: B
 
   return <Popup open={open} setOpen={setOpen}>
     <div className="max-h-[90dvh] h-max flex flex-col overflow-hidden">
-      <div className="sticky top-0 bg-secondary p-2 border-b-4 border-primary shadow-md">
+      <div className="sticky top-0 bg-secondary p-2 border-b-4 border-accent shadow-md">
         <h1>{date.toLocaleDateString('en-us', { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</h1>
         <p>{events.length} Event{events.length !== 1 ? "s" : ""}</p>
       </div>

@@ -30,7 +30,7 @@ function formatDisplayName(name: string | null): string {
 
 function EventLabel({ label, value, variant = "default", className }: { label: string, value?: string | null, variant?: "default" | "wide", className?: string }) {
   return value && <div className={variant === "wide" ? `col-span-3` : `col-span-1` + className && ` ${className}`}>
-    <p className="text-xs whitespace-nowrap">{label}:</p>
+    <p className="text-xs font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{label}:</p>
     {variant === "wide"
       ? <p className="text-textHeading bg-primary p-2 mt-1 rounded-sm shadow-md max-h-24 overflow-y-auto custom-scroller">{value}</p>
       : <p title={value} className="text-textHeading whitespace-nowrap overflow-hidden text-ellipsis">{value}</p>
@@ -85,10 +85,10 @@ function EventPopup({ open = null, setOpen, event }: { open: Boolean | null, set
       <div className="max-h-[600px] grid grid-cols-3 gap-1 md:gap-2 p-1 md:p-2 bg-secondary custom-scroller overflow-auto">
         <EventLabel label="Event Date" value={eventDate} />
         <EventLabel label="Event Time" value={`${startTime} - ${endTime}`} />
-        <EventLabel label="Minutes for Setup" value={formatMinutes(event.Minutes_for_Setup)} />
+        <EventLabel label="Setup Time" value={formatMinutes(event.Minutes_for_Setup)} />
         <EventLabel label="Primary Contact" value={formatDisplayName(event.Primary_Contact)} />
         <EventLabel label="Event Type" value={event.Event_Type} />
-        <EventLabel label="Minutes for Cleanup" value={formatMinutes(event.Minutes_for_Cleanup)} />
+        <EventLabel label="Cleanup Time" value={formatMinutes(event.Minutes_for_Cleanup)} />
         <EventLabel label="Location" value={event.Location_Name ?? "None"} />
         <EventLabel label="Congregation" value={event.Congregation_Name} />
         <EventLabel label="Program" value={event.Program_Name} />

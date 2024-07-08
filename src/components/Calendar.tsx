@@ -1,11 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState, useCallback, useContext, useRef } from 'react';
-import { useRouter } from "next/router";
+import { useSearchParams } from 'next/navigation';
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faBars, faClose } from '@awesome.me/kit-10a739193a/icons/classic/light';
-import { LoadingContext, MPEvent, MPLocation, correctForTimezone, CalendarDate, getFormattedDate, MPBuilding, settings, MPRoom } from '@/lib/utils';
+import { LoadingContext, MPEvent, MPLocation, correctForTimezone, CalendarDate, getFormattedDate, MPBuilding, MPRoom, SettingsContext } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import WeekCalendar from './WeekCalendar';
@@ -17,6 +17,7 @@ import SearchBar from './SearchBar';
 import DatePicker from './DatePicker';
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const calendarViewStorageName = "active_calendar_view";
 
 function sameDay(d1: Date, d2: Date) {
   return d1.getFullYear() === d2.getFullYear() &&
@@ -56,9 +57,13 @@ function getDatesOfWeek(year: number, weekNumber: number): string[] {
 }
 
 export default function Calendar() {
+  const { settings } = useContext(SettingsContext);
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const { updateLoading } = useContext(LoadingContext);
   const updateLoadingRef = useRef(updateLoading);
+
+  const selectedCalendarView = sessionStorage.getItem(calendarViewStorageName) ?? "month";
 
   const today = new CalendarDate();
   const [week, setWeek] = useState<number>(today.getWeek());
@@ -74,7 +79,7 @@ export default function Calendar() {
   const [selectedBuildingID, setSelectedBuildingID] = useState<string>("0");
   const [selectedRoomID, setSelectedRoomID] = useState<string>("0");
   const [selectedEvent, setSelectedEvent] = useState<MPEvent | undefined>();
-  const [calendarView, setCalendarView] = useState<string>('month');
+  const [calendarView, setCalendarView] = useState<string>(selectedCalendarView);
 
   const [searchTargetDate, setSearchTargetDate] = useState<string>();
 
@@ -121,6 +126,13 @@ export default function Calendar() {
     setDateValuesFromDate(new CalendarDate(year, month, day - 1));
   }
 
+  const fetchSingleEvent = useCallback(async (id: string) => {
+    return await axios({
+      method: "GET",
+      url: `/api/events/${id}`,
+    }).then(response => response.data);
+  }, []);
+
   const fetchEvents = useCallback(async (startDate: string, endDate: string) => {
     return await axios({
       method: "GET",
@@ -163,11 +175,26 @@ export default function Calendar() {
       }
 
       const locationData: MPLocation[] = await fetchLocations();
-      const filteredLocations = locationData.filter(l => !l.Retired || settings.showRetiredLocations);
+      const filteredLocations = locationData.filter(l => !l.Retired || settings?.showRetiredLocations());
       setLocations(filteredLocations);
 
       const events: MPEvent[] = await fetchEvents(formattedStartDate, formattedLastDate);
       setAllEvents(events);
+
+      sessionStorage.setItem(calendarViewStorageName, calendarView);
+
+      const specificEventID = searchParams.get('id');
+      if (specificEventID) {
+        const specificEvent = await fetchSingleEvent(specificEventID);
+        setSelectedEvent(specificEvent);
+        setIsEventPopupOpen(true);
+
+
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('id');
+        const newPath = `${window.location.pathname}?${newParams.toString()}`;
+        window.history.replaceState(null, '', newPath);
+      }
     } catch (error) {
       console.error(error);
       toast({
@@ -178,7 +205,7 @@ export default function Calendar() {
       });
     }
     updateLoadingRef.current(false);
-  }, [calendarView, year, month, week, day, fetchEvents, fetchLocations, toast]);
+  }, [calendarView, year, month, week, day, fetchSingleEvent, fetchEvents, fetchLocations, toast, searchParams, settings]);
 
   const handleEventClick = (event: MPEvent): void => {
     setSelectedEvent(event);
@@ -196,10 +223,10 @@ export default function Calendar() {
       return (selectedLocationID === '0' || e.Location_ID === parseInt(selectedLocationID))
         && (selectedBuildingID === '0' || BookedBuildingIDs.includes(parseInt(selectedBuildingID)))
         && (selectedRoomID === '0' || BookedRoomIDs.includes(parseInt(selectedRoomID)))
-        && (!e.Cancelled || settings.showCancelledEvents)
+        && (!e.Cancelled || settings?.showCancelledEvents())
     }
     ));
-  }, [selectedLocationID, allEvents, selectedBuildingID, selectedRoomID]);
+  }, [selectedLocationID, allEvents, selectedBuildingID, selectedRoomID, settings]);
 
   useEffect(() => {
     setSelectedRoomID("0");

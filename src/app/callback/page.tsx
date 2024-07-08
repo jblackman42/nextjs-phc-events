@@ -2,8 +2,9 @@
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import { AuthData, saveAuthData } from "@/lib/utils";
 import axios from 'axios';
+import { AuthData, saveAuthData } from '@/lib/utils';
+import { Loading } from '@/components';
 
 function CallbackComponent() {
   const searchParams = useSearchParams();
@@ -41,12 +42,12 @@ function CallbackComponent() {
     })();
   }, [searchParams, router]);
 
-  return <h1>Loading...</h1>;
+  return <Loading />;
 }
 
 export default function Callback() {
   return (
-    <Suspense fallback={<h1>Loading...</h1>}>
+    <Suspense fallback={<Loading />}>
       <CallbackComponent />
     </Suspense>
   );

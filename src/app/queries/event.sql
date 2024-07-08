@@ -77,6 +77,4 @@ LEFT JOIN Locations L ON L.Location_ID = E.Location_ID
 LEFT JOIN Event_Types ET ON ET.Event_Type_ID = E.Event_Type_ID
 LEFT JOIN Visibility_Levels VL ON VL.Visibility_Level_ID = E.Visibility_Level_ID
 
-WHERE
-  E.Event_Start_Date BETWEEN @startDate AND @endDate
-ORDER BY E.Event_Start_Date;
+WHERE E.Event_ID = @Event_ID

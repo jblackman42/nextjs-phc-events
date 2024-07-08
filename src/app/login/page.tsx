@@ -1,7 +1,8 @@
-"use client"
-import { useRouter } from 'next/navigation'
-import { getOAuthConfig, encodeUrlForm } from "@/lib/utils"
-import { useEffect } from "react"
+"use client";
+import { useRouter } from 'next/navigation';
+import { getOAuthConfig, encodeUrlForm } from "@/lib/utils";
+import { useEffect } from "react";
+import { Loading } from '@/components';
 
 export default function Login() {
   const router = useRouter()
@@ -18,5 +19,5 @@ export default function Login() {
     })()
   }, [router])
 
-  return <h1>Loading...</h1>
+  return <Loading />;
 }
