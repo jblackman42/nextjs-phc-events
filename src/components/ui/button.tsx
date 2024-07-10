@@ -10,9 +10,10 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-accent text-accent-foreground border border-2 border-accent",
-        thin: "bg-primary hover:bg-accent hover:text-accent-foreground text-textHeading shadow-sm",
+        thin: "bg-primary hover:bg-accent hover:text-accent-foreground text-textHeading shadow-md",
         icon: "bg-background text-textHeading hover:bg-accent text-xl w-10 rounded-full border border-input",
-        outline: "bg-transparent border text-textHeading"
+        outline: "bg-transparent border text-textHeading",
+        simple: "bg-secondary text-textHeading border border-ring"
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -5,6 +5,7 @@ import { NextPage } from 'next';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { getOAuthConfig, AuthData, saveAuthData, UserContext, User, getUserType } from "@/lib/utils";
+import { Router } from 'next/router';
 
 interface WithAuthProps {
   isAuthenticated: boolean;
@@ -14,6 +15,7 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
   const WithAuth: NextPage<T & WithAuthProps> = (props) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [user, setUser] = useState<User | null>(null);
+    const router = useRouter();
 
     const updateGlobalUser = (userData: User): void => {
       setUser(userData);
@@ -29,6 +31,7 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
       console.log("user not logged in");
       setIsAuthenticated(false);
       setUser(null);
+      router.push('/login');
     }
 
     useEffect(() => {

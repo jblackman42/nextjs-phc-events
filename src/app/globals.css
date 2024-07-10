@@ -96,7 +96,7 @@
       border-radius: 4px;
       background-color: white;
       color: black !important;
-      z-index: 999;
+      z-index: 40;
       pointer-events: none;
       border: 1px solid var(--input);
 
@@ -138,7 +138,7 @@
 
 .week-picker:hover button {
   background-color: var(--primary) !important;
-  color: var(--text-primary) !important;
+  color: var(--text-heading) !important;
 }
 
 .loading-container {

@@ -64,7 +64,7 @@ export default function DatePicker({ year, month, week, day, calendarView, handl
   const MonthPicker = () => {
     return (
       <div className="grid grid-cols-4 gap-1 group">
-        {months.map((m, i) => <button key={i} onClick={() => handleSubmit(new CalendarDate(Date.UTC(tempYear, i, 1)))} data-selected={tempYear === year && month === i} className="bg-primary rounded-[2px] py-2 hover:!bg-accent hover:!text-white group-hover:bg-primary group-hover:text-textPrimary data-[selected=true]:bg-accent data-[selected=true]:text-white">{m}</button>)}
+        {months.map((m, i) => <button key={i} onClick={() => handleSubmit(new CalendarDate(Date.UTC(tempYear, i, 1)))} data-selected={tempYear === year && month === i} className="bg-primary rounded-[2px] py-2 hover:!bg-accent hover:!text-white group-hover:bg-primary group-hover:text-textHeading data-[selected=true]:bg-accent data-[selected=true]:text-white">{m}</button>)}
       </div>
     )
   };
@@ -111,7 +111,7 @@ export default function DatePicker({ year, month, week, day, calendarView, handl
         {dates.map((dateStr, i) => {
           const currDate = new CalendarDate(dateStr);
           const isSelected = currDate.getUTCFullYear() === year && currDate.getUTCMonth() === month && currDate.getUTCDate() === day;
-          return <button key={i} onClick={() => handleSubmit(currDate)} data-selected={isSelected} className="group-hover:bg-primary group-hover:text-textPrimary hover:!bg-accent hover:!text-white bg-primary aspect-square grid place-items-center rounded-sm data-[selected=true]:bg-accent data-[selected=true]:text-white">{new CalendarDate(dateStr).getUTCDate()}</button>
+          return <button key={i} onClick={() => handleSubmit(currDate)} data-selected={isSelected} className="group-hover:bg-primary group-hover:text-textHeading hover:!bg-accent hover:!text-white bg-primary aspect-square grid place-items-center rounded-sm data-[selected=true]:bg-accent data-[selected=true]:text-white">{new CalendarDate(dateStr).getUTCDate()}</button>
         })}
       </div>
     )

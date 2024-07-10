@@ -9,9 +9,11 @@ function AccountPopup({ open = null, setOpen }: { open: Boolean | null, setOpen:
   const { user } = useContext(UserContext)
 
   return user && <Popup open={open} setOpen={setOpen}>
-    <div className="p-2">
-      <h2 className="text-center">user account</h2>
-      <div className="flex mt-4">
+    <div className="bg-secondary">
+      <div className="p-2 border-b-4 border-accent">
+        <h2 className="text-center">user account</h2>
+      </div>
+      <div className="flex p-2">
         <Avatar>
           <AvatarImage src={`/api/files/contact/${user.ext_Contact_GUID}`} />
           <AvatarFallback>{user.ext_First_Name[0] + user.ext_Last_Name[0]}</AvatarFallback>

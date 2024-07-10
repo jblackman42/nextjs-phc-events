@@ -76,13 +76,13 @@ function EventPopup({ open = null, setOpen, event }: { open: Boolean | null, set
       <div className="sticky top-0 bg-secondary p-2 border-b-4 border-accent">
         <h1 className="pr-6">{event.Event_Title}</h1>
       </div>
-      <div className="bg-secondary grid grid-cols-4 gap-1 pt-1 px-1">
+      <div className="bg-secondary grid grid-cols-4 gap-1 p-1 pb-2">
         <a href={event.Event_Path} target="_blank"><Button variant="thin" size="sm" className="w-full">View on MP</Button></a>
         <a href={addToCalendarLink} target="_blank"><Button variant="thin" size="sm" className="w-full">Add to Calendar</Button></a>
         <Button onClick={copyLink} variant="thin" size="sm" className="w-full">{shareMsg}</Button>
         <Link href={`/print?id=${event.Event_ID}`}><Button variant="thin" size="sm" className="w-full">Print</Button></Link>
       </div>
-      <div className="max-h-[600px] grid grid-cols-3 gap-1 md:gap-2 p-1 md:p-2 bg-secondary custom-scroller overflow-auto">
+      <div className="max-h-[600px] grid grid-cols-3 gap-1 md:gap-2 p-1 md:p-2 !pt-0 bg-secondary custom-scroller overflow-auto">
         <EventLabel label="Event Date" value={eventDate} />
         <EventLabel label="Event Time" value={`${startTime} - ${endTime}`} />
         <EventLabel label="Setup Time" value={formatMinutes(event.Minutes_for_Setup)} />
