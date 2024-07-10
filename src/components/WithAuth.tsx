@@ -31,7 +31,7 @@ export default function WithAuth<T extends object>(WrappedComponent: ComponentTy
       console.log("user not logged in");
       setIsAuthenticated(false);
       setUser(null);
-      router.push('/login');
+      // router.push('/login');
     }
 
     useEffect(() => {

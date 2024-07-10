@@ -1,7 +1,7 @@
 "use client";
 import { useContext, useState } from "react";
 import { WithAuth, Navbar, AccountPopup, SettingsPopup, Calendar } from "@/components";
-import { faCalendar, faGear, faRightToBracket, faSun, faMoon, faUser } from '@awesome.me/kit-10a739193a/icons/classic/light';
+import { faCalendar, faGear, faRightToBracket, faBrightness, faMoon, faUser } from '@awesome.me/kit-10a739193a/icons/classic/light';
 import { ThemeContext, SettingsContext, NavbarItem } from "@/lib/utils";
 
 interface Props {
@@ -30,7 +30,7 @@ const Home: React.FC<Props> = ({ isAuthenticated }) => {
     {
       type: "navLink",
       label: theme === "dark" ? "Light Mode" : "Dark Mode",
-      icon: theme === "dark" ? faSun : faMoon,
+      icon: theme === "dark" ? faBrightness : faMoon,
       link: null,
       action: toggleTheme,
     },
