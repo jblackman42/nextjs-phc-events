@@ -1,32 +1,8 @@
 import React, { useState } from 'react';
 import Popup from './Popup';
-import { MPEvent, MPRoom, correctForTimezone, copy } from '@/lib/utils';
+import { MPEvent, MPRoom, correctForTimezone, copy, formatMinutes, pullNumberFromString, formatDisplayName } from '@/lib/utils';
 import { Button } from './ui/button';
 import Link from 'next/link';
-
-function formatMinutes(minutes: number): string {
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-
-  let result = '';
-
-  if (hours > 0) {
-    result += `${hours} hr${hours > 1 ? 's' : ''}`;
-  }
-
-  if (remainingMinutes > 0) {
-    if (hours > 0) {
-      result += ' ';
-    }
-    result += `${remainingMinutes} min${remainingMinutes > 1 ? 's' : ''}`;
-  }
-
-  return result || '0 mins';
-}
-
-function formatDisplayName(name: string | null): string {
-  return name ? `${name.split(', ')[1]} ${name.split(', ')[0]}` : '';
-}
 
 function EventLabel({ label, value, variant = "default", className }: { label: string, value?: string | null, variant?: "default" | "wide", className?: string }) {
   return value && <div className={variant === "wide" ? `col-span-3` : `col-span-1` + className && ` ${className}`}>
@@ -36,11 +12,6 @@ function EventLabel({ label, value, variant = "default", className }: { label: s
       : <p title={value} className="text-textHeading whitespace-nowrap overflow-hidden text-ellipsis">{value}</p>
     }
   </div>
-}
-
-function pullNumberFromString(str: string): number {
-  const matches = str.match(/(\d+)/);
-  return !matches ? Infinity : parseInt(matches[0])
 }
 
 function EventPopup({ open = null, setOpen, event }: { open: Boolean | null, setOpen: Function, event: MPEvent }) {

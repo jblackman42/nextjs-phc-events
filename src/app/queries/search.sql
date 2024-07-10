@@ -37,7 +37,8 @@ SELECT TOP 10
   COALESCE((
     SELECT DISTINCT
       R.Room_ID,
-      R.Room_Name
+      R.Room_Name,
+      R.Building_ID
     FROM Event_Rooms ER
     JOIN Rooms R ON R.Room_ID = ER.Room_ID
     WHERE ER.Event_ID = E.Event_ID AND ER.Cancelled = 0

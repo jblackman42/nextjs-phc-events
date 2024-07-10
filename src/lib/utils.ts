@@ -84,10 +84,14 @@ export interface MPLocation {
   Location_ID: number;
   Location_Name: string;
   Retired: boolean;
-  Buildings: MPBuilding[];
+  Buildings: MPBuildingWithRooms[];
 }
 
 export interface MPBuilding {
+  Building_ID: number;
+  Building_Name: string;
+}
+export interface MPBuildingWithRooms {
   Building_ID: number;
   Building_Name: string;
   Rooms: MPRoom[]
@@ -96,6 +100,7 @@ export interface MPBuilding {
 export interface MPRoom {
   Room_ID: number;
   Room_Name: string;
+  Building_ID: number;
 }
 
 export interface MPEquipment {
@@ -340,6 +345,35 @@ export const createSetting = (value: boolean, name: string, id?: string) => {
 
 export const generateUid = () => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
+}
+
+export function pullNumberFromString(str: string): number {
+  const matches = str.match(/(\d+)/);
+  return !matches ? Infinity : parseInt(matches[0])
+}
+
+export function formatDisplayName(name: string | null): string {
+  return name ? `${name.split(', ')[1]} ${name.split(', ')[0]}` : '';
+}
+
+export function formatMinutes(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  let result = '';
+
+  if (hours > 0) {
+    result += `${hours} hr${hours > 1 ? 's' : ''}`;
+  }
+
+  if (remainingMinutes > 0) {
+    if (hours > 0) {
+      result += ' ';
+    }
+    result += `${remainingMinutes} min${remainingMinutes > 1 ? 's' : ''}`;
+  }
+
+  return result || '0 mins';
 }
 
 export function copy(text: string): Promise<void> {
