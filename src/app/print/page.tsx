@@ -58,7 +58,7 @@ export default function Print() {
   }, [getEventInformation]);
 
   return <article className="m-6">
-    {event && <div className="flex flex-col gap-2 w-full max-w-[8.5in] mx-auto text-white">
+    {event && <div className="flex flex-col gap-2 w-full max-w-[8.5in] mx-auto text-textPrimary">
       <div className="bg-secondary border border-input p-4 rounded-sm relative">
         <div className="w-max min-w-72 max-w-lg mx-auto">
           <a href={`/?id=${searchParams.get('id')}`} className="absolute top-0 left-0 text-xl p-2"><FontAwesomeIcon icon={faArrowLeft} /></a>

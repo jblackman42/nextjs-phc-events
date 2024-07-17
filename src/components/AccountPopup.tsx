@@ -1,12 +1,12 @@
-import { useContext } from 'react'
-import Popup from './Popup'
-import { UserContext } from '@/lib/utils'
+import Popup from './Popup';
+import { useUser } from '@/context/UserContext';
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Link from 'next/link'
+import { logout } from '@/lib/util';
 
-function AccountPopup({ open = null, setOpen }: { open: Boolean | null, setOpen: Function }) {
-  const { user } = useContext(UserContext)
+function AccountPopup({ open = undefined, setOpen }: { open: Boolean | undefined, setOpen: Function }) {
+  const { user } = useUser();
 
   return user && <Popup open={open} setOpen={setOpen}>
     <div className="bg-secondary">
@@ -15,7 +15,7 @@ function AccountPopup({ open = null, setOpen }: { open: Boolean | null, setOpen:
       </div>
       <div className="flex p-2">
         <Avatar>
-          <AvatarImage src={`/api/files/contact/${user.ext_Contact_GUID}`} />
+          <AvatarImage src={`/api/client/files/contact/${user.ext_Contact_GUID}`} />
           <AvatarFallback>{user.ext_First_Name[0] + user.ext_Last_Name[0]}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col justify-center mx-4">
@@ -24,9 +24,7 @@ function AccountPopup({ open = null, setOpen }: { open: Boolean | null, setOpen:
           <p>{user.user_type}</p>
         </div>
         <div className="flex flex-col justify-end ml-auto">
-          <Button variant="default" asChild>
-            <Link href="/logout">Logout</Link>
-          </Button>
+          <Button variant="default" onClick={logout}>Logout</Button>
         </div>
       </div>
     </div>

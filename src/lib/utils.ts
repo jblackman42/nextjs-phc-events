@@ -318,30 +318,15 @@ export interface CalendarSettings {
   showRetiredLocations: Function;
 }
 
-interface CalendarSettingsType {
-  settings: CalendarSettings | null,
-  updateSettings: (value: CalendarSettings) => void
-}
+// interface CalendarSettingsType {
+//   settings: CalendarSettings | null,
+//   updateSettings: (value: CalendarSettings) => void
+// }
 
-export const SettingsContext = createContext<CalendarSettingsType>({
-  settings: null,
-  updateSettings: (value: CalendarSettings) => { }
-})
-
-export const createSetting = (value: boolean, name: string, id?: string) => {
-  return (() => {
-    const func = () => func.value;
-    func.value = value;
-    func.id = id ?? generateUid();
-    Object.defineProperty(func, 'name', {
-      value: name,
-      writable: true,
-      configurable: true,
-    });
-
-    return func;
-  })();
-}
+// export const SettingsContext = createContext<CalendarSettingsType>({
+//   settings: null,
+//   updateSettings: (value: CalendarSettings) => { }
+// })
 
 export const generateUid = () => {
   return Date.now().toString(36) + Math.random().toString(36).substring(2);
