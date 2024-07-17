@@ -6,8 +6,10 @@ import axios from 'axios';
 import { UserProvider } from '@/context/UserContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { ToastProvider } from '@/context/ToastContext';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css'; // Import Font Awesome CSS
+import { ToastClientComponent } from '@/components';
 
 config.autoAddCss = false; // Tell Font Awesome to skip adding the CSS automatically since it's being imported above
 
@@ -35,24 +37,28 @@ const setInitialTheme = `
 `;
 
 const getUserData = async (session: string) => {
-  try {
-    return axios({
-      method: "POST",
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/client/auth/user`,
-      data: { session },
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(response => response.data);
-  } catch (error) {
-    return null;
-  }
+  return axios({
+    method: "POST",
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/client/auth/user`,
+    data: { session },
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }).then(response => response.data);
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const cookieStore = cookies();
-  const sessionCookie = cookieStore.get('session')?.value;
-  const user = sessionCookie ? await getUserData(sessionCookie) : null;
+  let user = null;
+  let errorMessage = '';
+
+  try {
+    const cookieStore = cookies();
+    const sessionCookie = cookieStore.get('session')?.value;
+    user = sessionCookie ? await getUserData(sessionCookie) : null;
+  } catch (error) {
+    // console.log('Failed to find user:', error);
+    errorMessage = "Failed to find user object.";
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -61,12 +67,15 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       </head>
       <body className={font.className}>
         <ThemeProvider>
-          <UserProvider user={user}>
-            <SettingsProvider>
-              <Toaster />
-              {children}
-            </SettingsProvider>
-          </UserProvider>
+          <ToastProvider>
+            <UserProvider user={user}>
+              <SettingsProvider>
+                <Toaster />
+                {children}
+                {errorMessage && <ToastClientComponent key={errorMessage} message={errorMessage} variant="destructive" />}
+              </SettingsProvider>
+            </UserProvider>
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>
