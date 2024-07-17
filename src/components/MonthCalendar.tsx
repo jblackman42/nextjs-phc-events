@@ -1,6 +1,40 @@
 import React from 'react';
-import { MPEvent, getOrdinalSuffix, getFormattedDate, correctForTimezone, CalendarDate } from '@/lib/utils';
+import { MPEvent } from '@/lib/types';
+export function correctForTimezone(date: string): Date {
+  const result = new Date(date);
+  result.setMinutes(result.getMinutes() + result.getTimezoneOffset());
+  return result;
+}
+export function getOrdinalSuffix(value: number | string): string {
+  const num = typeof value === 'string' ? parseInt(value, 10) : value;
 
+  if (isNaN(num)) {
+    throw new Error('Invalid input: not a number');
+  }
+
+  const remainder = num % 100;
+
+  if (remainder >= 11 && remainder <= 13) {
+    return 'th';
+  }
+
+  switch (num % 10) {
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
+  }
+}
+export function getFormattedDate(date: Date): string {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 interface CalendarProps {
   monthDates: string[];
   events: MPEvent[];

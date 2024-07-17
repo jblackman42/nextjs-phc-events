@@ -93,7 +93,17 @@ export interface NavLink {
   link: string | null;
   action: (() => void) | null;
 }
-
+export interface MPLocation {
+  Location_ID: number;
+  Location_Name: string;
+  Retired: boolean;
+  Buildings: MPBuildingWithRooms[];
+}
+export interface MPBuildingWithRooms {
+  Building_ID: number;
+  Building_Name: string;
+  Rooms: MPRoom[]
+}
 export interface MPBuilding {
   Building_ID: number;
   Building_Name: string;
@@ -138,4 +148,19 @@ export interface MPEvent {
   Visibility_Level: string;
   Created_By: string | null;
   Event_Path: string;
+}
+
+export class CalendarDate extends Date {
+  getWeek(this: CalendarDate): number {
+    var date = new Date(this.getUTCFullYear(), this.getUTCMonth(), this.getUTCDate());
+    date.setHours(0, 0, 0, 0);
+    // Set the date to the nearest Sunday (the start of the week)
+    date.setDate(date.getUTCDate() - date.getUTCDay());
+    // January 1 is always in week 1
+    var week1 = new Date(date.getUTCFullYear(), 0, 1);
+    // Adjust to the nearest Sunday in week 1
+    week1.setDate(week1.getUTCDate() - week1.getUTCDay());
+    // Calculate the number of weeks from week1 to the current date
+    return Math.ceil(((date.getTime() - week1.getTime()) / 86400000 + 1) / 7);
+  }
 }

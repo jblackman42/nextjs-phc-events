@@ -1,5 +1,4 @@
-"use client";
-import { createContext } from "react";
+// import { createContext } from "react";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import axios from 'axios';
@@ -238,41 +237,7 @@ export function getUserType(roles: Array<string>): string {
   }
 }
 
-export function correctForTimezone(date: string): Date {
-  const result = new Date(date);
-  result.setMinutes(result.getMinutes() + result.getTimezoneOffset());
-  return result;
-}
-export function getOrdinalSuffix(value: number | string): string {
-  const num = typeof value === 'string' ? parseInt(value, 10) : value;
 
-  if (isNaN(num)) {
-    throw new Error('Invalid input: not a number');
-  }
-
-  const remainder = num % 100;
-
-  if (remainder >= 11 && remainder <= 13) {
-    return 'th';
-  }
-
-  switch (num % 10) {
-    case 1:
-      return 'st';
-    case 2:
-      return 'nd';
-    case 3:
-      return 'rd';
-    default:
-      return 'th';
-  }
-}
-export function getFormattedDate(date: Date): string {
-  const year = date.getUTCFullYear();
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-based
-  const day = String(date.getUTCDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
 
 export class CalendarDate extends Date {
   getWeek(this: CalendarDate): number {
@@ -289,34 +254,7 @@ export class CalendarDate extends Date {
   }
 }
 
-interface UserContextType {
-  user: User | null,
-  updateGlobalUser: (userData: User) => void
-}
 
-interface ThemeType {
-  theme: string | null,
-  toggleTheme: () => void
-}
-const Theme: ThemeType = {
-  theme: '',
-  toggleTheme: () => { }
-}
-export const ThemeContext = createContext(Theme);
-
-export const LoadingContext = createContext({
-  loading: false,
-  updateLoading: (value: boolean) => { }
-});
-export const UserContext = createContext<UserContextType>({
-  user: null,
-  updateGlobalUser: () => { }
-});
-
-export interface CalendarSettings {
-  showCancelledEvents: Function;
-  showRetiredLocations: Function;
-}
 
 // interface CalendarSettingsType {
 //   settings: CalendarSettings | null,
