@@ -150,6 +150,12 @@ export interface MPEvent {
   Event_Path: string;
 }
 
+export interface MPEventCount {
+  Date: string;
+  Event_Count: number;
+  Cancelled_Count: number;
+}
+
 export class CalendarDate extends Date {
   getWeek(this: CalendarDate): number {
     var date = new Date(this.getUTCFullYear(), this.getUTCMonth(), this.getUTCDate());

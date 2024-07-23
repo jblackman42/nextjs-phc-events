@@ -8,6 +8,7 @@ import { SettingsProvider } from '@/context/SettingsContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ToastProvider } from '@/context/ToastContext';
 import { ViewProvider } from '@/context/ViewContext';
+import { CurrentDateProvider } from '@/context/CurrentDateContext';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css'; // Import Font Awesome CSS
 import { ToastClientComponent } from '@/components';
@@ -69,15 +70,17 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={font.className}>
         <ThemeProvider>
           <UserProvider user={user}>
-            <ToastProvider>
-              <SettingsProvider>
-                <ViewProvider>
-                  <Toaster />
-                  {children}
-                  {errorMessage && <ToastClientComponent key={errorMessage} message={errorMessage} variant="destructive" />}
-                </ViewProvider>
-              </SettingsProvider>
-            </ToastProvider>
+            <SettingsProvider>
+              <ViewProvider>
+                <CurrentDateProvider>
+                  <ToastProvider>
+                    <Toaster />
+                    {children}
+                    {errorMessage && <ToastClientComponent key={errorMessage} message={errorMessage} variant="destructive" />}
+                  </ToastProvider>
+                </CurrentDateProvider>
+              </ViewProvider>
+            </SettingsProvider>
           </UserProvider>
         </ThemeProvider>
       </body>

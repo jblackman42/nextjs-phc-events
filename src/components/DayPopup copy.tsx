@@ -1,41 +1,22 @@
-"use client";
-import { useEffect, useRef, useState } from 'react';
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
-import { useCurrentDate } from '@/context/CurrentDateContext';
-import { CalendarDate, MPEvent } from '@/lib/types';
-import { getEvents } from '@/app/actions';
-
-const getDateString = (date: Date | CalendarDate) => {
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  return `${weekdays[date.getUTCDay()]}, ${months[date.getUTCMonth()]} ${date.getUTCDate()}, ${date.getUTCFullYear()}`
+import { useEffect, useRef } from 'react';
+import Popup from './Popup';
+import { MPEvent } from '@/lib/types';
+function correctForTimezone(date: string): Date {
+  const result = new Date(date);
+  result.setMinutes(result.getMinutes() + result.getTimezoneOffset());
+  return result;
 }
-
-const DayPopup = () => {
-  const { currentDate } = useCurrentDate();
-  const [event, setEvents] = useState<MPEvent[]>([]);
+function DayPopup({ open = undefined, setOpen, date, handleClick, events }: { open: Boolean | undefined, setOpen: Function, date: Date, handleClick: (event: MPEvent) => void, events: MPEvent[] }) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    (async () => {
-      const startDate = currentDate.toISOString();
-      const endDate = new Date(currentDate.getTime() + (86400000 - 1)).toISOString();
+    if (scrollContainerRef.current && open) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [open]);
 
-      const newEvents = await getEvents(startDate, endDate);
-      console.log(newEvents);
-    })()
-  }, [currentDate]);
-
-  return <DialogContent>
-    <DialogHeader>
-      <DialogTitle>{getDateString(currentDate)}</DialogTitle>
-      <DialogDescription>{21} Events</DialogDescription>
-    </DialogHeader>
-    {/* <div className="max-h-[90dvh] h-max flex flex-col overflow-hidden">
+  return <Popup open={open} setOpen={setOpen}>
+    <div className="max-h-[90dvh] h-max flex flex-col overflow-hidden">
       <div className="sticky top-0 bg-secondary p-2 border-b-4 border-accent shadow-md">
         <h1>{date.toLocaleDateString('en-us', { weekday: "short", month: "short", day: "numeric", year: "numeric" })}</h1>
         <p>{events.length} Event{events.length !== 1 ? "s" : ""}</p>
@@ -56,8 +37,8 @@ const DayPopup = () => {
           </button>
         })}
       </div>
-    </div> */}
-  </DialogContent>
+    </div>
+  </Popup>
 }
 
 export default DayPopup;

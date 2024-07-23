@@ -1,8 +1,82 @@
 import React, { useState } from 'react';
 import Popup from './Popup';
-import { MPEvent, MPRoom, correctForTimezone, copy, formatMinutes, pullNumberFromString, formatDisplayName } from '@/lib/utils';
+import { MPEvent, MPRoom } from '@/lib/types';
 import { Button } from './ui/button';
 import Link from 'next/link';
+
+function correctForTimezone(date: string): Date {
+  const result = new Date(date);
+  result.setMinutes(result.getMinutes() + result.getTimezoneOffset());
+  return result;
+}
+function formatDisplayName(name: string | null): string {
+  return name ? `${name.split(', ')[1]} ${name.split(', ')[0]}` : '';
+}
+function pullNumberFromString(str: string): number {
+  const matches = str.match(/(\d+)/);
+  return !matches ? Infinity : parseInt(matches[0])
+}
+function formatMinutes(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  let result = '';
+
+  if (hours > 0) {
+    result += `${hours} hr${hours > 1 ? 's' : ''}`;
+  }
+
+  if (remainingMinutes > 0) {
+    if (hours > 0) {
+      result += ' ';
+    }
+    result += `${remainingMinutes} min${remainingMinutes > 1 ? 's' : ''}`;
+  }
+
+  return result || '0 mins';
+}
+function copy(text: string): Promise<void> {
+  return new Promise((resolve, reject): void => {
+    if (typeof navigator !== "undefined" && typeof navigator.clipboard !== "undefined" && typeof navigator.permissions !== "undefined") {
+      const type = "text/plain";
+      const blob = new Blob([text], { type });
+      const data = [new ClipboardItem({ [type]: blob })];
+
+      navigator.permissions.query({ name: "clipboard-write" as PermissionName }).then((permission) => {
+        if (permission.state === "granted" || permission.state === "prompt") {
+          navigator.clipboard.write(data).then(resolve, reject).catch(reject);
+        } else {
+          reject(new Error("Permission not granted!"));
+        }
+      });
+    } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+      const textarea = document.createElement("textarea");
+      textarea.textContent = text;
+      textarea.style.position = "fixed"; // Prevent scrolling to bottom of page in MS Edge.
+      textarea.style.width = '2em';
+      textarea.style.height = '2em';
+      textarea.style.padding = '0';
+      textarea.style.border = 'none';
+      textarea.style.outline = 'none';
+      textarea.style.boxShadow = 'none';
+      textarea.style.background = 'transparent';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        resolve();
+      } catch (e) {
+        document.body.removeChild(textarea);
+        reject(e);
+      }
+    } else {
+      reject(new Error("None of copying methods are supported by this browser!"));
+    }
+  });
+}
 
 function EventLabel({ label, value, variant = "default", className }: { label: string, value?: string | null, variant?: "default" | "wide", className?: string }) {
   return value && <div className={variant === "wide" ? `col-span-3` : `col-span-1` + className && ` ${className}`}>
@@ -14,7 +88,7 @@ function EventLabel({ label, value, variant = "default", className }: { label: s
   </div>
 }
 
-function EventPopup({ open = null, setOpen, event }: { open: Boolean | null, setOpen: Function, event: MPEvent }) {
+function EventPopup({ open = undefined, setOpen, event }: { open: Boolean | undefined, setOpen: Function, event: MPEvent }) {
   const [shareMsg, setShareMsg] = useState<string>("Share");
 
   const eventDate = correctForTimezone(event.Event_Start_Date).toLocaleDateString('en-us', { day: "numeric", month: "short", year: "numeric" });

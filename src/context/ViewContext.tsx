@@ -34,8 +34,15 @@ const ViewContext = createContext<ViewContextType | undefined>(undefined);
 export const ViewProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentView, setCurrentView] = React.useState<View>(getActiveView());
 
+  const setView = (newView: View) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(calendarViewStorageName, newView);
+    }
+    setCurrentView(newView);
+  }
+
   return (
-    <ViewContext.Provider value={{ view: currentView, setView: setCurrentView }}>
+    <ViewContext.Provider value={{ view: currentView, setView: setView }}>
       {children}
     </ViewContext.Provider>
   );

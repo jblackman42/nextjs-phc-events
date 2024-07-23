@@ -2,7 +2,7 @@ import Navbar from "./Navbar";
 import Loading from "./Loading";
 import SettingsPopup from "./SettingsPopup";
 import AccountPopup from "./AccountPopup";
-import CalendarPage from "./CalendarPage";
+// import CalendarPage from "./CalendarPage";
 import PageDefaults from "./PageDefaults";
 import ToastClientComponent from "./ToastClientComponent";
 import Calendar from "./Calendar";
@@ -21,7 +21,7 @@ export {
   AccountPopup,
   PageDefaults,
   ToastClientComponent,
-  CalendarPage,
+  // CalendarPage,
   Calendar,
   // WithAuth,
   // Login,
