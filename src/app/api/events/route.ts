@@ -9,8 +9,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Missing required query parameters" }, { status: 400 });
   }
 
-  console.log(startDate, endDate);
-
   try {
     const result = await db.queryFromPath('events', { startDate, endDate });
     return NextResponse.json(result, { status: 200 });

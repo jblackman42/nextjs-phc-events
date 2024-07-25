@@ -4,7 +4,7 @@ import { MPEvent, MPEventCount, MPLocation } from "@/lib/types";
 import axios from "axios";
 
 export const getEventCounts = cache(async (datesArr: string[]): Promise<MPEventCount[]> => {
-  // await new Promise((resolve) => setTimeout(resolve, 2000));
+  // await new Promise((resolve) => setTimeout(resolve, 20000));
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/events/count`,

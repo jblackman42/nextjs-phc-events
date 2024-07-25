@@ -58,10 +58,10 @@ const MonthCalendarSkeleton = () => {
         const dateNum = currDate.getUTCDate();
 
         return <div key={i} className="text-[2vw] lg:text-[22px] bg-secondary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
-          <div style={{ animationDelay: `${0 + (40 * i)}ms` }} className="m-[0.5em] mx-auto w-11 h-11 bg-primary animate-skeleton-breathe rounded-md"></div>
-          <div style={{ animationDelay: `${500 + (40 * i)}ms` }} className="m-[.15em] mt-auto w-24 h-7 bg-primary animate-skeleton-breathe rounded-md"></div>
+          <div style={{ animationDelay: `${50 * (i % 7)}ms` }} className="m-[0.5em] mx-auto w-11 h-11 bg-primary animate-skeleton-breathe rounded-md"></div>
+          <div style={{ animationDelay: `${50 * (i % 7)}ms` }} className="m-[.15em] mt-auto w-24 h-7 bg-primary animate-skeleton-breathe rounded-md"></div>
           <div className="w-full h-0.5 md:h-2">
-            <div style={{ width: `100%`, animationDelay: `${1000 + (40 * i)}ms` }} className='bg-primary border border-secondary h-full max-w-full rounded-full animate-skeleton-breathe'></div>
+            <div style={{ width: `100%`, animationDelay: `${50 * (i % 7)}ms` }} className='bg-primary h-full max-w-full rounded-full animate-skeleton-breathe'></div>
           </div>
         </div>
       })}

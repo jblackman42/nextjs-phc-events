@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { MPEvent, MPEventCount } from '@/lib/types';
+import { MPEventCount } from '@/lib/types';
 import { useSettings } from '@/context/SettingsContext';
 import { useCurrentDate } from '@/context/CurrentDateContext';
 import {
   DialogTrigger
 } from "@/components/ui/dialog";
+import { useEffect, useState } from 'react';
 
 const fullDayCount = 21;
 
@@ -39,30 +39,32 @@ export function getFormattedDate(date: Date): string {
   const day = String(date.getUTCDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
-interface CalendarProps {
-  monthDates: string[];
-  eventCounts: MPEventCount[];
-  handleClick: (date: Date) => void;
-}
 
 const MonthCalendarClient = ({ eventCounts }: { eventCounts: MPEventCount[] }) => {
   const { settings } = useSettings();
   const { setCurrentDate } = useCurrentDate();
+  const [totalCounts, setTotalCounts] = useState<number[]>([]);
+
+  useEffect(() => {
+    const newTotalCounts = eventCounts.map(count => {
+      return settings.showCancelledEvents.value ? count.Event_Count + count.Cancelled_Count : count.Event_Count;
+    });
+    setTotalCounts(newTotalCounts);
+  }, [eventCounts, settings.showCancelledEvents])
 
   return (<>
     {eventCounts.map((count, i) => {
-      const { Date: date, Event_Count, Cancelled_Count } = count;
-      const currDate = new Date(date);
+      const currDate = new Date(count.Date);
       const dateNum = currDate.getUTCDate();
+      const eventCount = totalCounts[i];
 
-      const totalCount = settings.showCancelledEvents ? Event_Count + Cancelled_Count : Event_Count;
 
       return <DialogTrigger asChild key={i}>
         <button onClick={() => setCurrentDate(currDate)} className="text-[2vw] lg:text-[22px] bg-secondary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
           <h1 className="m-0 mx-auto mt-[0.5em] text-[1.25em] leading-[1.25em] font-normal md:font-semibold">{dateNum}<sup>{getOrdinalSuffix(dateNum)}</sup></h1>
-          <p className="mt-auto mx-[.15em] font-extralight">{totalCount} Event{totalCount !== 1 ? "s" : ""}</p>
+          <p className="mt-auto mx-[.15em] font-extralight">{eventCount} Event{eventCount !== 1 ? "s" : ""}</p>
           <div className="w-full h-0.5 md:h-2">
-            <div style={{ width: `${Math.floor(totalCount / fullDayCount * 100)}%` }} className={`bg-accent h-full max-w-full rounded-full`}></div>
+            <div style={{ width: `${Math.floor(eventCount / fullDayCount * 100)}%` }} className={`bg-accent h-full max-w-full rounded-full`}></div>
           </div>
         </button>
       </DialogTrigger>

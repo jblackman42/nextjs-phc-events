@@ -2,7 +2,9 @@
 import React, { createContext, useContext } from 'react';
 const calendarViewStorageName = "active_calendar_view";
 
-export type View = 'month' | 'week' | 'day';
+export type View = {
+  periodical: 'month' | 'week' | 'day';
+};
 
 type ViewContextType = {
   view: View;
