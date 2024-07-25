@@ -19,7 +19,7 @@ FROM
 -- Main query
 SELECT
     d.[Date] AS [Date],
-    COUNT(e.Event_Start_Date) AS [Event_Count],
+    COUNT(CASE WHEN e.Cancelled = 0 THEN 1 END) AS [Event_Count],
     COUNT(CASE WHEN e.Cancelled = 1 THEN 1 END) AS [Cancelled_Count]
 FROM
     #Dates d

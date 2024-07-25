@@ -60,7 +60,7 @@ const MonthCalendarClient = ({ eventCounts }: { eventCounts: MPEventCount[] }) =
       return <DialogTrigger asChild key={i}>
         <button onClick={() => setCurrentDate(currDate)} className="text-[2vw] lg:text-[22px] bg-secondary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
           <h1 className="m-0 mx-auto mt-[0.5em] text-[1.25em] leading-[1.25em] font-normal md:font-semibold">{dateNum}<sup>{getOrdinalSuffix(dateNum)}</sup></h1>
-          <p className="mt-auto mx-[.15em] font-extralight">{Event_Count} Event{Event_Count !== 1 ? "s" : ""}</p>
+          <p className="mt-auto mx-[.15em] font-extralight">{totalCount} Event{totalCount !== 1 ? "s" : ""}</p>
           <div className="w-full h-0.5 md:h-2">
             <div style={{ width: `${Math.floor(totalCount / fullDayCount * 100)}%` }} className={`bg-accent h-full max-w-full rounded-full`}></div>
           </div>

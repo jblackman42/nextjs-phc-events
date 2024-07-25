@@ -67,9 +67,9 @@ const config = {
           to: { opacity: "1", transform: "translate(0,0)" }
         },
         "skeleton-breathe": {
-          "0%": { backgroundColor: "var(--primary)" },
-          "50%": { backgroundColor: "var(--secondary)" },
-          "100%": { backgroundColor: "var(--primary)" }
+          "0%": { backgroundColor: "var(--secondary)" },
+          "50%": { backgroundColor: "var(--primary)" },
+          "100%": { backgroundColor: "var(--secondary)" }
         }
       },
       animation: {
