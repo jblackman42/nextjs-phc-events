@@ -1,9 +1,9 @@
 import { getEventCounts } from '@/app/actions';
-import MonthCalendarClient from './MonthCalendarClient';
+import MonthCalendarClient from '../MonthCalendarClient';
 import {
   Dialog
 } from "@/components/ui/dialog"
-import DayPopup from "./DayPopup";
+import DayPopup from "../DayPopup";
 
 function getMonthDates(year: number, month: number): string[] {
   const startDate = new Date(Date.UTC(year, month, 1));

@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import WeekCalendar from './WeekCalendar';
 import DayCalendar from './DayCalendar';
-import MonthCalendar from './MonthCalendar';
+import MonthCalendar from './month/MonthCalendar';
 import DayPopup from './DayPopup';
 import EventPopup from './EventPopup';
 import SearchBar from './SearchBar';

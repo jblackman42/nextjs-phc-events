@@ -5,6 +5,7 @@ import axios from "axios";
 
 export const getEventCounts = cache(async (datesArr: string[]): Promise<MPEventCount[]> => {
   // await new Promise((resolve) => setTimeout(resolve, 20000));
+  let result: MPEventCount[] = [];
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/events/count`,
@@ -17,11 +18,12 @@ export const getEventCounts = cache(async (datesArr: string[]): Promise<MPEventC
         body: JSON.stringify({ dateList: datesArr.join(',') })
       }
     )
-    return await res.json()
+    // return await res.json()
+    result = await res.json();
   } catch (error) {
     // console.error(error);
-    return [];
   }
+  return result;
 });
 export const getEvents = cache(async (startDate: string, endDate: string): Promise<MPEvent[]> => {
   try {

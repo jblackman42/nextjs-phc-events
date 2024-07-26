@@ -5,7 +5,7 @@ import AccountPopup from "./AccountPopup";
 // import CalendarPage from "./CalendarPage";
 import PageDefaults from "./PageDefaults";
 import ToastClientComponent from "./ToastClientComponent";
-import Calendar from "./Calendar";
+import Home from "./Home";
 // import WithAuth from "./WithAuth";
 // import Login from "./Login";
 // import DayPopup from "./DayPopup";
@@ -22,7 +22,7 @@ export {
   PageDefaults,
   ToastClientComponent,
   // CalendarPage,
-  Calendar,
+  Home as Calendar,
   // WithAuth,
   // Login,
   // DayPopup,

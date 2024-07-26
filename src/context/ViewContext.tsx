@@ -11,24 +11,12 @@ type ViewContextType = {
   setView: (view: View) => void;
 };
 
-const defaultView: View = "month"
+const defaultView: View = {
+  periodical: "month"
+}
 
 const getActiveView = (): View => {
-  if (typeof window === 'undefined') {
-    return defaultView;
-  }
-
-  const storageView = localStorage.getItem(calendarViewStorageName);
-  switch (storageView) {
-    case 'month':
-      return 'month';
-    case 'week':
-      return 'week';
-    case 'day':
-      return 'day';
-    default:
-      return defaultView;
-  }
+  return defaultView;
 }
 
 const ViewContext = createContext<ViewContextType | undefined>(undefined);
@@ -37,9 +25,9 @@ export const ViewProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentView, setCurrentView] = React.useState<View>(getActiveView());
 
   const setView = (newView: View) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(calendarViewStorageName, newView);
-    }
+    // if (typeof window !== 'undefined') {
+    //   localStorage.setItem(calendarViewStorageName, newView);
+    // }
     setCurrentView(newView);
   }
 
