@@ -1,5 +1,5 @@
 import { getEventCounts } from '@/app/actions';
-import MonthCalendarClient from '../MonthCalendarClient';
+import MonthCalendarClient from './MonthCalendarClient';
 import {
   Dialog
 } from "@/components/ui/dialog"

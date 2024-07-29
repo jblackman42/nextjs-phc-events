@@ -1,9 +1,9 @@
-"use client";
+import MonthCalendar from "./month/MonthCalendar";
 
 const Calendar = () => {
 
   return <>
-    <h1>This is a calendar</h1>
+    <MonthCalendar />
   </>
 }
 

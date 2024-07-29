@@ -46,6 +46,7 @@ const DayPopup = ({ eventCounts = [] }: { eventCounts?: MPEventCount[] }) => {
       const startDate = currentDate.toISOString();
       const endDate = new Date(currentDate.getTime() + (86400000 - 1)).toISOString();
 
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
       const newEvents = await getEvents(startDate, endDate);
       setEvents(newEvents);
       setLoading(false);
