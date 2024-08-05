@@ -1,13 +1,14 @@
 "use client";
 import axios from 'axios';
 import React, { useState, useEffect, useCallback, useContext, useRef } from 'react';
-import { LoadingContext, MPEvent, correctForTimezone, formatMinutes, pullNumberFromString, formatDisplayName } from '@/lib/utils';
+// import { LoadingContext, MPEvent, correctForTimezone, formatMinutes, pullNumberFromString, formatDisplayName } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faClose } from '@awesome.me/kit-10a739193a/icons/classic/light';
+import { MPEvent } from '@/lib/types';
 
 function EventLabel({ label, value, variant = "default", className = "" }: { label: string, value?: string | null, variant?: "default" | "wide", className?: string }) {
   return <div className={variant === "wide" ? `col-span-full w-full` : `col-span-1` + className && ` ${className}`}>
@@ -22,8 +23,8 @@ function EventLabel({ label, value, variant = "default", className = "" }: { lab
 export default function Print() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { updateLoading } = useContext(LoadingContext);
-  const updateLoadingRef = useRef(updateLoading);
+  // const { updateLoading } = useContext(LoadingContext);
+  // const updateLoadingRef = useRef(updateLoading);
   const [event, setEvent] = useState<MPEvent | undefined>();
 
   const fetchSingleEvent = useCallback(async (id: string) => {
@@ -34,7 +35,6 @@ export default function Print() {
   }, []);
 
   const getEventInformation = useCallback(async () => {
-    updateLoadingRef.current(true);
     try {
       const specificEventID = searchParams.get('id');
       if (!specificEventID) throw console.error("Missing Event ID");
@@ -50,7 +50,6 @@ export default function Print() {
         variant: "destructive"
       });
     }
-    updateLoadingRef.current(false);
   }, [fetchSingleEvent, searchParams, toast]);
 
   useEffect(() => {
@@ -64,8 +63,8 @@ export default function Print() {
           <a href={`/?id=${searchParams.get('id')}`} className="absolute top-0 left-0 text-xl p-2"><FontAwesomeIcon icon={faArrowLeft} /></a>
           <h1 className="text-center">{event.Event_Title}</h1>
           <div className="flex justify-between">
-            <p>{correctForTimezone(event.Event_Start_Date).toLocaleDateString('en-us', { day: "numeric", month: "short", year: "numeric" })}</p>
-            <p>{correctForTimezone(event.Event_Start_Date).toLocaleTimeString('en-us', { hour: "numeric", minute: "2-digit" })} - {correctForTimezone(event.Event_End_Date).toLocaleTimeString('en-us', { hour: "numeric", minute: "2-digit" })}</p>
+            {/* <p>{correctForTimezone(event.Event_Start_Date).toLocaleDateString('en-us', { day: "numeric", month: "short", year: "numeric" })}</p> */}
+            {/* <p>{correctForTimezone(event.Event_Start_Date).toLocaleTimeString('en-us', { hour: "numeric", minute: "2-digit" })} - {correctForTimezone(event.Event_End_Date).toLocaleTimeString('en-us', { hour: "numeric", minute: "2-digit" })}</p> */}
           </div>
         </div>
       </div>
@@ -94,11 +93,11 @@ export default function Print() {
         </div>
         <EventLabel label="Congregation" value={event.Congregation_Name} />
         <EventLabel label="Program" value={event.Program_Name} />
-        <EventLabel label="Setup Time" value={formatMinutes(event.Minutes_for_Setup)} />
-        <EventLabel label="Cleanup Time" value={formatMinutes(event.Minutes_for_Cleanup)} />
+        {/* <EventLabel label="Setup Time" value={formatMinutes(event.Minutes_for_Setup)} /> */}
+        {/* <EventLabel label="Cleanup Time" value={formatMinutes(event.Minutes_for_Cleanup)} /> */}
       </div>
       <div className="flex gap-2">
-        {event.Booked_Buildings.length > 0 && event.Booked_Rooms.length > 0 && (
+        {/* {event.Booked_Buildings.length > 0 && event.Booked_Rooms.length > 0 && (
           <div className="w-full bg-secondary border border-input p-4 rounded-sm flex flex-wrap gap-4">
             {event.Booked_Buildings.sort((a, b) => event.Booked_Rooms.filter(room => room.Building_ID === b.Building_ID).length - event.Booked_Rooms.filter(room => room.Building_ID === a.Building_ID).length).map(building => {
               return <div key={building.Building_ID}>
@@ -109,14 +108,14 @@ export default function Print() {
               </div>
             })}
           </div>
-        )}
+        )} */}
 
         {event.Requested_Services.length > 0 && (
           <div className="flex flex-col gap-2 w-full">
             {event.Requested_Services.map((service, i) => {
               return <div key={i} className="bg-secondary border border-input p-4 rounded-sm grid grid-cols-2 gap-2">
                 <EventLabel label="Service" value={service.Service_Name} />
-                <EventLabel label="Contact" value={formatDisplayName(service.Service_Contact)} />
+                {/* <EventLabel label="Contact" value={formatDisplayName(service.Service_Contact)} /> */}
               </div>
             })}
           </div>

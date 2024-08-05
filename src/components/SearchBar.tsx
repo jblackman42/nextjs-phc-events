@@ -2,11 +2,11 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import axios, { CancelTokenSource } from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@awesome.me/kit-10a739193a/icons/classic/light';
-import { MPEvent, correctForTimezone, getOrdinalSuffix } from '@/lib/utils';
+import { MPEvent } from '@/lib/types';
 
 const minInputLength = 3;
 
-function SearchBar({ targetDate, handleClick }: { targetDate?: string, handleClick: (e: MPEvent) => void }) {
+function SearchBar() {
   const [searchInput, setSearchInput] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Array<MPEvent>>([]);
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -46,35 +46,36 @@ function SearchBar({ targetDate, handleClick }: { targetDate?: string, handleCli
     }
   }, []);
 
-  useEffect(() => {
-    setSearchResults([]);
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
+  // useEffect(() => {
+  //   setSearchResults([]);
+  //   if (debounceTimeout.current) {
+  //     clearTimeout(debounceTimeout.current);
+  //   }
 
-    if (searchInput.length >= minInputLength) {
-      setLoading(true);
-      debounceTimeout.current = setTimeout(async () => {
-        const results = await searchEvents(searchInput, targetDate ?? new Date().toISOString());
-        if (results) {
-          setSearchResults(results);
-        }
-      }, 500); // Adjust debounce delay as needed
-    } else {
-      setLoading(false);
-    }
+  //   if (searchInput.length >= minInputLength) {
+  //     setLoading(true);
+  //     debounceTimeout.current = setTimeout(async () => {
+  //       const results = await searchEvents(searchInput, targetDate ?? new Date().toISOString());
+  //       if (results) {
+  //         setSearchResults(results);
+  //       }
+  //     }, 500); // Adjust debounce delay as needed
+  //   } else {
+  //     setLoading(false);
+  //   }
 
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [searchInput, targetDate, searchEvents]);
+  //   return () => {
+  //     if (debounceTimeout.current) {
+  //       clearTimeout(debounceTimeout.current);
+  //     }
+  //   };
+  // }, [searchInput, targetDate, searchEvents]);
 
   const handleClickEvent = (e: MPEvent): void => {
-    setSearchInput('');
-    setSearchResults([]);
-    handleClick(e);
+    console.log(e);
+    //   setSearchInput('');
+    //   setSearchResults([]);
+    //   handleClick(e);
   }
 
   const handleFocus = () => {
@@ -90,7 +91,7 @@ function SearchBar({ targetDate, handleClick }: { targetDate?: string, handleCli
 
   return (
     <div
-      className="bg-background rounded-full h-10 w-full relative border border-input"
+      className="bg-background rounded-md h-10 w-full relative border border-input"
       onFocus={handleFocus}
       onBlur={handleBlur}
       tabIndex={-1}
@@ -125,11 +126,11 @@ function SearchBar({ targetDate, handleClick }: { targetDate?: string, handleCli
           })}
         </>}
         {searchResults.map(event => {
-          const startDate = correctForTimezone(event.Event_Start_Date);
+          // const startDate = (event.Event_Start_Date);
           return <div key={event.Event_ID} className="m-1 shadow-md">
             <button onClick={() => handleClickEvent(event)} className="flex justify-between gap-2 rounded-sm px-2 py-1 w-full bg-primary border-l-4 border-accent hover:border-l-[6px] hover:bg-secondary duration-75 transition-[border-width] text-left">
               <p className="whitespace-nowrap text-ellipsis overflow-hidden">{event.Event_Title}</p>
-              <p className="whitespace-nowrap">{startDate.toLocaleDateString('en-us', { month: "short", day: "numeric", year: "numeric" })}</p>
+              {/* <p className="whitespace-nowrap">{startDate.toLocaleDateString('en-us', { month: "short", day: "numeric", year: "numeric" })}</p> */}
             </button>
           </div>
         })}

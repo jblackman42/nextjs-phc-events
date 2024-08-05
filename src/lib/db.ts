@@ -34,7 +34,7 @@ export const db = {
       const result = await this.query(queryString, params);
       return this.parseJsonFields(result.recordset);
     } catch (error) {
-      console.error('Error executing query from path:', error);
+      // console.error('Error executing query from path:', error);
       throw error;
     }
   },

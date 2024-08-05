@@ -1,11 +1,11 @@
 "use client";
 import { MPEventCount } from '@/lib/types';
 import { useSettings } from '@/context/SettingsContext';
-import { useCurrentDate } from '@/context/CurrentDateContext';
 import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { useEffect, useState } from 'react';
+import { useView } from '@/context/ViewContext';
 
 const fullDayCount = 21;
 
@@ -42,7 +42,7 @@ export function getFormattedDate(date: Date): string {
 
 const MonthCalendarClient = ({ eventCounts }: { eventCounts: MPEventCount[] }) => {
   const { settings } = useSettings();
-  const { setCurrentDate } = useCurrentDate();
+  const { setView } = useView();
   const [totalCounts, setTotalCounts] = useState<number[]>([]);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const MonthCalendarClient = ({ eventCounts }: { eventCounts: MPEventCount[] }) =
 
 
       return <DialogTrigger asChild key={i}>
-        <button onClick={() => setCurrentDate(currDate)} className="text-[2vw] lg:text-[22px] bg-secondary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
+        <button onClick={() => setView('selected_date', currDate)} className="text-[2vw] lg:text-[22px] bg-secondary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
           <h1 className="m-0 mx-auto mt-[0.5em] text-[1.25em] leading-[1.25em] font-normal md:font-semibold">{dateNum}<sup>{getOrdinalSuffix(dateNum)}</sup></h1>
           <p className="mt-auto mx-[.15em] font-extralight">{eventCount} Event{eventCount !== 1 ? "s" : ""}</p>
           <div className="w-full h-0.5 md:h-2">

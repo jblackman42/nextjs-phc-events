@@ -148,6 +148,7 @@ export interface MPEvent {
   Visibility_Level: string;
   Created_By: string | null;
   Event_Path: string;
+  Event_Image_URL: string;
 }
 
 export interface MPEventCount {

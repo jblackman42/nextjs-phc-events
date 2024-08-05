@@ -1,18 +1,33 @@
 "use client";
 import React, { createContext, useContext } from 'react';
+import { CalendarDate } from '@/lib/types';
 const calendarViewStorageName = "active_calendar_view";
 
 export type View = {
   periodical: 'month' | 'week' | 'day';
+  location_id: number;
+  building_id: number;
+  room_id: number;
+  selected_date: CalendarDate;
+  current_date: CalendarDate;
 };
 
 type ViewContextType = {
   view: View;
-  setView: (view: View) => void;
+  setView: (field: string, value: any) => void;
+  nextPeriod: () => void;
+  prevPeriod: () => void;
 };
 
+const today = new Date();
+
 const defaultView: View = {
-  periodical: "month"
+  periodical: "month",
+  location_id: 0,
+  building_id: 0,
+  room_id: 0,
+  selected_date: new CalendarDate(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())),
+  current_date: new CalendarDate(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1))
 }
 
 const getActiveView = (): View => {
@@ -24,15 +39,36 @@ const ViewContext = createContext<ViewContextType | undefined>(undefined);
 export const ViewProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentView, setCurrentView] = React.useState<View>(getActiveView());
 
-  const setView = (newView: View) => {
-    // if (typeof window !== 'undefined') {
-    //   localStorage.setItem(calendarViewStorageName, newView);
-    // }
+  const setView = (field: string, value: any) => {
+    const newView = {
+      ...currentView,
+      [field]: value
+    }
     setCurrentView(newView);
   }
 
+  const nextPeriod = (): void => {
+    if (currentView.periodical === "month") {
+      const currDate = currentView.current_date;
+      const newDate = new CalendarDate(currDate.getUTCFullYear(), currDate.getUTCMonth() + 1, 1);
+      setView('current_date', newDate);
+      console.log(newDate);
+    }
+    console.log('next period');
+  }
+  const prevPeriod = (): void => {
+    if (currentView.periodical === "month") {
+      const currDate = currentView.current_date;
+      const newDate = new CalendarDate(currDate.getUTCFullYear(), currDate.getUTCMonth() - 1, 1);
+      setView('current_date', newDate);
+      console.log(newDate);
+    }
+    console.log('prev period');
+  }
+
+
   return (
-    <ViewContext.Provider value={{ view: currentView, setView: setView }}>
+    <ViewContext.Provider value={{ view: currentView, setView: setView, nextPeriod: nextPeriod, prevPeriod: prevPeriod }}>
       {children}
     </ViewContext.Provider>
   );

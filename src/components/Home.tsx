@@ -2,7 +2,7 @@ import { Suspense } from "react";
 // import MonthCalendar from "./month/MonthCalendar";
 import MonthCalendarSkeleton from "./month/MonthCalendarSkeleton";
 import Calendar from "./Calendar";
-import CalendarOptions from "./CalendarOptions";
+import CalendarOptions from "./options/CalendarOptions";
 
 const Home = async () => {
 

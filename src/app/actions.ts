@@ -25,6 +25,27 @@ export const getEventCounts = cache(async (datesArr: string[]): Promise<MPEventC
   }
   return result;
 });
+
+
+
+export const getEventByID = cache(async (id: string | null): Promise<MPEvent | undefined> => {
+  try {
+    return axios({
+      method: "GET",
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/events/${id}`,
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.API_KEY
+      }
+    }).then(response => response.data)
+  } catch (error) {
+    // console.error(error);
+    return undefined;
+  }
+});
+
+
+
 export const getEvents = cache(async (startDate: string, endDate: string): Promise<MPEvent[]> => {
   try {
     return axios({
@@ -42,19 +63,23 @@ export const getEvents = cache(async (startDate: string, endDate: string): Promi
   }
 });
 export const getLocations = cache(async (): Promise<MPLocation[]> => {
+  let result: MPLocation[] = [];
   try {
-    return axios({
-      method: "GET",
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/locations`,
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.API_KEY
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/locations`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.API_KEY ?? ""
+        }
       }
-    }).then(response => response.data);
+    );
+    result = await res.json();
   } catch (error) {
     // console.error(error);
-    return [];
   }
+  return result;
 });
 
 export const getFormattedDate = async (date: Date): Promise<string> => {

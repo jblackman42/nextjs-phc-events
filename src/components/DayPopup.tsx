@@ -6,10 +6,10 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
-import { useCurrentDate } from '@/context/CurrentDateContext';
 import { CalendarDate, MPEvent, MPEventCount } from '@/lib/types';
 import { getEvents } from '@/app/actions';
 import { useSettings } from '@/context/SettingsContext';
+import { useView } from '@/context/ViewContext';
 const correctForTimezone = (date: string): Date => {
   const result = new Date(date);
   result.setMinutes(result.getMinutes() + result.getTimezoneOffset());
@@ -29,33 +29,33 @@ const sameDay = (d1: Date, d2: Date) => {
 const DayPopup = ({ eventCounts = [] }: { eventCounts?: MPEventCount[] }) => {
 
   const { settings } = useSettings();
-  const { currentDate } = useCurrentDate();
+  const { view } = useView();
   const [loading, setLoading] = useState<boolean>(true);
   const [eventCount, setEventCount] = useState<number | undefined>(undefined);
   const [events, setEvents] = useState<MPEvent[]>([]);
 
   useEffect(() => {
-    const newEventCount = eventCounts.find(count => sameDay(new Date(count.Date), currentDate));
+    const newEventCount = eventCounts.find(count => sameDay(new Date(count.Date), view.selected_date));
     if (newEventCount) setEventCount(settings.showCancelledEvents.value ? newEventCount?.Event_Count + newEventCount?.Cancelled_Count : newEventCount?.Event_Count)
-  }, [currentDate, eventCounts, settings.showCancelledEvents]);
+  }, [view.selected_date, eventCounts, settings.showCancelledEvents]);
 
   useEffect(() => {
     (async () => {
       setEvents([]);
       setLoading(true);
-      const startDate = currentDate.toISOString();
-      const endDate = new Date(currentDate.getTime() + (86400000 - 1)).toISOString();
+      const startDate = view.selected_date.toISOString();
+      const endDate = new Date(view.selected_date.getTime() + (86400000 - 1)).toISOString();
 
       // await new Promise((resolve) => setTimeout(resolve, 2000));
       const newEvents = await getEvents(startDate, endDate);
       setEvents(newEvents);
       setLoading(false);
     })()
-  }, [currentDate]);
+  }, [view.selected_date]);
 
   return <DialogContent>
     <DialogHeader>
-      <DialogTitle>{getDateString(currentDate)}</DialogTitle>
+      <DialogTitle>{getDateString(view.selected_date)}</DialogTitle>
       <DialogDescription>{eventCount ?? events.length} Events</DialogDescription>
     </DialogHeader>
     <div className="max-h-[550px] grid gap-2 p-2 custom-scroller overflow-auto">
