@@ -80,4 +80,25 @@ LEFT JOIN Visibility_Levels VL ON VL.Visibility_Level_ID = E.Visibility_Level_ID
 
 WHERE
   E.Event_Start_Date BETWEEN @startDate AND @endDate
+  AND (E.Location_ID = @Location_ID OR @Location_ID IS NULL)
+  AND (
+    EXISTS (
+      SELECT 1 
+      FROM Event_Rooms ER
+      WHERE ER.Event_ID = E.Event_ID
+      AND (ER.Room_ID = @Room_ID OR @Room_ID IS NULL)
+    )
+    OR @Room_ID IS NULL
+  )
+  AND (
+    EXISTS (
+      SELECT 1
+      FROM Buildings B
+      JOIN Rooms R ON R.Building_ID = B.Building_ID
+      JOIN Event_Rooms ER ON ER.Room_ID = R.Room_ID
+      WHERE ER.Event_ID = E.Event_ID
+      AND (B.Building_ID = @Building_ID OR @Building_ID IS NULL)
+    )
+    OR @Building_ID IS NULL
+  )
 ORDER BY E.Event_Start_Date;

@@ -70,13 +70,18 @@ const config = {
           "0%": { backgroundColor: "var(--primary)" },
           "50%": { backgroundColor: "var(--secondary)" },
           "100%": { backgroundColor: "var(--primary)" }
+        },
+        "calendar-fade": {
+          "0%": { transform: "translate(5%, 20%)", opacity: "0" },
+          "100%": { transform: "translate(0, 0)", opacity: "1" }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-slide-down": "fade-slide-down 500ms ease-in-out forwards",
-        "skeleton-breathe": "skeleton-breathe 2s ease-in-out infinite"
+        "skeleton-breathe": "skeleton-breathe 2s ease-in-out infinite",
+        "calendar-fade": "calendar-fade 500ms ease-in-out 200ms 1 normal forwards"
       },
     },
   },

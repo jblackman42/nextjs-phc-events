@@ -1,19 +1,8 @@
-"use client";
 import React, { useState } from 'react';
-import {
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
+import Popup from './Popup';
 import { MPEvent, MPRoom } from '@/lib/types';
 import { Button } from './ui/button';
 import Link from 'next/link';
-import { Separator } from '@radix-ui/react-select';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash } from '@awesome.me/kit-10a739193a/icons/classic/solid';
-import { cn } from '@/lib/utils';
 
 function correctForTimezone(date: string): Date {
   const result = new Date(date);
@@ -90,8 +79,7 @@ function copy(text: string): Promise<void> {
 }
 
 function EventLabel({ label, value, variant = "default", className }: { label: string, value?: string | null, variant?: "default" | "wide", className?: string }) {
-  // {variant === "wide" ? `col-span-3` : `col-span-1` + className && ` ${className}`}
-  return value && <div className={cn("col-span-3", variant === "wide" ? `col-span-full` : "sm:col-span-2", className)}>
+  return value && <div className={variant === "wide" ? `col-span-3` : `col-span-1` + className && ` ${className}`}>
     <p className="text-xs font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{label}:</p>
     {variant === "wide"
       ? <p className="text-textHeading bg-primary p-2 mt-1 rounded-sm shadow-md max-h-24 overflow-y-auto custom-scroller">{value}</p>
@@ -100,12 +88,8 @@ function EventLabel({ label, value, variant = "default", className }: { label: s
   </div>
 }
 
-function EventPopup({ event }: { event: MPEvent | undefined }) {
+function EventPopup({ open = undefined, setOpen, event }: { open: Boolean | undefined, setOpen: Function, event: MPEvent }) {
   const [shareMsg, setShareMsg] = useState<string>("Share");
-
-  if (!event) {
-    return null;
-  }
 
   const eventDate = correctForTimezone(event.Event_Start_Date).toLocaleDateString('en-us', { day: "numeric", month: "short", year: "numeric" });
   const startTime = correctForTimezone(event.Event_Start_Date).toLocaleTimeString('en-us', { hour: "numeric", minute: "2-digit" });
@@ -130,28 +114,20 @@ function EventPopup({ event }: { event: MPEvent | undefined }) {
     }
   }
 
-  const isPublicEvent = event.Visibility_Level === "4 - Public";
-  const visibilityIcon = isPublicEvent ? <FontAwesomeIcon icon={faEye} /> : <FontAwesomeIcon icon={faEyeSlash} />
 
-  return event && <DialogContent>
-    <DialogHeader>
-      <DialogTitle>{event.Event_Title}</DialogTitle>
-      <DialogDescription>
-        <span className="text-sm" title={isPublicEvent ? "Visible on PHC Website" : "Hidden on PHC Website"}>{visibilityIcon}</span>
-        <span className="px-2">|</span>
-        {eventDate}
-        <span className="px-2 hidden sm:inline">|</span><br className="sm:hidden" />
-        {`${startTime} - ${endTime}`}
-      </DialogDescription>
-    </DialogHeader>
-    <div className="max-h-[550px] grid p-2 custom-scroller overflow-auto">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 pb-2">
+
+  return event && <Popup open={open} setOpen={setOpen} >
+    <div className="max-h-[90dvh] h-max flex flex-col overflow-hidden">
+      <div className="sticky top-0 bg-secondary p-2 border-b-4 border-accent">
+        <h1 className="pr-6">{event.Event_Title}</h1>
+      </div>
+      <div className="bg-secondary grid grid-cols-4 gap-1 p-1 pb-2">
         <a href={event.Event_Path} target="_blank"><Button variant="thin" size="sm" className="w-full">View on MP</Button></a>
         <a href={addToCalendarLink} target="_blank"><Button variant="thin" size="sm" className="w-full">Add to Calendar</Button></a>
         <Button onClick={copyLink} variant="thin" size="sm" className="w-full">{shareMsg}</Button>
         <Link href={`/print?id=${event.Event_ID}`}><Button variant="thin" size="sm" className="w-full">Print</Button></Link>
       </div>
-      <div className="max-h-[600px] grid grid-cols-6 gap-1 md:gap-2 !pt-0 custom-scroller overflow-auto">
+      <div className="max-h-[600px] grid grid-cols-3 gap-1 md:gap-2 p-1 md:p-2 !pt-0 bg-secondary custom-scroller overflow-auto">
         <EventLabel label="Event Date" value={eventDate} />
         <EventLabel label="Event Time" value={`${startTime} - ${endTime}`} />
         <EventLabel label="Setup Time" value={formatMinutes(event.Minutes_for_Setup)} />
@@ -168,8 +144,8 @@ function EventPopup({ event }: { event: MPEvent | undefined }) {
         <EventLabel variant="wide" label="Meeting Instructions" value={event.Meeting_Instructions} />
         <EventLabel variant="wide" label="Booked Rooms" value={bookedRoomsNames} />
         {event.Requested_Services.length > 0 && (
-          <div className="col-span-full">
-            <p className="text-xs font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Services Requested:</p>
+          <div className="col-span-3">
+            <p className="text-xs">Services Requested:</p>
             {event.Requested_Services.map((service, i) => {
               return <div key={i} className="bg-primary p-2 mt-1 rounded-sm shadow-md grid grid-cols-3 gap-2">
                 <EventLabel label="Service" value={service.Service_Name} />
@@ -180,20 +156,20 @@ function EventPopup({ event }: { event: MPEvent | undefined }) {
           </div>
         )}
         {event.Requested_Equipment.length > 0 && (
-          <div className="col-span-full">
-            <p className="text-xs font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Equipment Requested:</p>
+          <div className="col-span-3">
+            <p className="text-xs">Equipment Requested:</p>
             {event.Requested_Equipment.map((equipment, i) => {
               return <div key={i} className="bg-primary p-2 mt-1 rounded-sm shadow-md grid grid-cols-5 gap-2">
-                <EventLabel className="!col-span-3" label="Equipment" value={equipment.Equipment_Name} />
-                <EventLabel className="!col-span-1" label="Quantity" value={equipment.Quantity.toString()} />
-                <EventLabel className="!col-span-1" label="Approved" value={equipment.Approved ? "True" : "False"} />
+                <EventLabel className="col-span-3" label="Equipment" value={equipment.Equipment_Name} />
+                <EventLabel className="col-span-1" label="Quantity" value={equipment.Quantity.toString()} />
+                <EventLabel className="col-span-1" label="Approved" value={equipment.Approved ? "True" : "False"} />
               </div>
             })}
           </div>
         )}
       </div>
     </div>
-  </DialogContent>
+  </Popup>
 }
 
 export default EventPopup;

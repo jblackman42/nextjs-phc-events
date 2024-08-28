@@ -4,7 +4,8 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import { CalendarDate, MPEvent, MPEventCount } from '@/lib/types';
 import { getEvents } from '@/app/actions';
@@ -26,7 +27,7 @@ const sameDay = (d1: Date, d2: Date) => {
     d1.getUTCDate() === d2.getUTCDate();
 }
 
-const DayPopup = ({ eventCounts = [] }: { eventCounts?: MPEventCount[] }) => {
+const DayPopup = ({ eventCounts = [], handleEventClick }: { eventCounts?: MPEventCount[], handleEventClick: (value: MPEvent) => void }) => {
 
   const { settings } = useSettings();
   const { view } = useView();
@@ -47,11 +48,11 @@ const DayPopup = ({ eventCounts = [] }: { eventCounts?: MPEventCount[] }) => {
       const endDate = new Date(view.selected_date.getTime() + (86400000 - 1)).toISOString();
 
       // await new Promise((resolve) => setTimeout(resolve, 2000));
-      const newEvents = await getEvents(startDate, endDate);
+      const newEvents = await getEvents(startDate, endDate, view.location_id, view.building_id, view.room_id);
       setEvents(newEvents);
       setLoading(false);
     })()
-  }, [view.selected_date]);
+  }, [view.selected_date, view.location_id, view.building_id, view.room_id]);
 
   return <DialogContent>
     <DialogHeader>
@@ -76,7 +77,7 @@ const DayPopup = ({ eventCounts = [] }: { eventCounts?: MPEventCount[] }) => {
           const startTime = correctForTimezone(event.Event_Start_Date).toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
           const endTime = correctForTimezone(event.Event_End_Date).toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
           const pcDisplayName = `${event.Primary_Contact.split(', ')[1]} ${event.Primary_Contact.split(', ')[0]}`
-          return <button key={i} onClick={() => console.log(event)}>
+          return <button key={i} onClick={() => handleEventClick(event)}>
             <div style={{ borderColor: event.Cancelled ? "var(--destructive)" : event.Featured_On_Calendar ? "#27ae60" : "" }} className="grid grid-cols-2 text-sm bg-secondary p-2 rounded-sm border-l-4 border-accent duration-75 transition-[border-width] hover:border-l-8 shadow-md text-left">
               <p className="col-start-1">{event.Event_Type}</p>
               <p className="col-start-2 text-right">{pcDisplayName}</p>

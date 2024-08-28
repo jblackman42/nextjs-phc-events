@@ -20,7 +20,7 @@ const Home = async () => {
 
       </div>
 
-      <div className="bg-primary grow md:rounded-sm shadow-sm p-2 md:p-4 overflow-auto">
+      <div className="bg-primary grow md:rounded-sm shadow-sm p-2 md:p-4 overflow-auto custom-scroller">
         <Suspense fallback={<MonthCalendarSkeleton />}>
           <Calendar />
         </Suspense>

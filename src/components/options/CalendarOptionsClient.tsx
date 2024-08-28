@@ -7,6 +7,7 @@ import SearchBar from "../SearchBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight, faBars, faClose } from "@awesome.me/kit-10a739193a/icons/classic/light";
 import { Button } from '@/components/ui/button';
+const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 function CalendarOptionsClient({ locations }: { locations: MPLocation[] }) {
   const { view, setView, nextPeriod, prevPeriod } = useView();
@@ -16,27 +17,33 @@ function CalendarOptionsClient({ locations }: { locations: MPLocation[] }) {
 
   const [mobileFilterDropdownOpen, setMobileFilterDropdownOpen] = useState<boolean>(false);
 
+  const [prevLocationID, setPrevLocationID] = useState<number | undefined>();
+  const [prevBuildingID, setPrevBuildingID] = useState<number | undefined>();
+
   useEffect(() => {
+    setPrevLocationID(view.location_id);
     const location = locations.find(l => l.Location_ID === view.location_id);
     setSelectedLocation(location);
 
+    setPrevBuildingID(view.building_id);
     const building = location?.Buildings.find(b => b.Building_ID === view.building_id);
     setSelectedBuilding(building);
+  }, [view.location_id, view.building_id, view.room_id, locations, setView]);
 
-    // Reset building and room selection if necessary
-    if (view.location_id === 0 && view.building_id !== 0) {
+  useEffect(() => {
+    if (view.location_id !== prevLocationID) {
       setView('building_id', 0);
     }
-    if (view.building_id === 0 && view.room_id !== 0) {
+    if (view.building_id !== prevBuildingID) {
       setView('room_id', 0);
     }
-  }, [view.location_id, view.building_id, view.room_id, locations, setView]);
+  }, [view.location_id, view.building_id, prevLocationID, prevBuildingID, setView]);
 
   return (
     <div className="max-w-screen-xl mx-auto grid grid-cols-2 md:grid-cols-4">
       <div className="flex items-center md:col-span-2 relative">
         <Button variant="icon" onClick={prevPeriod}><FontAwesomeIcon icon={faArrowLeft} /></Button>
-        <button><h1 className="date-picker-trigger md:text-xl text-lg mx-2 min-w-40 text-center whitespace-nowrap hover:underline">July 29</h1></button>
+        <button><h1 className="date-picker-trigger md:text-xl text-lg mx-2 min-w-40 text-center whitespace-nowrap hover:underline">{months[view.current_date.getUTCMonth()]} {view.current_date.getUTCFullYear()}</h1></button>
         <Button variant="icon" onClick={nextPeriod}><FontAwesomeIcon icon={faArrowRight} /></Button>
       </div>
 
@@ -65,7 +72,7 @@ function CalendarOptionsClient({ locations }: { locations: MPLocation[] }) {
             </SelectContent>
           </Select>
 
-          <Select value={view.location_id.toString()} onValueChange={(val) => setView('location_id', parseInt(val))}>
+          <Select value={view.location_id.toString()} onValueChange={(val) => { setView('location_id', parseInt(val)); }}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>

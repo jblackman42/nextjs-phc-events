@@ -3,8 +3,11 @@ import { cache } from "react";
 import { MPEvent, MPEventCount, MPLocation } from "@/lib/types";
 import axios from "axios";
 
-export const getEventCounts = cache(async (datesArr: string[]): Promise<MPEventCount[]> => {
+export const getEventCounts = cache(async (datesArr: string[], locationID?: number, buildingID?: number, roomID?: number): Promise<MPEventCount[]> => {
   // await new Promise((resolve) => setTimeout(resolve, 20000));
+  const Location_ID = locationID && locationID !== 0 ? locationID : null;
+  const Building_ID = buildingID && buildingID !== 0 ? buildingID : null;
+  const Room_ID = roomID && roomID !== 0 ? roomID : null;
   let result: MPEventCount[] = [];
   try {
     const res = await fetch(
@@ -15,13 +18,22 @@ export const getEventCounts = cache(async (datesArr: string[]): Promise<MPEventC
           "Content-Type": "application/json",
           "x-api-key": process.env.API_KEY ?? ""
         },
-        body: JSON.stringify({ dateList: datesArr.join(',') })
+        body: JSON.stringify({
+          dateList: datesArr.join(','),
+          Location_ID: Location_ID,
+          Building_ID: Building_ID,
+          Room_ID: Room_ID
+        })
       }
-    )
+    );
+
+    if (!res.ok) {
+      throw new Error("Internal server error");
+    }
     // return await res.json()
     result = await res.json();
   } catch (error) {
-    // console.error(error);
+    console.error(error);
   }
   return result;
 });
@@ -46,21 +58,38 @@ export const getEventByID = cache(async (id: string | null): Promise<MPEvent | u
 
 
 
-export const getEvents = cache(async (startDate: string, endDate: string): Promise<MPEvent[]> => {
+export const getEvents = cache(async (startDate: string, endDate: string, locationID?: number, buildingID?: number, roomID?: number): Promise<MPEvent[]> => {
+  const Location_ID = locationID && locationID !== 0 ? locationID : null;
+  const Building_ID = buildingID && buildingID !== 0 ? buildingID : null;
+  const Room_ID = roomID && roomID !== 0 ? roomID : null;
+  let result: MPEvent[] = [];
   try {
-    return axios({
-      method: "GET",
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/events`,
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.API_KEY
-      },
-      params: { startDate: startDate, endDate: endDate }
-    }).then(response => response.data)
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/events`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.API_KEY ?? ""
+        },
+        body: JSON.stringify({
+          startDate: startDate,
+          endDate: endDate,
+          Location_ID: Location_ID,
+          Building_ID: Building_ID,
+          Room_ID: Room_ID
+        })
+      });
+
+    if (!res.ok) {
+      throw new Error("Internal server error");
+    }
+
+    result = await res.json();
   } catch (error) {
-    // console.error(error);
-    return [];
+    console.error(error);
   }
+  return result;
 });
 export const getLocations = cache(async (): Promise<MPLocation[]> => {
   let result: MPLocation[] = [];
