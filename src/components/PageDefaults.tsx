@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Navbar, SettingsPopup, AccountPopup } from '@/components';
 import { NavLink } from "@/lib/types";
-import { faCalendar, faGear, faRightToBracket, faBrightness, faMoon, faUser } from '@awesome.me/kit-10a739193a/icons/classic/light';
+import { faCalendar, faGear, faRightToBracket, faBrightness, faMoon, faUser, faFileExcel } from '@awesome.me/kit-10a739193a/icons/classic/light';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -19,6 +19,13 @@ const PageDefaults = () => {
       label: "Calendar",
       icon: faCalendar,
       link: "/",
+      action: null
+    },
+    {
+      variant: "link",
+      label: "Health Assessment",
+      icon: faFileExcel,
+      link: "/ha",
       action: null
     },
     {

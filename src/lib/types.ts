@@ -1,5 +1,35 @@
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
+export interface HaQuestionData {
+  Ministry_Question_ID: number;
+  Question_Header: string;
+  Question_Title: string;
+  Question_Description: string;
+  Answer_Format: 'C' | 'N0' | 'N2';
+  Answer_Label: string;
+  Current_Total: number;
+  Previous_Total: number;
+  Current_Year: number;
+  Previous_Year: number;
+}
+export interface HaQuestion {
+  Question_Category_ID: number;
+  Question_Category: string;
+  Question_Data: HaQuestionData[];
+}
+export interface HaSection {
+  Question_Section_ID: number;
+  Question_Section: string;
+  Questions: HaQuestion[];
+}
+export interface Congregation {
+  Congregation_ID: number;
+  Congregation_Name: string;
+  Description: string;
+  Start_Date: string;
+  Location: string;
+  Time_Zone: string;
+}
 export interface AuthData {
   id_token: string;
   access_token: string;

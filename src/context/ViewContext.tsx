@@ -52,18 +52,14 @@ export const ViewProvider = ({ children }: { children: React.ReactNode }) => {
       const currDate = currentView.current_date;
       const newDate = new CalendarDate(currDate.getUTCFullYear(), currDate.getUTCMonth() + 1, 1);
       setView('current_date', newDate);
-      console.log(newDate);
     }
-    console.log('next period');
   }
   const prevPeriod = (): void => {
     if (currentView.periodical === "month") {
       const currDate = currentView.current_date;
       const newDate = new CalendarDate(currDate.getUTCFullYear(), currDate.getUTCMonth() - 1, 1);
       setView('current_date', newDate);
-      console.log(newDate);
     }
-    console.log('prev period');
   }
 
 

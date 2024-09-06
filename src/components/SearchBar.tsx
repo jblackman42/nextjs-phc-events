@@ -91,7 +91,7 @@ function SearchBar() {
 
   return (
     <div
-      className="bg-background rounded-md h-10 w-full relative border border-input"
+      className="bg-primary rounded-md h-10 w-full relative border border-input"
       onFocus={handleFocus}
       onBlur={handleBlur}
       tabIndex={-1}

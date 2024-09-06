@@ -63,12 +63,12 @@ const DayPopup = ({ eventCounts = [], handleEventClick }: { eventCounts?: MPEven
       {loading ? (
         [...Array(eventCount ?? 5)].map((_, i) => {
           return (
-            <div key={i} className="grid grid-cols-2 bg-secondary p-2 h-[84px] box-border gap-1 rounded-sm border-l-4 border-accent shadow-md *:rounded-md">
-              <div style={{ animationDelay: `${50 * i}ms` }} className="col-start-1 w-16 h-4 bg-primary animate-skeleton-breathe"></div>
-              <div style={{ animationDelay: `${50 * i}ms` }} className="col-start-2 w-20 h-4 ml-auto bg-primary animate-skeleton-breathe"></div>
-              <div style={{ animationDelay: `${50 * i}ms` }} className="col-span-2 w-56 h-6 bg-primary animate-skeleton-breathe"></div>
-              <div style={{ animationDelay: `${50 * i}ms` }} className="col-start-1 w-24 h-4 bg-primary animate-skeleton-breathe"></div>
-              <div style={{ animationDelay: `${50 * i}ms` }} className="col-start-2 w-16 h-4 ml-auto bg-primary animate-skeleton-breathe"></div>
+            <div key={i} className="grid grid-cols-2 bg-primary border p-2 h-[84px] box-border gap-1 rounded-sm border-l-4 border-l-accent shadow-md *:rounded-md">
+              <div style={{ animationDelay: `${50 * i}ms` }} className="col-start-1 w-16 h-4 bg-secondary animate-skeleton-breathe"></div>
+              <div style={{ animationDelay: `${50 * i}ms` }} className="col-start-2 w-20 h-4 ml-auto bg-secondary animate-skeleton-breathe"></div>
+              <div style={{ animationDelay: `${50 * i}ms` }} className="col-span-2 w-56 h-6 bg-secondary animate-skeleton-breathe"></div>
+              <div style={{ animationDelay: `${50 * i}ms` }} className="col-start-1 w-24 h-4 bg-secondary animate-skeleton-breathe"></div>
+              <div style={{ animationDelay: `${50 * i}ms` }} className="col-start-2 w-32 h-4 ml-auto bg-secondary animate-skeleton-breathe"></div>
             </div>
           )
         })
@@ -78,7 +78,7 @@ const DayPopup = ({ eventCounts = [], handleEventClick }: { eventCounts?: MPEven
           const endTime = correctForTimezone(event.Event_End_Date).toLocaleTimeString('en-us', { hour: 'numeric', minute: '2-digit' });
           const pcDisplayName = `${event.Primary_Contact.split(', ')[1]} ${event.Primary_Contact.split(', ')[0]}`
           return <button key={i} onClick={() => handleEventClick(event)}>
-            <div style={{ borderColor: event.Cancelled ? "var(--destructive)" : event.Featured_On_Calendar ? "#27ae60" : "" }} className="grid grid-cols-2 text-sm bg-secondary p-2 rounded-sm border-l-4 border-accent duration-75 transition-[border-width] hover:border-l-8 shadow-md text-left">
+            <div style={{ borderLeftColor: event.Cancelled ? "var(--destructive)" : event.Featured_On_Calendar ? "#27ae60" : "" }} className="grid grid-cols-2 text-sm bg-primary border p-2 rounded-sm border-l-4 border-l-accent duration-75 transition-[border-width] hover:border-l-8 shadow-md text-left">
               <p className="col-start-1">{event.Event_Type}</p>
               <p className="col-start-2 text-right">{pcDisplayName}</p>
               <p className="col-span-2 text-textHeading text-lg font-semibold whitespace-nowrap overflow-hidden text-ellipsis">{event.Event_Title}</p>

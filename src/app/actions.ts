@@ -1,7 +1,32 @@
 'use server';
 import { cache } from "react";
-import { MPEvent, MPEventCount, MPLocation } from "@/lib/types";
+import { MPEvent, MPEventCount, MPLocation, Congregation, HaSection } from "@/lib/types";
 import axios from "axios";
+
+export const getCongregations = cache(async (): Promise<Congregation[]> => {
+  let result: Congregation[] = [];
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/congregations`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.API_KEY ?? ""
+        }
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Internal server error");
+    }
+    // return await res.json()
+    result = await res.json();
+  } catch (error) {
+    console.error(error);
+  }
+  return result;
+})
 
 export const getEventCounts = cache(async (datesArr: string[], locationID?: number, buildingID?: number, roomID?: number): Promise<MPEventCount[]> => {
   // await new Promise((resolve) => setTimeout(resolve, 20000));
@@ -160,3 +185,31 @@ export const getCalendarDates = async (year: number, month: number): Promise<str
   }
   return dates;
 }
+
+export const getHaInformation = async (
+  year: number,
+  month: number,
+  congregation?: number
+): Promise<HaSection[]> => {
+  let result: HaSection[] = [];
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/ha?year=${year}&month=${month + 1}&congregation=${congregation ?? 0}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.API_KEY ?? ""
+        }
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Internal server error");
+    }
+    result = await res.json();
+  } catch (error) {
+    console.error(error);
+  }
+  return result;
+};

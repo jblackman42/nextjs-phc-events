@@ -44,6 +44,10 @@ const config = {
           2: "var(--accent-2)",
           3: "var(--accent-3)"
         },
+        popover: {
+          DEFAULT: "var(--popover)",
+          foreground: "var(--popover-foreground)"
+        },
         destructive: "var(--destructive)",
         muted: "var(--muted)",
         smoky: "var(--smoky)"
@@ -67,9 +71,9 @@ const config = {
           to: { opacity: "1", transform: "translate(0,0)" }
         },
         "skeleton-breathe": {
-          "0%": { backgroundColor: "var(--primary)" },
-          "50%": { backgroundColor: "var(--secondary)" },
-          "100%": { backgroundColor: "var(--primary)" }
+          "0%": { backgroundColor: "var(--secondary)" },
+          "50%": { backgroundColor: "var(--background)" },
+          "100%": { backgroundColor: "var(--secondary)" }
         },
         "calendar-fade": {
           "0%": { transform: "translate(5%, 20%)", opacity: "0" },

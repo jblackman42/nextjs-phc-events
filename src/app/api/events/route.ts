@@ -4,8 +4,6 @@ import { db } from '@/lib/db';
 export async function POST(request: NextRequest) {
   const data = await request.json();
   const { startDate, endDate } = data;
-  // const startDate = request.nextUrl.searchParams.get('startDate');
-  // const endDate = request.nextUrl.searchParams.get('endDate');
 
   if (!startDate || !endDate) {
     return NextResponse.json({ error: "Missing required query parameters" }, { status: 400 });

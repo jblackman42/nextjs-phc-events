@@ -26,7 +26,7 @@ const LinkOrButton = ({ navLink }: { navLink: NavLink }) => {
 
 const Navbar = ({ navLinks }: { navLinks: NavLink[] }) => {
   return (
-    <nav className="bg-primary p-2 md:p-4 md:rounded-sm shadow-sm">
+    <nav className="bg-primary border p-2 md:p-4 shadow-sm">
       <ul className="flex flex-col gap-2 md:gap-4 h-full">
         {navLinks.map((navLink, i) => (
           navLink.variant === 'spacer'

@@ -1,10 +1,6 @@
 import { getEventCounts } from '@/app/actions';
 import MonthCalendarClient from './MonthCalendarClient';
-import {
-  Dialog
-} from "@/components/ui/dialog"
-import DayPopup from "../DayPopup";
-import EventPopup from '../EventPopup';
+import { useEffect, useState } from 'react';
 
 function getMonthDates(year: number, month: number): string[] {
   const startDate = new Date(Date.UTC(year, month, 1));
@@ -25,16 +21,25 @@ function getMonthDates(year: number, month: number): string[] {
 const MonthCalendar = async () => {
   const today = new Date();
   const monthDates = getMonthDates(today.getUTCFullYear(), today.getUTCMonth());
-  const eventCounts = await getEventCounts(monthDates);
+  const initialEventCounts = await getEventCounts(monthDates);
 
-  return (<>
-    <div className="w-full mb-2 text-center grid grid-cols-7 gap-1 lg:gap-2 max-w-screen-xl mx-auto">
-      {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, i) => <div key={i}><h1 className="lg:uppercase font-normal text-base xl:text-xl"><span>{day.slice(0, 2)}</span><span className="hidden lg:inline-block">{day.slice(2, day.length)}</span></h1></div>)}
+  return (
+    <div>
+      <div className="w-full mb-2 text-center grid grid-cols-7 gap-1 lg:gap-2 max-w-screen-xl mx-auto">
+        {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, i) => (
+          <div key={i}>
+            <h1 className="lg:uppercase font-normal text-base xl:text-xl">
+              <span>{day.slice(0, 2)}</span>
+              <span className="hidden lg:inline-block">{day.slice(2)}</span>
+            </h1>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-7 gap-1 lg:gap-2 max-w-screen-xl mx-auto">
+        <MonthCalendarClient initialEventCounts={initialEventCounts} initialDates={monthDates} />
+      </div>
     </div>
-    <div className="grid grid-cols-7 gap-1 lg:gap-2 max-w-screen-xl mx-auto">
-      <MonthCalendarClient eventCounts={eventCounts} dates={monthDates} />
-    </div>
-  </>)
+  );
 };
 
 export default MonthCalendar;
