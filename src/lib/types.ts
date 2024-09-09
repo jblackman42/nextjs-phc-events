@@ -1,5 +1,27 @@
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
+export interface HaQuestionValueBreakdown {
+  Numerical_Value: number;
+  Congregation_Name: string;
+}
+export interface HaQuestionAnswers {
+  Fiscal_Period_ID: number;
+  Fiscal_Period_Start: string;
+  Period_Total: number;
+  Period_Breakdown: HaQuestionValueBreakdown[]
+}
+export interface HaQuestion {
+  Ministry_Question_ID: number;
+  Question_Header: string;
+  Question_Title: string;
+  Question_Description: string;
+  Answer_Label: string;
+  Answer_Format: string;
+  Question_Section: string;
+  Question_Category: string;
+  Question_Answers: HaQuestionAnswers[];
+}
+
 export interface HaQuestionData {
   Ministry_Question_ID: number;
   Question_Header: string;

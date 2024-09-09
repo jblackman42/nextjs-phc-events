@@ -13,6 +13,7 @@ import Home from "./Home";
 // import SearchBar from "./SearchBar";
 // import DatePicker from "./DatePicker";
 // import EventHoverCard from "./EventHoverCard";
+import MinistryQuestionPopup from "./popups/MinistryQuestionPopup";
 
 export {
   Navbar,
@@ -23,6 +24,7 @@ export {
   ToastClientComponent,
   // CalendarPage,
   Home as Calendar,
+  MinistryQuestionPopup
   // WithAuth,
   // Login,
   // DayPopup,

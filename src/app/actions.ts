@@ -1,6 +1,6 @@
 'use server';
 import { cache } from "react";
-import { MPEvent, MPEventCount, MPLocation, Congregation, HaSection } from "@/lib/types";
+import { MPEvent, MPEventCount, MPLocation, Congregation, HaSection, HaQuestion } from "@/lib/types";
 import axios from "axios";
 
 export const getCongregations = cache(async (): Promise<Congregation[]> => {
@@ -195,6 +195,32 @@ export const getHaInformation = async (
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/ha?year=${year}&month=${month + 1}&congregation=${congregation ?? 0}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.API_KEY ?? ""
+        }
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Internal server error");
+    }
+    result = await res.json();
+  } catch (error) {
+    console.error(error);
+  }
+  return result;
+};
+
+export const getQuestionInformation = async (
+  QuestionID: number
+): Promise<HaQuestion | undefined> => {
+  let result: HaQuestion | undefined = undefined;
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/ha/question?id=${QuestionID}`,
       {
         method: "GET",
         headers: {
