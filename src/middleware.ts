@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { encrypt, decrypt } from './lib/encryption';
 import axios from 'axios';
 import { AuthData, SessionData } from './lib/types';
+import { PROTECTED_ROUTES } from './lib/constants';
 import { serialize } from 'cookie';
 
 export async function middleware(request: NextRequest) {
@@ -26,25 +27,39 @@ async function handleApiRequests(request: NextRequest) {
 async function handleOtherRequests(request: NextRequest) {
   const response = NextResponse.next();
   const sessionCookie = request.cookies.get('session')?.value;
+  const url = request.nextUrl;
 
-  if (!sessionCookie) {
-    return response;
+  // Check if this is a protected route
+  const isProtectedRoute = PROTECTED_ROUTES.some(route => url.pathname.startsWith(route));
+
+  // If no session and trying to access protected route, redirect to login
+  if (isProtectedRoute && !sessionCookie) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
-  try {
-    const sessionData = await decrypt(sessionCookie);
-    const { access_token, refresh_token, expires_in, expiry_date, session_state }: SessionData = JSON.parse(sessionData);
+  // If session exists, validate it
+  if (sessionCookie) {
+    try {
+      const sessionData = await decrypt(sessionCookie);
+      const { access_token, expires_in, expiry_date, refresh_token, session_state }: SessionData = JSON.parse(sessionData);
 
-    if (!access_token || !expires_in) {
+      if (!access_token || !expires_in) {
+        if (isProtectedRoute) {
+          return NextResponse.redirect(new URL('/login', request.url));
+        }
+        return response;
+      }
+
+      const expires_in_value = new Date(expiry_date);
+      if (new Date() > expires_in_value && refresh_token) {
+        return await refreshSessionToken(refresh_token, session_state);
+      }
+    } catch (error) {
+      if (isProtectedRoute) {
+        return NextResponse.redirect(new URL('/login', request.url));
+      }
       return response;
     }
-
-    const expires_in_value = new Date(expiry_date);
-    if (new Date() > expires_in_value && refresh_token) {
-      return await refreshSessionToken(refresh_token, session_state);
-    }
-  } catch (error) {
-    return response;
   }
 
   return response;
@@ -97,5 +112,10 @@ async function refreshSessionToken(refresh_token: string, session_state: string)
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|.*\\.png$|callback$|api/client.*).*)'],
+  matcher: [
+    // Protected routes
+    '/create/:path*',
+    // Existing matchers
+    '/((?!_next/static|_next/image|.*\\.png$|callback$|api/client.*).*)'
+  ],
 };

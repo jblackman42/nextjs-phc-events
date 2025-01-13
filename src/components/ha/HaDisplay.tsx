@@ -104,7 +104,8 @@ const Ha = ({ congregations }: { congregations: Congregation[] }) => {
   const today = new Date();
   const initialDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 1, 1)); //defaults to the first date of the previous month
   const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
-  const [selectedQuestionID, setSelecteQuestionID] = useState<number | undefined>(undefined);
+  const [selectedQuestionData, setSelectedQuestionData] = useState<HaQuestionData | undefined>(undefined);
+  const [selectedQuestionID, setSelectedQuestionID] = useState<number | undefined>(undefined);
 
   // const [sections, setSections] = useState<SectionsProps[]>();
   // const [questionData, setQuestionData] = useState<QuestionDataProps[]>([]);
@@ -128,9 +129,10 @@ const Ha = ({ congregations }: { congregations: Congregation[] }) => {
     })()
   }, [selectedDate, selectedCongregationID]);
 
-  const handleQuestionClicked = (QuestionID: number): void => {
+  const handleQuestionClicked = (QuestionData: HaQuestionData): void => {
     setIsQuestionPopupOpen(true);
-    setSelecteQuestionID(QuestionID);
+    setSelectedQuestionData(QuestionData);
+    setSelectedQuestionID(QuestionData.Ministry_Question_ID);
   }
 
   return <>
@@ -158,7 +160,7 @@ const Ha = ({ congregations }: { congregations: Congregation[] }) => {
         </Select>
       </div>
       <Dialog open={isQuestionPopupOpen} onOpenChange={setIsQuestionPopupOpen}>
-        <MinistryQuestionPopup QuestionID={selectedQuestionID} />
+        <MinistryQuestionPopup congregations={congregations} QuestionData={selectedQuestionData} QuestionID={selectedQuestionID} />
       </Dialog>
       <div className="overflow-auto custom-scroller">
         <div className="max-w-screen-xl w-full mx-auto grid gap-4">
@@ -173,7 +175,7 @@ const Ha = ({ congregations }: { congregations: Congregation[] }) => {
                 return <div key={uniqueKey} style={{ gridTemplateColumns: `repeat(${numOfColums}, minmax(0, 1fr))` }} className="grid grid-cols-2 w-full h-max gap-2 text-left">
                   <h4 className="col-span-full text-lg px-1">{Question_Section} - {Question_Category}</h4>
                   {Question_Data.map(data => {
-                    return <button onClick={() => handleQuestionClicked(data.Ministry_Question_ID)} key={`${Question_Section_ID}-${Question_Category_ID}-${data.Ministry_Question_ID}`}>
+                    return <button onClick={() => handleQuestionClicked(data)} key={`${Question_Section_ID}-${Question_Category_ID}-${data.Ministry_Question_ID}`}>
                       <QuestionCard questionData={data} />
                     </button>
                   })}

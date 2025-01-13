@@ -6,6 +6,7 @@ import { NavLink } from "@/lib/types";
 
 const LinkOrButton = ({ navLink }: { navLink: NavLink }) => {
   const { label, icon, link, action } = navLink;
+
   const elementClasses = "bg-transparent text-background-foreground hover:bg-accent hover:text-white focus-visible:bg-accent focus-visible:text-secondary transition-colors rounded-sm aspect-square w-[1.5em] text-xl md:text-3xl grid place-items-center cursor-pointer nav-label";
 
   if (link) {
@@ -14,7 +15,8 @@ const LinkOrButton = ({ navLink }: { navLink: NavLink }) => {
         <FontAwesomeIcon icon={icon ?? faBan} />
       </a>
     );
-  } else if (action) {
+  }
+  if (typeof action === 'function') {
     return (
       <button onClick={action} className={elementClasses} data-label={label}>
         <FontAwesomeIcon icon={icon ?? faBan} />

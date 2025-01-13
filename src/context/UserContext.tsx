@@ -5,6 +5,7 @@ import React, { createContext, useContext } from 'react';
 type UserContextType = {
   user: User;
   setUser: (user: any) => void;
+  isAuthenticated: boolean;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -13,7 +14,11 @@ export const UserProvider = ({ children, user }: { children: React.ReactNode, us
   const [currentUser, setCurrentUser] = React.useState(user);
 
   return (
-    <UserContext.Provider value={{ user: currentUser, setUser: setCurrentUser }}>
+    <UserContext.Provider value={{
+      user: currentUser,
+      setUser: setCurrentUser,
+      isAuthenticated: !!currentUser
+    }}>
       {children}
     </UserContext.Provider>
   );

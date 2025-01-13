@@ -6,6 +6,8 @@ import AccountPopup from "./AccountPopup";
 import PageDefaults from "./PageDefaults";
 import ToastClientComponent from "./ToastClientComponent";
 import Home from "./Home";
+import CreateEvents from "./CreateEvents";
+import LineChart from "./charts/LineChart";
 // import WithAuth from "./WithAuth";
 // import Login from "./Login";
 // import DayPopup from "./DayPopup";
@@ -22,9 +24,11 @@ export {
   AccountPopup,
   PageDefaults,
   ToastClientComponent,
-  // CalendarPage,
   Home as Calendar,
-  MinistryQuestionPopup
+  CreateEvents,
+  MinistryQuestionPopup,
+  LineChart,
+  // CalendarPage,
   // WithAuth,
   // Login,
   // DayPopup,

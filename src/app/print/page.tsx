@@ -41,7 +41,7 @@ export default function Print() {
 
       const currEvent = await fetchSingleEvent(specificEventID);
       setEvent(currEvent);
-      console.log(currEvent);
+      // console.log(currEvent);
     } catch (error) {
       toast({
         title: "Uh oh! Something went wrong.",

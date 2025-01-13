@@ -2,14 +2,13 @@
 import { useState } from 'react';
 import { Navbar, SettingsPopup, AccountPopup } from '@/components';
 import { NavLink } from "@/lib/types";
-import { faCalendar, faGear, faRightToBracket, faBrightness, faMoon, faUser, faFileExcel } from '@awesome.me/kit-10a739193a/icons/classic/light';
+import { faCalendar, faGear, faRightToBracket, faBrightness, faMoon, faUser, faFileExcel, faSquarePlus, faBan } from '@awesome.me/kit-10a739193a/icons/classic/light';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 
 const PageDefaults = () => {
-  const { user } = useUser();
+  const { isAuthenticated } = useUser();
   const { theme, toggleTheme } = useTheme();
-  const isAuthenticated = user !== null;
   const [sOpen, setSOpen] = useState<boolean | undefined>();
   const [aOpen, setAOpen] = useState<boolean | undefined>();
 
@@ -19,6 +18,13 @@ const PageDefaults = () => {
       label: "Calendar",
       icon: faCalendar,
       link: "/",
+      action: null
+    },
+    {
+      variant: "link",
+      label: "Create",
+      icon: faSquarePlus,
+      link: "/create",
       action: null
     },
     {

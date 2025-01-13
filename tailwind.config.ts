@@ -50,7 +50,9 @@ const config = {
         },
         destructive: "var(--destructive)",
         muted: "var(--muted)",
-        smoky: "var(--smoky)"
+        smoky: "var(--smoky)",
+        crtvBackground: "#daddd4",
+        crtvAccent: "#628395"
       },
       borderRadius: {
         lg: "var(--radius)",
