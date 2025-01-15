@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { encrypt, decrypt } from './lib/encryption';
-import axios from 'axios';
 import { AuthData, SessionData } from './lib/types';
 import { PROTECTED_ROUTES } from './lib/constants';
 import { serialize } from 'cookie';
