@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 
-import { getCreateEventValues } from "@/app/actions";
-import { CreateEventValue } from "@/lib/types";
+import { getCreateEventValues, getLocations } from "@/app/actions";
+import { CreateEventValue, MPLocation } from "@/lib/types";
 
 import { TextInput, NumberInput, BooleanInput, DateInput, TimeInput, DropdownInput, TextAreaInput } from "@/components/inputs";
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,17 @@ const CreateEvents = () => {
   const [eventType, setEventType] = useState<number>();
   const [congregation, setCongregation] = useState<number>();
 
+  const [buildings, setBuildings] = useState<MPLocation[]>([]);
   const [eventValues, setEventValues] = useState<CreateEventValue[]>([]);
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
+  const previousPageIndex = useRef<number>(0);
+  const [currentBuilding, setCurrentBuilding] = useState<MPLocation>();
+
+
+  const handlePageChange = (newIndex: number) => {
+    previousPageIndex.current = currentPageIndex;
+    setCurrentPageIndex(newIndex);
+  };
 
   useEffect(() => {
     const fetchEventValues = async () => {
@@ -45,8 +54,20 @@ const CreateEvents = () => {
       setEventType(eventTypes.Default_ID);
       setCongregation(congregations.Default_ID);
     };
+
+    const fetchBuildings = async () => {
+      const buildings = await getLocations();
+      console.log(buildings);
+      setBuildings(buildings);
+    };
+
     fetchEventValues();
+    fetchBuildings();
   }, []);
+
+  useEffect(() => {
+    setCurrentBuilding(buildings.find(building => building.Location_ID === location));
+  }, [location, buildings]);
 
   const PageOne = () => {
     return <FormPage>
@@ -101,8 +122,17 @@ const CreateEvents = () => {
   }
 
   const PageThree = () => {
+
     return <FormPage>
-      <p>Page Three</p>
+      {!currentBuilding
+      ? <p>Please select a location</p>
+      : !currentBuilding.Buildings.length
+      ? <p>No buildings found for this location</p>
+      : currentBuilding.Buildings.map((building, index) => {
+        return (
+          <p key={index}>{building.Building_Name}</p>
+        )
+      })}
     </FormPage>
   }
 
@@ -113,25 +143,36 @@ const CreateEvents = () => {
     <div className="w-full my-2">
       <div className="flex gap-4">
         {pages.map((_, index) => {
+          const indexDiff = Math.abs(currentPageIndex - previousPageIndex.current);
+          const transitionDelay = indexDiff > 1 ? ((index - 1) - previousPageIndex.current) * 300 : 0;
+          
           return <div key={index} className={cn(index !== 0 && "w-full", "flex items-center gap-4")}>
             {index !== 0 && <div className={cn(
               currentPageIndex >= index ? "bg-accent after:w-full" : "after:w-0",
               "w-full h-[6px] border rounded-full bg-primary relative overflow-hidden"
             )}>
-              <div className="absolute inset-0 bg-accent transition-all duration-300 ease-in-out origin-left transform scale-x-0"
-                style={{ transform: currentPageIndex >= index ? 'scaleX(1)' : 'scaleX(0)' }} />
+              <div 
+                className="absolute inset-0 bg-accent origin-left"
+                style={{ 
+                  transform: currentPageIndex >= index ? 'scaleX(1)' : 'scaleX(0)',
+                  transition: 'transform 300ms ease-in-out',
+                  transitionDelay: `${transitionDelay}ms`
+                }} />
             </div>}
-            <div className={cn(
-              currentPageIndex >= index ? "border-accent" : "",
-              "grid place-items-center bg-primary w-10 h-10 rounded-full border-2 aspect-square transition-colors duration-300 ease-in-out",
-              currentPageIndex >= index ? "delay-300" : "delay-0"
+            <Button 
+              variant="icon" 
+              onClick={() => handlePageChange(index)} 
+              className={cn(
+                currentPageIndex >= index ? "border-accent" : "",
+                "hover:bg-primary border-2 transition-colors duration-300 ease-in-out",
+                "transition-delay-[" + (transitionDelay + 300) + "ms]"
             )}>
               <h1 className={cn(
                 currentPageIndex >= index ? "text-accent" : "",
                 "text-md transition-colors duration-200 ease-in-out",
-                currentPageIndex >= index ? "delay-200" : "delay-0"
+                "transition-delay-[" + transitionDelay + "ms]"
               )}>{index + 1}</h1>
-            </div>
+            </Button>
           </div>
         })}
       </div>
@@ -153,8 +194,8 @@ const CreateEvents = () => {
       </div>
     </div>
     <div className="w-full my-2 flex justify-between">
-      <Button variant="thin" disabled={currentPageIndex === 0} onClick={() => setCurrentPageIndex(currentPageIndex - 1)}>Previous</Button>
-      <Button variant="thin" disabled={currentPageIndex === pages.length - 1} onClick={() => setCurrentPageIndex(currentPageIndex + 1)}>Next</Button>
+      <Button variant="thin" disabled={currentPageIndex === 0} onClick={() => handlePageChange(currentPageIndex - 1)}>Previous</Button>
+      <Button variant="thin" disabled={currentPageIndex === pages.length - 1} onClick={() => handlePageChange(currentPageIndex + 1)}>Next</Button>
     </div>
   </div>
 };
