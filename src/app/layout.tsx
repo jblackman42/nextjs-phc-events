@@ -1,6 +1,6 @@
 import { Quicksand } from 'next/font/google';
 import { Toaster } from "@/components/ui/toaster";
-import './globals.css';
+import '@/app/globals.css';
 import { cookies } from 'next/headers';
 import axios from 'axios';
 import { UserProvider } from '@/context/UserContext';

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import Popup from './Popup';
+import { Popup } from "@/components/popups";
 import { Button } from "@/components/ui/button";
 import { useSettings, CalendarSettings, Setting } from '@/context/SettingsContext';
 import { Switch } from "@/components/ui/switch";
@@ -47,7 +47,7 @@ function SettingsPopup({ open = undefined, setOpen }: { open: Boolean | undefine
 
 
       <div className="flex gap-2 justify-between p-2 pt-0">
-        <Button variant="simple" size="sm" onClick={() => setOpen(false)}>Cancel</Button>
+        <Button variant="default" size="sm" onClick={() => setOpen(false)}>Cancel</Button>
         <Button variant="default" size="sm" onClick={handleSubmit}>Submit</Button>
       </div>
     </div>

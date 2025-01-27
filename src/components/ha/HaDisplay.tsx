@@ -9,7 +9,8 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import MonthSelector from "@/components/ui/month-selector";
-import { Loading, MinistryQuestionPopup } from "@/components";
+import { Loading } from "@/components";
+import { MinistryQuestionPopup } from "@/components/popups";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@awesome.me/kit-10a739193a/icons/classic/solid';

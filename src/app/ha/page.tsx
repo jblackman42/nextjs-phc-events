@@ -1,6 +1,6 @@
 import Ha from "@/components/ha/HaDisplay";
 import React from "react";
-import { getCongregations } from "../actions";
+import { getCongregations } from "@/app/actions";
 import { PageDefaults } from "@/components";
 
 const HaPage = async () => {

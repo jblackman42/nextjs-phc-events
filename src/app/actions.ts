@@ -1,6 +1,6 @@
 'use server';
 import { cache } from "react";
-import { MPEvent, MPEventCount, MPLocation, Congregation, HaSection, HaQuestion } from "@/lib/types";
+import { MPEvent, MPEventCount, MPLocation, Congregation, HaSection, HaQuestion, CreateEventValue } from "@/lib/types";
 import axios from "axios";
 
 export const getCongregations = cache(async (): Promise<Congregation[]> => {
@@ -61,6 +61,22 @@ export const getEventCounts = cache(async (datesArr: string[], locationID?: numb
     console.error(error);
   }
   return result;
+});
+
+export const getMonthDates = cache(async (year: number, month: number): Promise<string[]> => {
+  const startDate = new Date(Date.UTC(year, month, 1));
+  const dates: string[] = [];
+  while (startDate.getUTCMonth() === month) {
+    dates.push(startDate.toISOString().slice(0, 10));
+    startDate.setUTCDate(startDate.getUTCDate() + 1);
+  }
+  const currDate = new Date(dates[0]);
+  const daysToGoBack = currDate.getUTCDay();
+  for (let i = 0; i < daysToGoBack; i++) {
+    currDate.setUTCDate(currDate.getUTCDate() - 1);
+    dates.unshift(currDate.toISOString().slice(0, 10));
+  }
+  return dates;
 });
 
 
@@ -129,9 +145,14 @@ export const getLocations = cache(async (): Promise<MPLocation[]> => {
         }
       }
     );
+
+    if (!res.ok) {
+      throw new Error("Internal server error");
+    }
+
     result = await res.json();
   } catch (error) {
-    // console.error(error);
+    console.error(error);
   }
   return result;
 });
@@ -239,3 +260,35 @@ export const getQuestionInformation = async (
   }
   return result;
 };
+
+export const getCreateEventValues = async (): Promise<CreateEventValue[]> => {
+  let result: CreateEventValue[] = [];
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/events/event-values`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.API_KEY ?? ""
+        }
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Internal server error");
+    }
+    const [data] = await res.json();
+    result = data.Options;
+  } catch (error) {
+    console.error(error);
+  }
+  return result;
+}
+
+
+export const correctForTimezone = (date: string): Date => {
+  const result = new Date(date);
+  result.setMinutes(result.getMinutes() + result.getTimezoneOffset());
+  return result;
+}

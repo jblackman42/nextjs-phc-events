@@ -1,5 +1,13 @@
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
+export interface CreateEventValue {
+  Name: string;
+  Default_ID: number;
+  Labels: string[];
+  Values: number[];
+  Sort_Order: number;
+}
+
 export interface HaQuestionValueBreakdown {
   Numerical_Value: number;
   Congregation_Name: string;

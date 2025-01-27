@@ -1,3 +1,6 @@
+import React from "react";
+import { cn } from "@/lib/utils";
+
 function getMonthDates(year: number, month: number): string[] {
   const startDate = new Date(Date.UTC(year, month, 1));
   const dates: string[] = [];
@@ -53,34 +56,17 @@ const MonthCalendarSkeleton = () => {
       {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, i) => <div key={i}><h1 className="lg:uppercase font-normal text-base xl:text-xl"><span>{day.slice(0, 2)}</span><span className="hidden lg:inline-block">{day.slice(2, day.length)}</span></h1></div>)}
     </div>
     <div className="grid grid-cols-7 gap-1 lg:gap-2 max-w-screen-xl mx-auto">
-      {monthDates.map((date, i) => {
-        const currDate = new Date(date);
-        const dateNum = currDate.getUTCDate();
-
-        return <div key={i} className="text-[2vw] lg:text-[22px] bg-secondary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
-          <div style={{ animationDelay: `${50 * (i % 7)}ms` }} className="m-[0.5em] mx-auto w-11 h-11 bg-primary animate-skeleton-breathe rounded-md"></div>
-          <div style={{ animationDelay: `${50 * (i % 7)}ms` }} className="m-[.15em] mt-auto w-24 h-7 bg-primary animate-skeleton-breathe rounded-md"></div>
-          <div className="w-full h-0.5 md:h-2">
-            <div style={{ width: `100%`, animationDelay: `${50 * (i % 7)}ms` }} className='bg-primary h-full max-w-full rounded-full animate-skeleton-breathe'></div>
-          </div>
+      {monthDates.map((_, i) => {
+        const randomWidth = Math.floor(Math.random() * 34) + 3; // Random number between 3 and 36
+        return <div key={i} className="text-[2vw] lg:text-[22px] bg-primary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
+          <div className="m-[0.5em] mx-auto w-11 h-11 bg-primary animate-skeleton-breathe rounded-md"></div>
+          <div className="m-[.15em] mt-auto w-24 h-7 bg-primary animate-skeleton-breathe rounded-md"></div>
+          <div className={cn(`w-${randomWidth}`, "m-[.15em] mt-0 h-0.5 md:h-2 bg-primary animate-skeleton-breathe rounded-md")}></div>
+          {/* <div className="w-full h-0.5 md:h-[6px] p-1">
+            <div style={{ width: `100%`, animationDelay: `${50 * (i % 7)}ms` }} className='bg-primary h-full w-full rounded-full animate-skeleton-breathe'></div>
+          </div> */}
         </div>
       })}
-      {/* {eventCounts.map((count, i) => {
-        const { Date: date, Event_Count, Cancelled_Count } = count;
-        const currDate = new Date(date);
-        const dateNum = currDate.getUTCDate();
-
-        const totalCount = settings.showCancelledEvents.value ? Event_Count + Cancelled_Count : Event_Count;
-        const fullDayCount = 21;
-
-        return <button key={i} onClick={() => handleClick(currDate)} style={{ animationDelay: `${20 * i}ms` }} className="text-[2vw] lg:text-[22px] opacity-0 animate-fade-slide-down bg-secondary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
-          <h1 className="m-0 mx-auto mt-[0.5em] text-[1.25em] leading-[1.25em] font-normal md:font-semibold">{dateNum}<sup>{getOrdinalSuffix(dateNum)}</sup></h1>
-          <p className="mt-auto mx-[.15em] font-extralight">{totalCount} Event{totalCount !== 1 ? "s" : ""}</p>
-          <div className="w-full h-0.5 md:h-2">
-            <div style={{ width: `${Math.floor(totalCount / fullDayCount * 100)}%` }} className={`bg-accent h-full max-w-full rounded-full`}></div>
-          </div>
-        </button>
-      })} */}
     </div>
   </>)
 };

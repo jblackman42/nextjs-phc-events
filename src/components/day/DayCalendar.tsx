@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { MPEvent, correctForTimezone, WeekEvent } from '@/lib/utils';
-import EventHoverCard from './EventHoverCard';
+import React, { useEffect, useState, useRef } from 'react';
+import { correctForTimezone, WeekEvent } from '@/lib/utils';
+import { MPEvent } from '@/lib/types';
+import { EventHoverCard } from '@/components/popups';
 
 interface CalendarProps {
-  weekDates: string[];
+  date: Date;
   events: MPEvent[];
   getFormattedDate: (date: Date) => string;
   handleClick: (event: MPEvent) => void;
@@ -57,9 +58,11 @@ const placeEventsInColumns = (events: MPEvent[], doEventsOverlap: (event1: MPEve
   return eventsWithColumns;
 };
 
-const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormattedDate, handleClick }) => {
+const DayCalendar: React.FC<CalendarProps> = ({ date, events, getFormattedDate, handleClick }) => {
   const [hourHeightPx, setHourHeightPx] = useState(window.innerWidth < 768 ? 56 : 96);
   const calendarRef = useRef<HTMLDivElement>(null);
+
+  const [daysEvents, setDaysEvents] = useState<Array<WeekEvent>>([]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -82,6 +85,16 @@ const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormatted
       calendarRef.current.scrollTop = 7 * hourHeightPx;
     }
   }, [hourHeightPx]);
+
+  useEffect(() => {
+    const currDate = new Date(date);
+    const tempDaysEvents = events.filter(event => getFormattedDate(new Date(event.Event_Start_Date)) === getFormattedDate(currDate));
+    tempDaysEvents.sort((a, b) => correctForTimezone(a.Event_Start_Date).getTime() - correctForTimezone(b.Event_Start_Date).getTime());
+
+    const initialColumnsEvents = placeEventsInColumns(tempDaysEvents, doEventsOverlap, hourHeightPx);
+    const adjustedDaysEvents = adjustForOverlap(initialColumnsEvents);
+    setDaysEvents(adjustedDaysEvents);
+  }, [events, date, getFormattedDate, hourHeightPx]);
 
   const adjustForOverlap = (weekEvents: WeekEvent[]) => {
     // Check if two events collide (i.e. overlap).
@@ -159,17 +172,9 @@ const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormatted
     return weekEvents;
   };
 
-
   return (
-    <div className="w-[1280px] max-w-full h-full mx-auto">
+    <div className="w-full max-w-screen-xl h-full mx-auto">
       <div className="h-full flex flex-col">
-        <div className="flex justify-around pl-12">
-          {weekDates.map((day, i) => (
-            <h1 key={i} className="uppercase text-base lg:text-xl xl:text-2xl">
-              {correctForTimezone(day).toLocaleDateString('en-us', { month: 'short', day: 'numeric' })}
-            </h1>
-          ))}
-        </div>
         <div ref={calendarRef} className="overflow-y-auto overflow-x-hidden custom-scroller">
           <div className="flex">
             <div className="w-12 ml-auto">
@@ -185,28 +190,15 @@ const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormatted
                 );
               })}
             </div>
-            <div className="w-full grid grid-cols-7 gap-[2px]">
-              {weekDates.map((date, i) => {
-                const currDate = new Date(date);
-                const daysEvents = events.filter(event => getFormattedDate(new Date(event.Event_Start_Date)) === getFormattedDate(currDate));
-
-                daysEvents.sort((a, b) => correctForTimezone(a.Event_Start_Date).getTime() - correctForTimezone(b.Event_Start_Date).getTime());
-
-                const weekEvents = placeEventsInColumns(daysEvents, doEventsOverlap, hourHeightPx);
-                const adjustedWeekEvents = adjustForOverlap(weekEvents);
-
-                return (
-                  <div key={i} style={{ animationDelay: `${20 * i}ms` }} className="day-column hover:z-40 relative flex flex-col justify-between bg-secondary text-secondary-foreground w-full rounded-sm">
-                    {[...Array(24)].map((_, j) => (
-                      <div key={j} style={{ height: `${hourHeightPx}px` }} className={`w-full border-b border-primary`}></div>
-                    ))}
-
-                    {adjustedWeekEvents.map(eventData =>
-                      <EventHoverCard key={eventData.id} index={i} eventData={eventData} handleClick={handleClick} />
-                    )}
-                  </div>
-                );
-              })}
+            <div className="w-full">
+              <div className="day-column hover:z-40 relative flex flex-col justify-between bg-secondary text-secondary-foreground w-full rounded-sm">
+                {[...Array(24)].map((_, j) => (
+                  <div key={j} style={{ height: `${hourHeightPx}px` }} className={`w-full border-b border-primary`}></div>
+                ))}
+                {daysEvents.map(eventData =>
+                  <EventHoverCard key={eventData.id} eventData={eventData} handleClick={handleClick} />
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -215,4 +207,4 @@ const WeekCalendar: React.FC<CalendarProps> = ({ weekDates, events, getFormatted
   );
 };
 
-export default WeekCalendar;
+export default DayCalendar;

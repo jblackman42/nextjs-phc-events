@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
-import { Navbar, SettingsPopup, AccountPopup } from '@/components';
+import { Navbar } from '@/components';
+import { SettingsPopup, AccountPopup } from '@/components/popups';
 import { NavLink } from "@/lib/types";
 import { faCalendar, faGear, faRightToBracket, faBrightness, faMoon, faUser, faFileExcel, faSquarePlus, faBan } from '@awesome.me/kit-10a739193a/icons/classic/light';
 import { useUser } from '@/context/UserContext';

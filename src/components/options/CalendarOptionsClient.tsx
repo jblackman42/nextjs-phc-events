@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useView } from "@/context/ViewContext";
 import { MPBuildingWithRooms, MPLocation } from "@/lib/types";
 import { useEffect, useState } from "react";
-import SearchBar from "../SearchBar";
+import { SearchBar } from "@/components/inputs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight, faBars, faClose } from "@awesome.me/kit-10a739193a/icons/classic/light";
 import { Button } from '@/components/ui/button';

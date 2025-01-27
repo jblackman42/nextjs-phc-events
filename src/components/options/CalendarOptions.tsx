@@ -1,5 +1,5 @@
 import { getLocations } from "@/app/actions"
-import CalendarOptionsClient from "./CalendarOptionsClient"
+import CalendarOptionsClient from "@/components/options/CalendarOptionsClient"
 
 const CalendarOptions = async () => {
   const locations = await getLocations();

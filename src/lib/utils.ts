@@ -5,6 +5,7 @@ import axios from 'axios';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import Cookies from 'js-cookie';
+import { MPEvent } from "@/lib/types";
 
 export interface AuthData {
   id_token: string;
@@ -44,33 +45,6 @@ export interface WeekEvent {
   height: string;
   posX: string;
   posY: string;
-}
-
-export interface MPEvent {
-  Booked_Buildings: MPBuilding[];
-  Booked_Rooms: MPRoom[];
-  Requested_Services: MPService[];
-  Requested_Equipment: MPEquipment[];
-  Event_ID: number;
-  Event_Title: string;
-  Event_Type: string;
-  Congregation_Name: string;
-  Location_Name: string;
-  Location_ID: number;
-  Meeting_Instructions: string | null;
-  Description: string | null;
-  Program_Name: string;
-  Primary_Contact: string;
-  Participants_Expected: number | null;
-  Minutes_for_Setup: number;
-  Minutes_for_Cleanup: number;
-  Event_Start_Date: string;
-  Event_End_Date: string;
-  Cancelled: boolean;
-  Featured_On_Calendar: boolean;
-  Visibility_Level: string;
-  Created_By: string | null;
-  Event_Path: string;
 }
 
 export interface MPService {
@@ -340,4 +314,11 @@ export function copy(text: string): Promise<void> {
       reject(new Error("None of copying methods are supported by this browser!"));
     }
   });
+}
+
+export const correctForTimezone = (date: string | Date): Date => {
+  const inputDate = date instanceof Date ? date : new Date(date);
+  const result = new Date(inputDate);
+  result.setMinutes(result.getMinutes() + result.getTimezoneOffset());
+  return result;
 }

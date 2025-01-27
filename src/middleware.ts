@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { encrypt, decrypt } from './lib/encryption';
-import { AuthData, SessionData } from './lib/types';
-import { PROTECTED_ROUTES } from './lib/constants';
+import { encrypt, decrypt } from '@/lib/encryption';
+import { AuthData, SessionData } from '@/lib/types';
+import { PROTECTED_ROUTES } from '@/lib/constants';
 import { serialize } from 'cookie';
 
 export async function middleware(request: NextRequest) {

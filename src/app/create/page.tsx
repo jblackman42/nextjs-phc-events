@@ -1,4 +1,5 @@
-import { PageDefaults, CreateEvents } from '@/components';
+import { PageDefaults } from '@/components';
+import { CreateEvents } from '@/components/pages';
 
 const Create = async () => {
   return (
