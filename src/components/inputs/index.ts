@@ -8,5 +8,6 @@ import TextAreaInput from "@/components/inputs/TextAreaInput";
 import DatePicker from "@/components/inputs/DatePicker";
 import SearchBar from "@/components/inputs/SearchBar";
 import Time from "@/components/inputs/Time";
+import CheckboxInput from "@/components/inputs/CheckboxInput";
 
-export { TextInput, NumberInput, BooleanInput, DateInput, TimeInput, DropdownInput, TextAreaInput, DatePicker, SearchBar, Time };
+export { TextInput, NumberInput, BooleanInput, DateInput, TimeInput, DropdownInput, TextAreaInput, DatePicker, SearchBar, Time, CheckboxInput };

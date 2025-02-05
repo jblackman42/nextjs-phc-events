@@ -46,7 +46,7 @@ SELECT '[' +
             '"Sort_Order":2,' +
             '"Default_ID":' + CAST(@Default_Primary_Contact_ID AS VARCHAR) + ',' +
             '"Labels":[' + STUFF((
-                SELECT ',"' + C.Display_Name + '"'
+                SELECT ',"' + C.Nickname + ' ' + C.Last_Name + '"'
                 FROM dp_User_User_Groups UG
                 LEFT JOIN Contacts C ON C.User_Account = UG.User_ID
                 WHERE User_Group_ID = 76

@@ -12,20 +12,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 
-const DateInput = ({ date, setDate, label = "" }: { date: Date | undefined, setDate: (date: Date) => void, label?: string }) => {
+const DateInput = ({ date, setDate, label = "", isActive = true }: { date: Date | undefined, setDate: (date: Date) => void, label?: string, isActive?: boolean }) => {
   return <div>
-    <label>{label}</label>
-    <Popover>
+    <label className="px-1">{label}</label>
+    <Popover modal={true}>
       <PopoverTrigger asChild>
         <Button
           variant={"default"}
-          className={cn(
-            "w-full justify-between text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
+          className="w-full justify-between text-left font-normal text-primary-foreground"
+          tabIndex={isActive ? 0 : -1}
         >
           {date ? format(date, "PPP") : <span>Pick a date</span>}
-          <FontAwesomeIcon icon={faCalendar} className="h-4 w-4" />
+          <FontAwesomeIcon icon={faCalendar} className="h-4 w-4 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

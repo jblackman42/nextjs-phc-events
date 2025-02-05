@@ -12,7 +12,27 @@ SELECT
           R.Room_Name
         FROM Rooms R
         WHERE R.Building_ID = B.Building_ID AND R.Bookable = 1
-        ORDER BY R.Room_Name
+        ORDER BY 
+          CASE 
+            WHEN R.Room_Name NOT LIKE '%[0-9]%' THEN 0  -- Rooms without numbers go first
+            ELSE 1
+          END,
+          CASE 
+            WHEN R.Room_Name NOT LIKE '%[0-9]%' THEN R.Room_Name  -- Sort non-numbered rooms alphabetically
+            ELSE NULL
+          END,
+          CASE 
+            WHEN PATINDEX('%[0-9][0-9][0-9]%', R.Room_Name) > 0 
+            THEN CAST(
+              SUBSTRING(
+                R.Room_Name, 
+                PATINDEX('%[0-9][0-9][0-9]%', R.Room_Name), 
+                3
+              ) AS INT
+            )
+            ELSE 999999  -- Default high number for rooms without 3-digit numbers
+          END,
+          R.Room_Name  -- Secondary sort by full name
         FOR JSON PATH
       ), '[]') AS Rooms
     FROM Buildings B

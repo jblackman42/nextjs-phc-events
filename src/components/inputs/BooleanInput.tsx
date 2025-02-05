@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const BooleanInput = ({ boolean, setBoolean, label = "" }: { boolean: boolean, setBoolean: (boolean: boolean) => void, label?: string }) => {
+const BooleanInput = ({ boolean = false, setBoolean, label = "", isActive = true }: { boolean?: boolean, setBoolean: (boolean: boolean) => void, label?: string, isActive?: boolean }) => {
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(boolean ? 1 : 0);
 
@@ -24,12 +24,13 @@ const BooleanInput = ({ boolean, setBoolean, label = "" }: { boolean: boolean, s
   }, [open, boolean]);
 
   return <div>
-    <label>{label}</label>
-    <Popover open={open} onOpenChange={setOpen}>
+    <label className="px-1">{label}</label>
+    <Popover modal={true} open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           type="button"
           className="inline-flex items-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground border border-input hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full justify-between"
+          tabIndex={isActive ? 0 : -1}
         >
           <span>{boolean ? "Yes" : "No"}</span>
           <FontAwesomeIcon icon={faAnglesUpDown} className="h-4 w-4 opacity-50" />

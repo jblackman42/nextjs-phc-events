@@ -1,3 +1,2 @@
-1. When using tab to navigate the calendar options, there is no visual indication of which option is selected.
-2. Add spacing between event popups and the edge of the screen.
-3. Make icon colors match on the create event page (some are white, some are gray).
+1. Add spacing between event popups and the edge of the screen when on mobile.
+2. Make NumberInput have a variant for currency

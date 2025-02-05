@@ -11,24 +11,25 @@ import {
 import { Button } from "@/components/ui/button";
 import Time from "@/components/inputs/Time";
 
-const TimeInput = ({ time, setTime, label = "" }: {
+const TimeInput = ({ time, setTime, label = "", isActive = true }: {
   time: string | undefined,
-  setTime: React.Dispatch<React.SetStateAction<string | undefined>>,
-  label?: string
+  // setTime: React.Dispatch<React.SetStateAction<string | undefined>>,
+  setTime: (value: string) => void,
+  label?: string,
+  isActive?: boolean
 }) => {
   return <div>
-    <label>{label}</label>
-    <Popover>
+    <label className="px-1">{label}</label>
+    <Popover modal={true}>
       <PopoverTrigger asChild>
         <Button
           variant={"default"}
-          className={cn(
-            "w-full justify-between text-left font-normal",
-            !time && "text-muted-foreground"
-          )}
+          className="w-full justify-between text-left font-normal text-primary-foreground"
+          tabIndex={isActive ? 0 : -1}
         >
           {time ? time : <span>Pick a time</span>}
-          <FontAwesomeIcon icon={faClock} className="h-4 w-4" />
+          <FontAwesomeIcon icon={faClock} className="h-4 w-4 opacity-50" />
+
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">

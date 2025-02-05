@@ -47,6 +47,16 @@ const getOrdinalSuffix = async (value: number | string): Promise<string> => {
   }
 }
 
+// Use a fixed pattern instead of random numbers
+const SKELETON_WIDTHS = [
+  25, 15, 35, 20, 30, 10, 40,  // Week 1
+  30, 20, 15, 35, 25, 40, 10,  // Week 2
+  15, 35, 25, 10, 30, 20, 40,  // Week 3
+  35, 10, 30, 20, 40, 15, 25,  // Week 4
+  20, 40, 15, 25, 35, 10, 30,  // Week 5
+  30, 15, 35, 20, 25, 40, 10   // Week 6
+];
+
 const MonthCalendarSkeleton = () => {
   const today = new Date();
   const monthDates = getMonthDates(today.getUTCFullYear(), today.getUTCMonth());
@@ -56,17 +66,16 @@ const MonthCalendarSkeleton = () => {
       {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day, i) => <div key={i}><h1 className="lg:uppercase font-normal text-base xl:text-xl"><span>{day.slice(0, 2)}</span><span className="hidden lg:inline-block">{day.slice(2, day.length)}</span></h1></div>)}
     </div>
     <div className="grid grid-cols-7 gap-1 lg:gap-2 max-w-screen-xl mx-auto">
-      {monthDates.map((_, i) => {
-        const randomWidth = Math.floor(Math.random() * 34) + 3; // Random number between 3 and 36
-        return <div key={i} className="text-[2vw] lg:text-[22px] bg-primary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
+      {monthDates.map((_, i) => (
+        <div key={i} className="text-[2vw] lg:text-[22px] bg-primary text-secondary-foreground hover:bg-background w-full aspect-square rounded-sm md:rounded-md shadow-sm flex flex-col">
           <div className="m-[0.5em] mx-auto w-11 h-11 bg-primary animate-skeleton-breathe rounded-md"></div>
           <div className="m-[.15em] mt-auto w-24 h-7 bg-primary animate-skeleton-breathe rounded-md"></div>
-          <div className={cn(`w-${randomWidth}`, "m-[.15em] mt-0 h-0.5 md:h-2 bg-primary animate-skeleton-breathe rounded-md")}></div>
-          {/* <div className="w-full h-0.5 md:h-[6px] p-1">
-            <div style={{ width: `100%`, animationDelay: `${50 * (i % 7)}ms` }} className='bg-primary h-full w-full rounded-full animate-skeleton-breathe'></div>
-          </div> */}
+          <div
+            className="m-[.15em] mt-0 h-0.5 md:h-2 bg-primary animate-skeleton-breathe rounded-md"
+            style={{ width: `${SKELETON_WIDTHS[i]}%` }}
+          ></div>
         </div>
-      })}
+      ))}
     </div>
   </>)
 };

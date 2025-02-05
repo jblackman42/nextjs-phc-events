@@ -1,10 +1,12 @@
 "use client";
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 interface TimeProps {
   time: string | undefined;
-  setTime: React.Dispatch<React.SetStateAction<string | undefined>>;
+  // setTime: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setTime: (value: string) => void;
 }
+
 
 const Time: React.FC<TimeProps> = ({ time, setTime }) => {
 
@@ -13,21 +15,49 @@ const Time: React.FC<TimeProps> = ({ time, setTime }) => {
   const minuteOptions = ["00", "15", "30", "45"];
   const amOptions = ["AM", "PM"];
 
-  const [selectedHour, setSelectedHour] = useState<string>(time ? time.split(":")[0] : hourOptions[0]);
-  const [selectedMinute, setSelectedMinute] = useState<string>(time ? time.split(":")[1].split(" ")[0] : minuteOptions[0]);
-  const [selectedAm, setSelectedAm] = useState<string>(time ? time.split(" ")[1] : amOptions[0]);
+  const [selectedHour, setSelectedHour] = useState<string>(() => {
+    if (!time) return hourOptions[0];
+    try {
+      return time.split(":")[0] || hourOptions[0];
+    } catch {
+      return hourOptions[0];
+    }
+  });
 
-  const hourRef = React.useRef<HTMLDivElement>(null);
+  const [selectedMinute, setSelectedMinute] = useState<string>(() => {
+    if (!time) return minuteOptions[0];
+    try {
+      return time.split(":")[1].split(" ")[0] || minuteOptions[0];
+    } catch {
+      return minuteOptions[0];
+    }
+  });
+
+  const [selectedAm, setSelectedAm] = useState<string>(() => {
+    if (!time) return amOptions[0];
+    try {
+      return time.split(" ")[1] || amOptions[0];
+    } catch {
+      return amOptions[0];
+    }
+  });
+
+  const hourRef = useRef<HTMLDivElement>(null);
+
+  // Create refs individually
+  const column1Ref = useRef<HTMLDivElement>(null);
+  const column2Ref = useRef<HTMLDivElement>(null);
+  const column3Ref = useRef<HTMLDivElement>(null);
+
+  // Store refs in array using useMemo
+  const columnRefs = useMemo(() => [
+    column1Ref,
+    column2Ref,
+    column3Ref,
+  ], []);
 
   // Add state for tracking focused column
   const [focusedColumnIndex, setFocusedColumnIndex] = useState<number>(0);
-
-  // Add refs for all columns
-  const columnRefs = [
-    React.useRef<HTMLDivElement>(null),
-    React.useRef<HTMLDivElement>(null),
-    React.useRef<HTMLDivElement>(null),
-  ];
 
   useEffect(() => {
     if (hourRef.current) {
@@ -102,9 +132,12 @@ const Time: React.FC<TimeProps> = ({ time, setTime }) => {
 
   useEffect(() => {
     if (selectedHour && selectedMinute && selectedAm) {
-      setTime(`${selectedHour}:${selectedMinute} ${selectedAm}`);
+      const newTime = `${selectedHour}:${selectedMinute} ${selectedAm}`;
+      if (newTime !== time) {
+        setTime(newTime);
+      }
     }
-  }, [selectedHour, selectedMinute, selectedAm, setTime]);
+  }, [selectedHour, selectedMinute, selectedAm, setTime, time]);
 
   return (
     <div>
