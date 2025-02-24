@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/popover";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faAngleLeft, faAngleRight } from '@awesome.me/kit-10a739193a/icons/classic/solid';
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/util";
 import { useState } from "react";
 
 

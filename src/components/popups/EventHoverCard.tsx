@@ -5,8 +5,8 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { WeekEvent, correctForTimezone } from '@/lib/utils';
-import { MPEvent } from '@/lib/types';
+import { correctForTimezone } from '@/lib/util';
+import { MPEvent, WeekEvent } from '@/lib/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faLocationDot, faFolderOpen } from '@awesome.me/kit-10a739193a/icons/classic/light';
 import { faUpRightAndDownLeftFromCenter } from '@awesome.me/kit-10a739193a/icons/classic/solid';

@@ -6,11 +6,11 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
-import { LineChart } from '@/components'
+import { LineChart } from '@/components/charts'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@awesome.me/kit-10a739193a/icons/classic/solid';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/util';
 import { getQuestionInformation } from '@/app/actions';
 import { Congregation, HaQuestion, HaQuestionData } from '@/lib/types';
 import { ChartData, ChartDataset } from 'chart.js';

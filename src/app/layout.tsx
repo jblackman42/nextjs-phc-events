@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import '@/app/globals.css';
 import { cookies } from 'next/headers';
 import axios from 'axios';
+import { LoadingProvider } from '@/context/LoadingContext';
 import { UserProvider } from '@/context/UserContext';
 import { SettingsProvider } from '@/context/SettingsContext';
 import { ThemeProvider } from '@/context/ThemeContext';
@@ -68,21 +69,23 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <script dangerouslySetInnerHTML={{ __html: setInitialTheme }} />
       </head>
       <body className={font.className}>
-        <ThemeProvider>
-          <UserProvider user={user}>
-            <SettingsProvider>
-              <ViewProvider>
-                <CurrentDateProvider>
-                  <ToastProvider>
-                    <Toaster />
-                    {children}
-                    {errorMessage && <ToastClientComponent key={errorMessage} message={errorMessage} variant="destructive" />}
-                  </ToastProvider>
-                </CurrentDateProvider>
-              </ViewProvider>
-            </SettingsProvider>
-          </UserProvider>
-        </ThemeProvider>
+        <LoadingProvider>
+          <ThemeProvider>
+            <UserProvider user={user}>
+              <SettingsProvider>
+                <ViewProvider>
+                  <CurrentDateProvider>
+                    <ToastProvider>
+                      <Toaster />
+                      {children}
+                      {errorMessage && <ToastClientComponent key={errorMessage} message={errorMessage} variant="destructive" />}
+                    </ToastProvider>
+                  </CurrentDateProvider>
+                </ViewProvider>
+              </SettingsProvider>
+            </UserProvider>
+          </ThemeProvider>
+        </LoadingProvider>
       </body>
     </html>
   )

@@ -1,6 +1,7 @@
 "use client"
 import { useRouter } from 'next/navigation';
-import { getOAuthConfig, encodeUrlForm, deleteAuthData } from "@/lib/utils";
+import { deleteAuthData } from "@/lib/util";
+import { getOAuthConfig, encodeUrlForm } from "@/lib/util";
 import { useEffect } from "react";
 import Cookies from 'js-cookie';
 import { Loading } from '@/components';

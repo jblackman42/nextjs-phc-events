@@ -6,13 +6,13 @@ import {
   Dialog,
   DialogTrigger
 } from "@/components/ui/dialog";
-import { RegistrationPopup, ChildcarePopup, FacilitiesPopup, PromotionPopup, RecurringPopup, HeartCrewPopup, AVPopup } from "@/components/popups/form";
+import { RegistrationPopup, FacilitiesPopup, PromotionPopup, RecurringPopup, RecurringConfirm, HeartCrewPopup, AVPopup } from "@/components/popups/form";
 import { Button } from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClipboard, faChildReaching, faHammer, faRectangleAd, faCalendarDays, faPeopleGroup, faMicrophone } from "@awesome.me/kit-10a739193a/icons/classic/light";
+import { faClipboard, faHammer, faRectangleAd, faCalendarDays, faPeopleGroup, faMicrophone } from "@awesome.me/kit-10a739193a/icons/classic/light";
 
 import { useCreateEventData } from "@/context/CreateEventContext";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/util";
 
 type FormPage2Props = {
   isActive: boolean;
@@ -25,10 +25,10 @@ const FormPage2 = ({
   const { eventData } = useCreateEventData();
 
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  const [isChildcareOpen, setIsChildcareOpen] = useState(false);
   const [isFacilitiesOpen, setIsFacilitiesOpen] = useState(false);
   const [isPromotionOpen, setIsPromotionOpen] = useState(false);
   const [isRecurringOpen, setIsRecurringOpen] = useState(false);
+  const [isRecurringConfirmOpen, setIsRecurringConfirmOpen] = useState(false);
   const [isHeartCrewOpen, setIsHeartCrewOpen] = useState(false);
   const [isAVOpen, setIsAVOpen] = useState(false);
 
@@ -48,20 +48,6 @@ const FormPage2 = ({
         </DialogTrigger>
       </Dialog>
 
-      <Dialog open={isChildcareOpen} onOpenChange={setIsChildcareOpen}>
-        <ChildcarePopup />
-        <DialogTrigger asChild>
-          <Button
-            variant={"default"}
-            className="w-full justify-between text-left font-normal text-primary-foreground"
-            tabIndex={isActive ? 0 : -1}
-          >
-            <span>Set Up Childcare</span>
-            <FontAwesomeIcon icon={faChildReaching} className="h-4 w-4 opacity-50" />
-          </Button>
-        </DialogTrigger>
-      </Dialog>
-
       <Dialog open={isPromotionOpen} onOpenChange={setIsPromotionOpen}>
         <PromotionPopup />
         <DialogTrigger asChild>
@@ -72,20 +58,6 @@ const FormPage2 = ({
           >
             <span>Set Up Promotion</span>
             <FontAwesomeIcon icon={faRectangleAd} className="h-4 w-4 opacity-50" />
-          </Button>
-        </DialogTrigger>
-      </Dialog>
-
-      <Dialog open={isAVOpen} onOpenChange={setIsAVOpen}>
-        <AVPopup />
-        <DialogTrigger asChild>
-          <Button
-            variant={"default"}
-            className="w-full justify-between text-left font-normal text-primary-foreground"
-            tabIndex={isActive ? 0 : -1}
-          >
-            <span>Set Up AV</span>
-            <FontAwesomeIcon icon={faMicrophone} className="h-4 w-4 opacity-50" />
           </Button>
         </DialogTrigger>
       </Dialog>
@@ -104,6 +76,38 @@ const FormPage2 = ({
         </DialogTrigger>
       </Dialog>
 
+      <Dialog open={isAVOpen} onOpenChange={setIsAVOpen}>
+        <AVPopup />
+        <DialogTrigger asChild>
+          <Button
+            variant={"default"}
+            className="w-full justify-between text-left font-normal text-primary-foreground"
+            tabIndex={isActive ? 0 : -1}
+          >
+            <span>Set Up A/V</span>
+            <FontAwesomeIcon icon={faMicrophone} className="h-4 w-4 opacity-50" />
+          </Button>
+        </DialogTrigger>
+      </Dialog>
+
+      <Dialog open={isRecurringConfirmOpen} onOpenChange={setIsRecurringConfirmOpen}>
+        <RecurringConfirm open={isRecurringConfirmOpen} onOpenChange={setIsRecurringConfirmOpen} setRecurringOpen={setIsRecurringOpen} />
+
+        <Dialog open={isRecurringOpen} onOpenChange={setIsRecurringOpen}>
+          <RecurringPopup open={isRecurringOpen} onOpenChange={setIsRecurringOpen} setConfirmOpen={setIsRecurringConfirmOpen} />
+          <DialogTrigger asChild>
+            <Button
+              variant={"default"}
+              className={cn("w-full justify-between text-left font-normal text-primary-foreground", eventData && eventData.Recurring_Pattern.length > 0 ? "bg-accent" : "")}
+              tabIndex={isActive ? 0 : -1}
+            >
+              <span>{eventData && eventData.Recurring_Pattern.length > 0 ? `Edit Reccurrence (${eventData.Recurring_Pattern.length} Event${eventData.Recurring_Pattern.length !== 1 ? 's' : ''})` : "Set Up Recurring Event "}</span>
+              <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4 opacity-50" />
+            </Button>
+          </DialogTrigger>
+        </Dialog>
+      </Dialog>
+
       <Dialog open={isHeartCrewOpen} onOpenChange={setIsHeartCrewOpen}>
         <HeartCrewPopup />
         <DialogTrigger asChild>
@@ -114,20 +118,6 @@ const FormPage2 = ({
           >
             <span>Set Up Heart Crew</span>
             <FontAwesomeIcon icon={faPeopleGroup} className="h-4 w-4 opacity-50" />
-          </Button>
-        </DialogTrigger>
-      </Dialog>
-
-      <Dialog open={isRecurringOpen} onOpenChange={setIsRecurringOpen}>
-        <RecurringPopup open={isRecurringOpen} onOpenChange={setIsRecurringOpen} />
-        <DialogTrigger asChild>
-          <Button
-            variant={"default"}
-            className="w-full justify-between text-left font-normal text-primary-foreground col-span-2"
-            tabIndex={isActive ? 0 : -1}
-          >
-            <span>Set Up Reccuring Event</span>
-            <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4 opacity-50" />
           </Button>
         </DialogTrigger>
       </Dialog>

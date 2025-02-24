@@ -3,27 +3,37 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { toast as showToast } from '@/components/ui/use-toast';
 import { ToastActionElement, ToastAction } from '@/components/ui/toast';
 
+// export type ToastVariant = 'default' | 'destructive' | 'success';
 interface ToastContextType {
-  addToast: (message: string, variant?: 'default' | 'destructive', action?: ToastActionElement) => void;
+  addToast: ({ title, description, variant, action, actionText }: { title: string, description: string, variant?: string, action?: () => void, actionText?: string }) => void;
 }
+
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
-  const [toasts, setToasts] = useState<Array<{ message: string, variant: 'default' | 'destructive', action: ToastActionElement | null }>>([]);
+  const [toasts, setToasts] = useState<Array<{
+    title: string;
+    description: string;
+    variant: string;
+    action?: () => void;
+    actionText?: string;
+  }>>([]);
 
-  const addToast = (message: string, variant: 'default' | 'destructive' = 'default', action: ToastActionElement | null = null) => {
-    setToasts(prevToasts => [...prevToasts, { message, variant, action }]);
+  const addToast = ({ title, description, variant = 'default', action, actionText }: { title: string, description: string, variant?: string, action?: () => void, actionText?: string }) => {
+    const newToast = { title, description, variant, action, actionText };
+    setToasts(prevToasts => [...prevToasts, newToast]);
   };
 
   useEffect(() => {
     if (toasts.length > 0) {
-      const { message, variant, action } = toasts[0];
+      const { title, description, variant, action, actionText } = toasts[0];
+      console.log(variant);
       showToast({
-        title: "Uh oh! Something went wrong.",
-        description: message,
-        action: action ?? <ToastAction altText="Try Again" onClick={() => window.location.reload()}>Try Again</ToastAction>,
-        variant: variant,
+        title: title,
+        description: description,
+        action: action ? <ToastAction altText={actionText ?? ""} onClick={action}>{actionText}</ToastAction> : undefined,
+        variant: variant as "default" | "destructive" | "success" | "error" | undefined,
       });
       setToasts(prevToasts => prevToasts.slice(1));
     }

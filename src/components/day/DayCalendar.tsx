@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { correctForTimezone, WeekEvent } from '@/lib/utils';
-import { MPEvent } from '@/lib/types';
+import { correctForTimezone } from '@/lib/util';
+import { MPEvent, WeekEvent } from '@/lib/types';
 import { EventHoverCard } from '@/components/popups';
 
 interface CalendarProps {

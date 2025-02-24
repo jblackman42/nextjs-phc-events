@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/util";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesUpDown, faCheck } from '@awesome.me/kit-10a739193a/icons/classic/light';
 import {
@@ -14,11 +14,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import { CreateEventValue } from "@/lib/types";
 
-const DropdownInput = ({ value = 0, setValue, options, isActive = true }: {
+const DropdownInput = ({ value, setValue, options, showLabel = true, isActive = true, disabled = false }: {
   value?: number;
   setValue: (value: number) => void;
   options?: CreateEventValue;
+  showLabel?: boolean;
+  showSearch?: boolean;
   isActive?: boolean;
+  disabled?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   if (!options) return (
@@ -31,7 +34,7 @@ const DropdownInput = ({ value = 0, setValue, options, isActive = true }: {
   const { Name, Labels, Values } = options;
   return <Popover modal={true} open={open} onOpenChange={setOpen}>
     <div>
-      <label className="px-1">{Name}:</label>
+      {showLabel && <label className="px-1">{Name}:</label>}
       <PopoverTrigger asChild>
         <Button
           variant="default"
@@ -39,10 +42,12 @@ const DropdownInput = ({ value = 0, setValue, options, isActive = true }: {
           aria-expanded={open}
           className="w-full justify-between"
           tabIndex={isActive ? 0 : -1}
+          disabled={disabled}
         >
-          {value
+          {value !== null && value !== undefined
             ? Labels[Values.indexOf(value)]
             : `Select ${Name}...`}
+
 
           <FontAwesomeIcon icon={faAnglesUpDown} className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -59,7 +64,7 @@ const DropdownInput = ({ value = 0, setValue, options, isActive = true }: {
                 key={Values[index]}
                 value={label.toLowerCase()}
                 onSelect={(currentValue) => {
-                  setValue(currentValue === value.toString() ? 0 : Values[index])
+                  setValue(currentValue === value?.toString() ? 0 : Values[index])
                   setOpen(false)
                 }}
               >

@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from 'next/navigation';
-import { getOAuthConfig, encodeUrlForm } from "@/lib/utils";
+import { getOAuthConfig, encodeUrlForm } from "@/lib/util";
 import { useEffect } from "react";
 import { Loading } from '@/components';
 

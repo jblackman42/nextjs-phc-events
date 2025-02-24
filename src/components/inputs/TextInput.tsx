@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useId, InputHTMLAttributes } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/util";
 
 interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
   text?: string;

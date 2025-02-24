@@ -1,9 +1,9 @@
 "use client";
 import React, { useEffect, useRef, useState, useCallback, useMemo, useContext } from 'react';
-import { WeekEvent, correctForTimezone } from "@/lib/utils";
+import { correctForTimezone } from "@/lib/util";
 
 
-import { MPEvent } from "@/lib/types";
+import { MPEvent, WeekEvent } from "@/lib/types";
 
 import { useView } from "@/context/ViewContext";
 import { useSettings } from "@/context/SettingsContext";

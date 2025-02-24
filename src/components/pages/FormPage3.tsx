@@ -2,7 +2,7 @@
 import React from "react";
 
 import { MPLocation, MPBuildingWithRooms, MPRoom } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/util";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown } from "@awesome.me/kit-10a739193a/icons/classic/solid";

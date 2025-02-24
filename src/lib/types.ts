@@ -217,6 +217,15 @@ export interface MPEventCount {
   Cancelled_Count: number;
 }
 
+export interface WeekEvent {
+  id: number;
+  event: MPEvent;
+  width: string;
+  height: string;
+  posX: string;
+  posY: string;
+}
+
 export class CalendarDate extends Date {
   getWeek(this: CalendarDate): number {
     var date = new Date(this.getUTCFullYear(), this.getUTCMonth(), this.getUTCDate());

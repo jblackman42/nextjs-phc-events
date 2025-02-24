@@ -23,6 +23,7 @@ const FormPage1 = ({ isActive, eventValues }: { isActive: boolean, eventValues: 
         setValue={(value: number) => updateEventData({ Location_ID: value })}
         options={eventValues.find(value => value.Name === "Location")}
         isActive={isActive}
+        showSearch={false}
       />
 
 
@@ -51,8 +52,8 @@ const FormPage1 = ({ isActive, eventValues }: { isActive: boolean, eventValues: 
       />
 
       <DropdownInput
-        value={eventData?.Primary_Contact}
-        setValue={(value: number) => updateEventData({ Primary_Contact: value })}
+        value={eventData?.Primary_Contact_ID}
+        setValue={(value: number) => updateEventData({ Primary_Contact_ID: value })}
         options={eventValues.find(value => value.Name === "Primary Contact")}
         isActive={isActive}
 

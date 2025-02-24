@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/util";
 
 const TextAreaInput = ({ text = "", setText, label = "", isActive = true }: { text?: string, setText: (text: string) => void, label?: string, isActive?: boolean }) => {
   const [keyboardFocus, setKeyboardFocus] = useState(false);

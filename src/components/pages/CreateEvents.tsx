@@ -4,41 +4,30 @@ import React, { useState, useEffect, useRef } from "react";
 import { getCreateEventValues, getLocations } from "@/app/actions";
 import { CreateEventValue, MPLocation } from "@/lib/types";
 
-import { CreateEventProvider, useCreateEventData } from "@/context/CreateEventContext";
-
+import { defaultEventData, useCreateEventData } from "@/context/CreateEventContext";
+import { useLoading } from "@/context/LoadingContext";
+import { useUser } from "@/context/UserContext";
+import { useToast } from "@/context/ToastContext";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, createEvent } from "@/lib/util";
 
 
 import { FormPage1, FormPage2, FormPage3 } from "@/components/pages";
+// import { useToast } from "@/components/ui/use-toast";
+import { Loading } from "@/components";
 
 const numOfPages = 3;
 
 const CreateEvents = () => {
-  const { eventData } = useCreateEventData();
-
-  const [eventTitle, setEventTitle] = useState<string>("");
-  const [eventDate, setEventDate] = useState<Date>();
-  const [eventStartTime, setEventStartTime] = useState<string>();
-  const [eventEndTime, setEventEndTime] = useState<string>();
-  const [estimatedAttendance, setEstimatedAttendance] = useState<string>("0");
-  const [displayOnCalendar, setDisplayOnCalendar] = useState<boolean>(false);
-  const [setupMinutes, setSetupMinutes] = useState<string>("0");
-  const [cleanUpMinutes, setCleanUpMinutes] = useState<string>("0");
-  const [eventDescription, setEventDescription] = useState<string>("");
-
-  const [location, setLocation] = useState<number>();
-  const [primaryContact, setPrimaryContact] = useState<number>();
-  const [eventType, setEventType] = useState<number>();
-  const [congregation, setCongregation] = useState<number>();
-
-  const [selectedRooms, setSelectedRooms] = useState<number[]>([]);
+  const { eventData, updateEventData } = useCreateEventData();
+  const { user } = useUser();
+  const { addToast } = useToast();
+  const { loading, setLoading } = useLoading();
 
   const [allLocations, setAllLocations] = useState<MPLocation[]>([]);
   const [eventValues, setEventValues] = useState<CreateEventValue[]>([]);
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
   const previousPageIndex = useRef<number>(0);
-  const [currentLocation, setCurrentLocation] = useState<MPLocation>();
 
   // Add openAccordions state at the component level
   const [openAccordionID, setOpenAccordionID] = useState<number>();
@@ -48,18 +37,26 @@ const CreateEvents = () => {
     setCurrentPageIndex(newIndex);
   };
 
+  const handleSubmit = () => {
+    if (!eventData) {
+      addToast({
+        title: "Something Went Wrong",
+        description: "Internal Server Error.",
+        variant: "destructive"
+      });
+      return;
+    };
+    createEvent(eventData, user, setLoading, addToast);
+
+    updateEventData(defaultEventData);
+  }
+
   // Fetch event values and locations
   useEffect(() => {
     const fetchEventValues = async () => {
       const eventValues = await getCreateEventValues();
       const sortedEventValues = eventValues.sort((a, b) => a.Sort_Order - b.Sort_Order);
-      const [locations, primaryContacts, eventTypes, congregations] = sortedEventValues;
       setEventValues(sortedEventValues);
-
-      setLocation(locations.Default_ID);
-      setPrimaryContact(primaryContacts.Default_ID);
-      setEventType(eventTypes.Default_ID);
-      setCongregation(congregations.Default_ID);
     };
 
     const fetchBuildings = async () => {
@@ -71,16 +68,11 @@ const CreateEvents = () => {
     fetchBuildings();
   }, []);
 
-  // Set the current building based on the location input
-  useEffect(() => {
-    setCurrentLocation(allLocations.find(building => building.Location_ID === location));
-  }, [location, allLocations]);
-
   const pageContainerRef = useRef<HTMLDivElement>(null);
-
 
   return (
     <div className="max-w-screen-md h-full mx-auto flex flex-col justify-center">
+      {loading && <Loading />}
       <div className="w-full my-2">
         <div className="flex gap-4">
 
@@ -156,7 +148,7 @@ const CreateEvents = () => {
 
         <Button variant="thin" disabled={currentPageIndex === 0} onClick={() => handlePageChange(currentPageIndex - 1)}>Previous</Button>
         {currentPageIndex !== numOfPages - 1 && <Button variant="thin" onClick={() => handlePageChange(currentPageIndex + 1)}>Next</Button>}
-        {currentPageIndex === numOfPages - 1 && <Button variant="secondary" onClick={() => console.log(eventData)}>Submit</Button>}
+        {currentPageIndex === numOfPages - 1 && <Button variant="secondary" onClick={handleSubmit}>Submit</Button>}
 
       </div>
     </div>

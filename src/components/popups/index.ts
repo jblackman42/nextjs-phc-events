@@ -5,6 +5,6 @@ import MinistryQuestionPopup from "@/components/popups/MinistryQuestionPopup";
 import SettingsPopup from "@/components/popups/SettingsPopup";
 import Popup from "@/components/popups/Popup";
 import EventHoverCard from "@/components/popups/EventHoverCard";
-import ToastClientComponent from "@/components/popups/ToastClientComponent";
+import ToastClientComponent from "@/components/ToastClientComponent";
 
 export { AccountPopup, DayPopup, EventPopup, MinistryQuestionPopup, SettingsPopup, Popup, EventHoverCard, ToastClientComponent };

@@ -13,7 +13,7 @@ import { Separator } from '@radix-ui/react-select';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@awesome.me/kit-10a739193a/icons/classic/solid';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/util';
 
 function correctForTimezone(date: string): Date {
   const result = new Date(date);
