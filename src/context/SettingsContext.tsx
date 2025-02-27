@@ -56,7 +56,9 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   return (
-    <SettingsContext.Provider value={{ settings: currentSettings, updateSettings: updateSettings }}>
+    <SettingsContext.Provider value={{
+      settings: currentSettings,
+      updateSettings: updateSettings}}>
       {children}
     </SettingsContext.Provider>
   );

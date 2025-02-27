@@ -111,7 +111,7 @@ const config = {
 			},
 			animation: {
 				'fade-slide-down': 'fade-slide-down 500ms ease-in-out forwards',
-				'skeleton-breathe': 'skeleton-breathe 2s ease-in-out infinite',
+				'skeleton-breathe': 'skeleton-breathe 500ms ease-in-out infinite',
 				'calendar-fade': 'calendar-fade 500ms ease-in-out 200ms 1 normal forwards',
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'

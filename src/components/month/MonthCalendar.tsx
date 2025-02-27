@@ -12,6 +12,8 @@ import { getEventCounts } from '@/app/actions';
 import { DayPopup, EventPopup } from "@/components/popups"
 import { MonthCalendarSkeleton } from "@/components/month";
 
+import { getEvent } from "@/lib/util";
+
 const fullDayCount = 21;
 
 function getOrdinalSuffix(value: number | string): string {
@@ -69,6 +71,26 @@ const MonthCalendar = ({ initialEventCounts, initialDates }: { initialEventCount
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const lastFetchedDateRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const eventId = url.searchParams.get('eventId');
+    
+    if (eventId) {
+      // Remove the id parameter from URL without refreshing
+      url.searchParams.delete('eventId');
+      window.history.replaceState({}, '', url.toString());
+      
+      // Fetch and handle the event
+      getEvent(parseInt(eventId)).then(event => {
+        // console.log('Event from URL parameter:', event);
+        if (event) {
+          setSelectedEvent(event);
+          setEventPopupOpen(true);
+        }
+      });
+    }
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);

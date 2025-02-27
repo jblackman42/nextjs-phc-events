@@ -40,7 +40,7 @@ function CalendarOptionsClient({ locations }: { locations: MPLocation[] }) {
   }, [view.location_id, view.building_id, prevLocationID, prevBuildingID, setView]);
 
   return (
-    <div className="max-w-screen-xl mx-auto grid grid-cols-2 md:grid-cols-4">
+    <div className="max-w-screen-xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-x-2">
       <div className="flex items-center md:col-span-2 relative">
         <Button variant="icon" onClick={prevPeriod}><FontAwesomeIcon icon={faArrowLeft} /></Button>
         <button><h1 className="date-picker-trigger md:text-xl text-lg mx-2 min-w-40 text-center whitespace-nowrap hover:underline">{months[view.current_date.getUTCMonth()]} {view.current_date.getUTCFullYear()}</h1></button>
@@ -51,7 +51,7 @@ function CalendarOptionsClient({ locations }: { locations: MPLocation[] }) {
         <FontAwesomeIcon icon={mobileFilterDropdownOpen ? faClose : faBars} className="text-xl text-textHeading" />
       </button>
 
-      <div className="hidden md:block max-w-60  ml-auto col-span-2">
+      <div className="hidden md:block w-full  ml-auto col-start-4">
         <SearchBar />
       </div>
 

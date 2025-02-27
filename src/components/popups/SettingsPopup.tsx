@@ -11,8 +11,8 @@ function SettingsPopup({ open = undefined, setOpen }: { open: Boolean | undefine
   const [tempSettings, setTempSettings] = useState<CalendarSettings>(settings);
 
   const handleSubmit = () => {
-    setOpen(false);
     updateSettings(tempSettings);
+    setOpen(false);
   }
 
   useEffect(() => {

@@ -4,8 +4,9 @@ import axios from "axios";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import Cookies from 'js-cookie';
-import { OAuthConfig, User } from "@/lib/types";
-import { defaultEventData, CreateEventData } from "@/context/CreateEventContext";
+import { OAuthConfig, User, MPEvent } from "@/lib/types";
+
+import { CreateEventData } from "@/context/CreateEventContext";
 
 const getISOTime = (timeString: string) => {
   const [time, period] = timeString.split(' ');
@@ -116,6 +117,18 @@ export const createEvent = async (eventData: CreateEventData, user: User, setLoa
     action: () => { console.log(Events) },
     actionText: `View Event${Events.length > 1 ? "s" : ""}`
   });
+}
+
+export const getEvent = async (eventId: number): Promise<MPEvent> => {
+  try {
+    const response = await axios({
+      method: "GET",
+      url: `/api/client/event/${eventId}`
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to get event");
+  }
 }
 
 // Basic utility functions
