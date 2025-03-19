@@ -1,99 +1,17 @@
--- SELECT TOP 10
-
---   E.Event_ID,
---   E.Event_Title,
---   ET.Event_Type,
---   CO.Congregation_Name,
---   L.Location_Name,
---   L.Location_ID,
---   E.Meeting_Instructions,
---   E.Description,
---   P.Program_Name,
---   C.Display_Name AS Primary_Contact,
---   E.Participants_Expected,
---   E.Minutes_for_Setup,
---   E.Minutes_for_Cleanup,
---   E.Event_Start_Date,
---   E.Event_End_Date,
---   E.Cancelled,
---   E.Featured_On_Calendar,
---   VL.Visibility_Level,
---   UC.Display_Name AS "Created_By",
---   CONCAT(
---     (SELECT Base_URI FROM dp_Domains WHERE Domain_ID = 1),
---     (SELECT TOP 1 Page_ID FROM dp_Pages PG WHERE PG.Display_Name = 'Events'),
---     '/', E.Event_ID
---   ) AS Event_Path,
---   COALESCE((
---     SELECT DISTINCT
---       B.Building_ID,
---       B.Building_Name
---     FROM Event_Rooms ER
---     JOIN Rooms R ON R.Room_ID = ER.Room_ID
---     JOIN Buildings B ON B.Building_ID = R.Building_ID
---     WHERE ER.Event_ID = E.Event_ID AND ER.Cancelled = 0
---     FOR JSON PATH
---   ), '[]') AS Booked_Buildings,
---   COALESCE((
---     SELECT DISTINCT
---       R.Room_ID,
---       R.Room_Name,
---       R.Building_ID
---     FROM Event_Rooms ER
---     JOIN Rooms R ON R.Room_ID = ER.Room_ID
---     WHERE ER.Event_ID = E.Event_ID AND ER.Cancelled = 0
---     ORDER BY R.Room_Name
---     FOR JSON PATH
---   ), '[]') AS Booked_Rooms,
---   COALESCE((
---     SELECT DISTINCT
---       S.Service_Name,
---       C.Display_Name AS 'Service_Contact',
---       ES._Approved AS 'Approved'
---     FROM Event_Services ES
---     JOIN Servicing S ON S.Service_ID = ES.Service_ID
---     JOIN Contacts C ON C.Contact_ID = S.Contact_ID
---     WHERE ES.Event_ID = E.Event_ID AND ES.Cancelled = 0
---     ORDER BY S.Service_Name
---     FOR JSON PATH
---   ), '[]') AS Requested_Services,
---   COALESCE((
---     SELECT DISTINCT
---       EQ.Equipment_Name,
---       EE.Quantity,
---       EE._Approved AS 'Approved'
---     FROM Event_Equipment EE
---     JOIN Equipment EQ ON EQ.Equipment_ID = EE.Equipment_ID
---     WHERE EE.Event_ID = E.Event_ID AND EE.Cancelled = 0
---     ORDER BY EQ.Equipment_Name
---     FOR JSON PATH
---   ), '[]') AS Requested_Equipment
--- FROM Events E
--- LEFT JOIN Programs P ON P.Program_ID = E.Program_ID
--- LEFT JOIN Contacts C ON C.Contact_ID = E.Primary_Contact
--- LEFT JOIN dp_Users U ON U.User_ID = E.Created_By_User
--- LEFT JOIN Contacts UC ON UC.Contact_ID = U.Contact_ID
--- LEFT JOIN Congregations CO ON CO.Congregation_ID = E.Congregation_ID
--- LEFT JOIN Locations L ON L.Location_ID = E.Location_ID
--- LEFT JOIN Event_Types ET ON ET.Event_Type_ID = E.Event_Type_ID
--- LEFT JOIN Visibility_Levels VL ON VL.Visibility_Level_ID = E.Visibility_Level_ID
-
--- WHERE Event_Title LIKE '%' + @keyword + '%'
--- ORDER BY ABS(DATEDIFF(DAY, Event_Start_Date, @targetDate)), Event_Title
-
--- ------------------------------------------------------------------------------------------------
-
--- DECLARE @Keyword nvarchar(50) = '5th sunday';
--- DECLARE @EarliestDate Date = '2025-02-01';
-
 DECLARE @Amount int = 10;
--- Create a table variable to hold the initial results
+DECLARE @IsStaff bit = (SELECT CASE 
+                              WHEN EXISTS(SELECT 1 FROM dp_User_Roles UR 
+                                        JOIN dp_Users U ON U.User_ID = UR.User_ID 
+                                        WHERE CONVERT(nvarchar(36), U.User_GUID) = @userGUID)                         THEN 1
+                              ELSE 0
+                          END);-- Create a table variable to hold the initial results
 DECLARE @Results TABLE (
     Event_ID INT,
     Event_Title NVARCHAR(255),
     Event_Start_Date DATETIME,
     Cancelled BIT,
     Featured_On_Calendar BIT,
+    Visibility_Level_ID INT,
     SortOrder INT
 );
 
@@ -105,6 +23,7 @@ SELECT TOP (@Amount)
     E.Event_Start_Date,
     E.Cancelled,
     E.Featured_On_Calendar,
+    E.Visibility_Level_ID,
     CASE 
         WHEN E.Event_Title LIKE '%' + @keyword + '%' THEN 1
         WHEN E.[Description] LIKE '%' + @keyword + '%' THEN 2
@@ -122,6 +41,10 @@ WHERE E.Event_Start_Date >= @targetDate
       OR P.Program_Name LIKE '%' + @keyword + '%'
       OR M.Ministry_Name LIKE '%' + @keyword + '%'
   )
+  AND (
+    ((@IsStaff = 1)) 
+    OR E.Visibility_Level_ID = 4
+)
 ORDER BY SortOrder, E.Event_Start_Date;
 
 -- Check if we need more results
@@ -141,6 +64,7 @@ BEGIN
         E.Event_Start_Date,
         E.Cancelled,
         E.Featured_On_Calendar,
+        E.Visibility_Level_ID,
         CASE 
             WHEN E.Event_Title LIKE '%' + @keyword + '%' THEN 1
             WHEN E.[Description] LIKE '%' + @keyword + '%' THEN 2
@@ -158,6 +82,10 @@ BEGIN
           OR P.Program_Name LIKE '%' + @keyword + '%'
           OR M.Ministry_Name LIKE '%' + @keyword + '%'
       )
+      AND (
+        ((@IsStaff = 1)) 
+        OR E.Visibility_Level_ID = 4
+)
     ORDER BY E.Event_Start_Date DESC, SortOrder;  -- Order by most recent first
 END
 
@@ -167,6 +95,7 @@ SELECT TOP (@Amount)
     Event_Title,
     Event_Start_Date,
     Cancelled,
-    Featured_On_Calendar
+    Featured_On_Calendar,
+    Visibility_Level_ID
 FROM @Results
 ORDER BY ABS(DATEDIFF(DAY, @targetDate, Event_Start_Date)), SortOrder;
