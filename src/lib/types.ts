@@ -115,12 +115,12 @@ export interface tokenPayload {
   amr: string[];
 }
 
-interface userRole {
+export interface userRole {
   Role_ID: number;
   Role_Name: string;
 }
 
-interface userGroup {
+export interface userGroup {
   User_Group_ID: number;
   User_Group_Name: string;
 }

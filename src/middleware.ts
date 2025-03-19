@@ -81,12 +81,13 @@ async function checkSession(sessionValue: string, request: NextRequest): Promise
     }
 
     const userRolesData: userRoles = await userRolesResponse.json();
+    const route = PROTECTED_ROUTES.find(route => url.pathname.startsWith(route.path));
 
     const userRoles = userRolesData.Roles.map(role => role.Role_ID);
     const userGroups = userRolesData.User_Groups.map(group => group.User_Group_ID);
 
-    const isUserInRequiredRole = userRoles.some(role => PROTECTED_ROUTES.some(route => route.requiredRoleID.includes(role)));
-    const isUserInRequiredGroup = userGroups.some(group => PROTECTED_ROUTES.some(route => route.requiredGroupID.includes(group)));
+    const isUserInRequiredRole = userRoles.some(role => route?.requiredRoleID.includes(role));
+    const isUserInRequiredGroup = userGroups.some(group => route?.requiredGroupID.includes(group));
 
     if (isUserInRequiredRole || isUserInRequiredGroup) {
       return true;

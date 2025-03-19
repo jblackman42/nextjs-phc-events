@@ -8,7 +8,7 @@ import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 
 const PageDefaults = () => {
-  const { isAuthenticated } = useUser();
+  const { user, isAuthenticated } = useUser();
   const { theme, toggleTheme } = useTheme();
   const [sOpen, setSOpen] = useState<boolean | undefined>();
   const [aOpen, setAOpen] = useState<boolean | undefined>();
@@ -72,7 +72,7 @@ const PageDefaults = () => {
     <>
       <SettingsPopup open={sOpen} setOpen={setSOpen} />
       <AccountPopup open={aOpen} setOpen={setAOpen} />
-      <Navbar navLinks={navLinks} />
+      <Navbar navLinks={navLinks} user={user} />
     </>
   );
 };

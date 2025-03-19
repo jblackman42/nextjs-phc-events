@@ -1,10 +1,13 @@
 DECLARE @Amount int = 10;
 DECLARE @IsStaff bit = (SELECT CASE 
-                              WHEN EXISTS(SELECT 1 FROM dp_User_Roles UR 
-                                        JOIN dp_Users U ON U.User_ID = UR.User_ID 
-                                        WHERE CONVERT(nvarchar(36), U.User_GUID) = @userGUID)                         THEN 1
-                              ELSE 0
-                          END);-- Create a table variable to hold the initial results
+                            WHEN EXISTS(SELECT 1 FROM dp_User_Roles UR 
+                                JOIN dp_Users U ON U.User_ID = UR.User_ID 
+                                WHERE CONVERT(nvarchar(36), U.User_GUID) = @userGUID)
+                            THEN 1
+                            ELSE 0
+                        END);
+
+-- Create a table variable to hold the initial results
 DECLARE @Results TABLE (
     Event_ID INT,
     Event_Title NVARCHAR(255),
