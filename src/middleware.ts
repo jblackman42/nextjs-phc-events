@@ -67,15 +67,11 @@ async function checkSession(sessionValue: string, request: NextRequest): Promise
     }
 
     const isTokenValid = await verifyJWT(currentToken);
-
-
-
-    // if (isProtectedRoute && !isSessionValid) {
-    //   return NextResponse.redirect(new URL('/', request.url));
-    // }
-
+    if (!isTokenValid) {
+      return false;
+    }
+    
     const { sub } = parseJWT(currentToken);
-
     const userRolesResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/client/auth/user-roles`, {
       method: "POST",
       body: JSON.stringify({ sub })
@@ -120,13 +116,13 @@ async function handleApiRequests(request: NextRequest) {
 }
 
 async function handleOtherRequests(request: NextRequest) {
-  // const url = request.nextUrl;
-  // const isProtectedRoute = PROTECTED_ROUTES.some(route => url.pathname.startsWith(route.path));
+  const url = request.nextUrl;
+  const isProtectedRoute = PROTECTED_ROUTES.some(route => url.pathname.startsWith(route.path));
 
   const sessionCookie = request.cookies.get('session')?.value;
   const isSessionValid = !!sessionCookie && await checkSession(sessionCookie, request);
   
-  if (!isSessionValid) {
+  if (!isSessionValid && isProtectedRoute) {
     return NextResponse.redirect(new URL('/', request.url));
   } else {
     return NextResponse.next();
