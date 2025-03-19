@@ -67,7 +67,8 @@ function SearchBar() {
     if (searchInput.length >= minInputLength) {
       setSearchLoading(true);
       debounceTimeout.current = setTimeout(async () => {
-        const results = await searchEvents(searchInput, new Date().toISOString(), settings.showCancelledEvents.value, user.sub);
+        const userGUID = user ? user.sub : '';
+        const results = await searchEvents(searchInput, new Date().toISOString(), settings.showCancelledEvents.value, userGUID);
         if (results) {
           setSearchResults(results);
         }
@@ -81,7 +82,7 @@ function SearchBar() {
         clearTimeout(debounceTimeout.current);
       }
     };
-  }, [searchInput, searchEvents, settings.showCancelledEvents.value, user.sub]);
+  }, [searchInput, searchEvents, settings.showCancelledEvents.value, user]);
 
   const handleClickEvent = (e: MPEvent): void => {
     window.location.href = `/?eventId=${e.Event_ID}`;

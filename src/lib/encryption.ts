@@ -1,8 +1,52 @@
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
 const ivLength = 12; // AES-GCM recommends 12 bytes IV
+import { tokenPayload } from './types';
 
-async function getKey() {
+export function parseJWT(token: string): tokenPayload {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Invalid JWT format');
+    }
+
+    // Decode the payload (second part)
+    const payload = JSON.parse(
+      Buffer.from(parts[1], 'base64url').toString('utf8')
+    );
+
+    return payload as tokenPayload;
+  } catch (error) {
+    throw new Error('Failed to parse JWT');
+  }
+}
+
+export async function verifyJWT(token: string): Promise<boolean> {
+  try {
+    // Decode without verification
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return false; // Invalid JWT format
+    }
+
+    // Decode the payload (second part)
+    const payload = JSON.parse(
+      Buffer.from(parts[1], 'base64').toString('utf8')
+    );
+
+    // Check if token has expired
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.exp && payload.exp < now) {
+      return false; // Token has expired
+    }
+
+    return true;
+  } catch (error) {
+    return false; // Invalid token format or parsing error
+  }
+};
+
+async function getKey(): Promise<CryptoKey> {
   const password = process.env.ENCRYPTION_SECRET || 'default_secret';
   const salt = textEncoder.encode('salt');
   const keyMaterial = await crypto.subtle.importKey(

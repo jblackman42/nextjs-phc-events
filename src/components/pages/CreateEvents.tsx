@@ -111,7 +111,7 @@ const CreateEvents = () => {
           })}
         </div>
       </div>
-      <div className="w-full overflow-hidden">
+      <div className="w-full overflow-x-hidden">
         <div
           className="w-[768px] flex transition-transform duration-300 ease-in-out"
           ref={pageContainerRef}

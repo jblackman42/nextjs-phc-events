@@ -100,6 +100,35 @@ export interface OAuthConfig {
   token_endpoint_auth_methods_supported: Array<string>;
 }
 
+export interface tokenPayload {
+  iss: string;
+  aud: string;
+  exp: number;
+  nbf: number;
+  client_id: string;
+  scope: string[];
+  sub: string;
+  auth_time: number;
+  idp: string;
+  auth_hash: string;
+  name: string;
+  amr: string[];
+}
+
+interface userRole {
+  Role_ID: number;
+  Role_Name: string;
+}
+
+interface userGroup {
+  User_Group_ID: number;
+  User_Group_Name: string;
+}
+export interface userRoles {
+  Roles: userRole[];
+  User_Groups: userGroup[];
+}
+
 export interface User {
   amr: string;
   auth_hash: string;
@@ -145,6 +174,7 @@ export interface User {
   userid: string;
   zoneinfo: string;
 }
+
 
 export interface NavLink {
   variant: 'link' | 'spacer';

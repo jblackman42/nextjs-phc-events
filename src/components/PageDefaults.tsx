@@ -44,8 +44,10 @@ const PageDefaults = () => {
     },
     {
       variant: "link",
-      label: theme === "dark" ? "Light Mode" : "Dark Mode",
-      icon: theme === "dark" ? faBrightness : faMoon,
+      // label: theme === "dark" ? "Light Mode" : "Dark Mode",
+      // icon: theme === "dark" ? faBrightness : faMoon,
+      label: "dark",
+      icon: faBrightness,
       link: null,
       action: toggleTheme,
     },
@@ -59,6 +61,7 @@ const PageDefaults = () => {
     {
       variant: "link",
       label: isAuthenticated ? "Account" : "Login",
+      // icon: faRightToBracket,
       icon: isAuthenticated ? faUser : faRightToBracket,
       link: isAuthenticated ? null : "/login",
       action: isAuthenticated ? () => setAOpen(true) : null,

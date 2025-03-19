@@ -50,7 +50,7 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
-    "@types/jsonwebtoken": "^9.0.6",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/mssql": "^9.1.5",
     "@types/node": "^20",
     "@types/react": "^18",

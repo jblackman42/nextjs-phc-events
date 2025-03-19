@@ -8,7 +8,7 @@ import { OAuthConfig, User, MPEvent } from "@/lib/types";
 
 import { CreateEventData } from "@/context/CreateEventContext";
 
-const getISOTime = (timeString: string) => {
+export const getISOTime = (timeString: string) => {
   const [time, period] = timeString.split(' ');
   const [hours, minutes] = time.split(':');
 
@@ -93,30 +93,42 @@ export const createEvent = async (eventData: CreateEventData, user: User, setLoa
     })
   }
 
-  await new Promise(resolve => setTimeout(resolve, 500));
-  // await axios({
-  //   method: "POST",
-  //   url: "/api/client/events/create",
-  //   headers: {
-  //     "Content-Type": "application/json"
-  //   },
-  //   data: {
-  //     Display_Name: user.display_name,
-  //     User_ID: user.userid,
-  //     Events: JSON.stringify(Events),
-  //     Selected_Rooms: eventData.Selected_Rooms.length > 0 ? eventData.Selected_Rooms.join(",") : null
-  //   }
-  // })
-
-  setLoading(false);
-
-  addToast({
-    title: "Event Created",
-    description: `${Events.length} Event${Events.length > 1 ? "s" : ""} created successfully.`,
-    variant: "success",
-    action: () => { console.log(Events) },
-    actionText: `View Event${Events.length > 1 ? "s" : ""}`
-  });
+  try {
+    // await new Promise(resolve => setTimeout(resolve, 500));
+    await axios({
+      method: "POST",
+      // url: "/api/client/events/create",
+      url: "/api/events/create",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      data: {
+        Display_Name: user.display_name,
+        User_ID: user.userid,
+        Events: JSON.stringify(Events),
+        Selected_Rooms: eventData.Selected_Rooms.length > 0 ? eventData.Selected_Rooms.join(",") : null
+      }
+    })
+  
+    console.log(eventData.Recurring_Pattern)
+  
+    setLoading(false);
+  
+    addToast({
+      title: "Event Created",
+      description: `${Events.length} Event${Events.length > 1 ? "s" : ""} created successfully.`,
+      variant: "success",
+      action: () => { console.log(Events) },
+      actionText: `View Event${Events.length > 1 ? "s" : ""}`
+    });
+  } catch (error) {
+    setLoading(false);
+    addToast({
+      title: "Error Creating Event",
+      description: "Please try again.",
+      variant: "destructive"
+    });
+  }
 }
 
 export const getEvent = async (eventId: number): Promise<MPEvent> => {
