@@ -28,7 +28,7 @@ export const getCongregations = cache(async (): Promise<Congregation[]> => {
   return result;
 })
 
-export const getEventCounts = cache(async (datesArr: string[], locationID?: number, buildingID?: number, roomID?: number): Promise<MPEventCount[]> => {
+export const getEventCounts = cache(async (datesArr: string[], locationID?: number, buildingID?: number, roomID?: number, userGuid?: string): Promise<MPEventCount[]> => {
   // await new Promise((resolve) => setTimeout(resolve, 20000));
   const Location_ID = locationID && locationID !== 0 ? locationID : null;
   const Building_ID = buildingID && buildingID !== 0 ? buildingID : null;
@@ -47,7 +47,8 @@ export const getEventCounts = cache(async (datesArr: string[], locationID?: numb
           dateList: datesArr.join(','),
           Location_ID: Location_ID,
           Building_ID: Building_ID,
-          Room_ID: Room_ID
+          Room_ID: Room_ID,
+          User_Guid: userGuid ?? ''
         })
       }
     );
@@ -81,7 +82,7 @@ export const getMonthDates = cache(async (year: number, month: number): Promise<
 
 
 
-export const getEventByID = cache(async (id: string | null): Promise<MPEvent | undefined> => {
+export const getEventByID = cache(async (id: string): Promise<MPEvent | undefined> => {
   try {
     return axios({
       method: "GET",
@@ -99,7 +100,7 @@ export const getEventByID = cache(async (id: string | null): Promise<MPEvent | u
 
 
 
-export const getEvents = cache(async (startDate: string, endDate: string, locationID?: number, buildingID?: number, roomID?: number): Promise<MPEvent[]> => {
+export const getEvents = cache(async (startDate: string, endDate: string, locationID?: number, buildingID?: number, roomID?: number, userGuid?: string): Promise<MPEvent[]> => {
   const Location_ID = locationID && locationID !== 0 ? locationID : null;
   const Building_ID = buildingID && buildingID !== 0 ? buildingID : null;
   const Room_ID = roomID && roomID !== 0 ? roomID : null;
@@ -118,7 +119,8 @@ export const getEvents = cache(async (startDate: string, endDate: string, locati
           endDate: endDate,
           Location_ID: Location_ID,
           Building_ID: Building_ID,
-          Room_ID: Room_ID
+          Room_ID: Room_ID,
+          User_Guid: userGuid ?? ''
         })
       });
 

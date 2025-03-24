@@ -1,3 +1,13 @@
+-- Declare variables
+DECLARE @IsStaff bit;
+SET @IsStaff = (SELECT CASE 
+                    WHEN EXISTS(SELECT 1 FROM dp_User_Roles UR 
+                        JOIN dp_Users U ON U.User_ID = UR.User_ID 
+                        WHERE CONVERT(nvarchar(36), U.User_GUID) = @User_Guid)
+                    THEN 1
+                    ELSE 0
+                END);
+
 SELECT
 
   E.Event_ID,
@@ -80,6 +90,7 @@ LEFT JOIN Visibility_Levels VL ON VL.Visibility_Level_ID = E.Visibility_Level_ID
 
 WHERE
   E.Event_Start_Date BETWEEN @startDate AND @endDate
+  AND (@IsStaff = 1 OR E.Visibility_Level_ID = 4)
   AND (E.Location_ID = @Location_ID OR @Location_ID IS NULL)
   AND (
     EXISTS (

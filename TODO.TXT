@@ -1,8 +1,6 @@
 To Do:
- - Add spacing between event popups and the edge of the screen when on mobile.
  - finish forms for registration, promotion, facilities, a/v, and heart crews
  - Make NumberInput have a variant for currency
- - make client routes (/event/id, /events/search) require valid 'sub' for hidden
  - check if any data has changed before running the blocked rooms query a second time
  - Prayer wall manager
  - New Guide manager

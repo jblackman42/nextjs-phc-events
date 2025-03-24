@@ -11,6 +11,7 @@ import { CalendarDate, MPEvent, MPEventCount } from '@/lib/types';
 import { getEvents } from '@/app/actions';
 import { useSettings } from '@/context/SettingsContext';
 import { useView } from '@/context/ViewContext';
+import { useUser } from '@/context/UserContext';
 const correctForTimezone = (date: string): Date => {
   const result = new Date(date);
   result.setMinutes(result.getMinutes() + result.getTimezoneOffset());
@@ -28,7 +29,7 @@ const sameDay = (d1: Date, d2: Date) => {
 }
 
 const DayPopup = ({ eventCounts = [], handleEventClick }: { eventCounts?: MPEventCount[], handleEventClick: (value: MPEvent) => void }) => {
-
+  const { user } = useUser();
   const { settings } = useSettings();
   const { view } = useView();
   const [loading, setLoading] = useState<boolean>(true);
@@ -48,11 +49,11 @@ const DayPopup = ({ eventCounts = [], handleEventClick }: { eventCounts?: MPEven
       const endDate = new Date(view.selected_date.getTime() + (86400000 - 1)).toISOString();
 
       // await new Promise((resolve) => setTimeout(resolve, 2000));
-      const newEvents = await getEvents(startDate, endDate, view.location_id, view.building_id, view.room_id);
+      const newEvents = await getEvents(startDate, endDate, view.location_id, view.building_id, view.room_id, user?.sub);
       setEvents(newEvents);
       setLoading(false);
     })()
-  }, [view.selected_date, view.location_id, view.building_id, view.room_id]);
+  }, [view.selected_date, view.location_id, view.building_id, view.room_id, user?.sub]);
 
   return <DialogContent>
     <DialogHeader>

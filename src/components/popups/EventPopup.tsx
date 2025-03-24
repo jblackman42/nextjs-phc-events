@@ -9,7 +9,6 @@ import {
 import { MPEvent, MPRoom } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Separator } from '@radix-ui/react-select';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@awesome.me/kit-10a739193a/icons/classic/solid';

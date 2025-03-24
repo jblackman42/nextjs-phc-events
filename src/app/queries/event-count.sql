@@ -1,6 +1,16 @@
 -- Temporary table to hold the dates
 IF OBJECT_ID('tempdb..#Dates') IS NOT NULL DROP TABLE #Dates;
 
+-- Declare variables
+DECLARE @IsStaff bit;
+SET @IsStaff = (SELECT CASE 
+                    WHEN EXISTS(SELECT 1 FROM dp_User_Roles UR 
+                        JOIN dp_Users U ON U.User_ID = UR.User_ID 
+                        WHERE CONVERT(nvarchar(36), U.User_GUID) = @User_Guid)
+                    THEN 1
+                    ELSE 0
+                END);
+
 -- Split the comma-separated string into individual dates
 ;WITH SplitDates AS (
     SELECT 
@@ -27,6 +37,7 @@ SELECT
         WHERE 
             CAST(E.Event_Start_Date AS DATE) = d.[Date]
             AND E.Cancelled = 0
+            AND (@IsStaff = 1 OR E.Visibility_Level_ID = 4)
             AND (E.Location_ID = @Location_ID OR @Location_ID IS NULL)
             AND (
                 EXISTS (
@@ -57,6 +68,7 @@ SELECT
         WHERE 
             CAST(E.Event_Start_Date AS DATE) = d.[Date]
             AND E.Cancelled = 1
+            AND (@IsStaff = 1 OR E.Visibility_Level_ID = 4)
             AND (E.Location_ID = @Location_ID OR @Location_ID IS NULL)
             AND (
                 EXISTS (

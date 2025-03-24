@@ -44,10 +44,7 @@ WHERE E.Event_Start_Date >= @targetDate
       OR P.Program_Name LIKE '%' + @keyword + '%'
       OR M.Ministry_Name LIKE '%' + @keyword + '%'
   )
-  AND (
-    ((@IsStaff = 1)) 
-    OR E.Visibility_Level_ID = 4
-)
+  AND (@IsStaff = 1 OR E.Visibility_Level_ID = 4)
 ORDER BY SortOrder, E.Event_Start_Date;
 
 -- Check if we need more results
@@ -85,10 +82,7 @@ BEGIN
           OR P.Program_Name LIKE '%' + @keyword + '%'
           OR M.Ministry_Name LIKE '%' + @keyword + '%'
       )
-      AND (
-        ((@IsStaff = 1)) 
-        OR E.Visibility_Level_ID = 4
-)
+      AND (@IsStaff = 1 OR E.Visibility_Level_ID = 4)
     ORDER BY E.Event_Start_Date DESC, SortOrder;  -- Order by most recent first
 END
 

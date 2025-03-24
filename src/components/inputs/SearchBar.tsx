@@ -8,14 +8,16 @@ import { cn } from '@/lib/util';
 
 import { useSettings } from '@/context/SettingsContext';
 import { useUser } from '@/context/UserContext';
-import { useLoading } from '@/context/LoadingContext';
-
+// import { useLoading } from '@/context/LoadingContext';
+import { encrypt } from '@/lib/encryption';
+import { useToast } from '@/components/ui/use-toast';
 const minInputLength = 3;
 
 function SearchBar() {
+  const { toast } = useToast();
   const { settings } = useSettings();
   const { user } = useUser();
-  const { setLoading } = useLoading();
+  // const { setLoading } = useLoading();
   const [searchInput, setSearchInput] = useState<string>('');
   const [searchResults, setSearchResults] = useState<Array<MPEvent>>([]);
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -84,8 +86,18 @@ function SearchBar() {
     };
   }, [searchInput, searchEvents, settings.showCancelledEvents.value, user]);
 
-  const handleClickEvent = (e: MPEvent): void => {
-    window.location.href = `/?eventId=${e.Event_ID}`;
+  const handleClickEvent = async (e: MPEvent): Promise<void> => {
+    try {
+      const encryptedEventID = await encrypt(e.Event_ID.toString());
+      const safeEncryptedEventID = encodeURIComponent(encryptedEventID);
+      window.location.href = `/?eventId=${safeEncryptedEventID}`;
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to open event",
+        variant: "destructive"
+      });
+    }
   }
 
   const handleFocus = () => {

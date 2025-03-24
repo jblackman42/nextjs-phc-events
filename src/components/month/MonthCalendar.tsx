@@ -7,7 +7,10 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect, useState, useRef } from 'react';
 import { useView } from '@/context/ViewContext';
+import { useUser } from '@/context/UserContext';
 import { getEventCounts } from '@/app/actions';
+import { decrypt } from '@/lib/encryption';
+import { useToast } from '@/components/ui/use-toast';
 
 import { DayPopup, EventPopup } from "@/components/popups"
 import { MonthCalendarSkeleton } from "@/components/month";
@@ -57,11 +60,14 @@ function getMonthDates(year: number, month: number): string[] {
   return dates;
 }
 
-const MonthCalendar = ({ initialEventCounts, initialDates }: { initialEventCounts: MPEventCount[], initialDates: string[] }) => {
+// const MonthCalendar = ({ initialEventCounts, initialDates }: { initialEventCounts: MPEventCount[], initialDates: string[] }) => {
+const MonthCalendar = ({ initialDates }: { initialDates: string[] }) => {
   const { settings } = useSettings();
+  const { toast } = useToast();
   const { view, setView } = useView();
+  const { user } = useUser();
   const [allDates, setAllDates] = useState<string[]>(initialDates);
-  const [allCounts, setAllCounts] = useState<MPEventCount[]>(initialEventCounts);
+  const [allCounts, setAllCounts] = useState<MPEventCount[]>([]);
   const [totalCounts, setTotalCounts] = useState<number[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<MPEvent | undefined>(undefined);
 
@@ -73,24 +79,35 @@ const MonthCalendar = ({ initialEventCounts, initialDates }: { initialEventCount
   const lastFetchedDateRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const url = new URL(window.location.href);
-    const eventId = url.searchParams.get('eventId');
-    
-    if (eventId) {
-      // Remove the id parameter from URL without refreshing
-      url.searchParams.delete('eventId');
-      window.history.replaceState({}, '', url.toString());
-      
-      // Fetch and handle the event
-      getEvent(parseInt(eventId)).then(event => {
-        // console.log('Event from URL parameter:', event);
-        if (event) {
-          setSelectedEvent(event);
-          setEventPopupOpen(true);
-        }
-      });
+    const handleEventPopup = async () => {
+      try {
+        const url = new URL(window.location.href);
+        const eventId = url.searchParams.get('eventId');
+        
+        if (!eventId) return;
+        
+        // Remove the id parameter from URL without refreshing
+        url.searchParams.delete('eventId');
+        window.history.replaceState({}, '', url.toString());
+
+        const decryptedEventID = await decrypt(eventId);
+        // Fetch and handle the event
+        getEvent(parseInt(decryptedEventID)).then(event => {
+          if (event) {
+            setSelectedEvent(event);
+            setEventPopupOpen(true);
+          }
+        });
+      } catch (error) {
+        toast({
+          title: "Something went wrong",
+          description: "Failed to open event",
+          variant: "destructive"
+        });
+      }
     }
-  }, []);
+    handleEventPopup();
+  }, [toast]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -105,7 +122,7 @@ const MonthCalendar = ({ initialEventCounts, initialDates }: { initialEventCount
     lastFetchedDateRef.current = currentViewDate;
 
     const fetchEventCounts = async () => {
-      const newEventCounts = await getEventCounts(newDates, view.location_id, view.building_id, view.room_id);
+      const newEventCounts = await getEventCounts(newDates, view.location_id, view.building_id, view.room_id, user?.sub);
       // Only update the state if the fetched data corresponds to the latest view.current_date
       if (lastFetchedDateRef.current === currentViewDate) {
         setAllCounts(newEventCounts);
@@ -114,7 +131,7 @@ const MonthCalendar = ({ initialEventCounts, initialDates }: { initialEventCount
     };
 
     fetchEventCounts();
-  }, [view.current_date, view.location_id, view.building_id, view.room_id]);
+  }, [view.current_date, view.location_id, view.building_id, view.room_id, user?.sub]);
 
   useEffect(() => {
     const newTotalCounts = allCounts.map(count => {
