@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import { MPLocation, MPBuildingWithRooms, MPRoom } from "@/lib/types";
 import { cn, getISOTime } from "@/lib/util";
@@ -47,6 +47,15 @@ const FormPage3 = ({ isActive, allLocations, openAccordionID, setOpenAccordionID
   const [blockedRooms, setBlockedRooms] = useState<BlockedRoom[]>([]);
   const currentLocation = allLocations.find(location => location.Location_ID === eventData?.Location_ID);
   const filteredBuildings = currentLocation?.Buildings.filter(building => building.Rooms.length > 0) || [];
+  
+  // Add reference objects to track previous values
+  const prevValues = useRef({
+    locationId: undefined as number | undefined,
+    patternString: "",
+    eventLengthMinutes: 0,
+    setupTime: 0,
+    cleanupTime: 0
+  });
 
   const handleRoomChecked = (roomID: number) => {
     if (!eventData) return;
@@ -75,30 +84,56 @@ const FormPage3 = ({ isActive, allLocations, openAccordionID, setOpenAccordionID
   useEffect(() => {
     const getBlockedRooms = async () => {
       try {
-        if (eventData?.Location_ID === undefined || eventData?.Recurring_Pattern === undefined || eventData?.Event_Date === undefined || eventData?.Event_Start_Time === undefined || eventData?.Event_End_Time === undefined || eventData?.Setup_Time === undefined || eventData?.Cleanup_Time === undefined) {
-          // addToast({
-          //   title: "Something went wrong",
-          //   description: "Error retrieving blocked rooms",
-          //   variant: "destructive"
-          // });
-          console.error('Error retrieving blocked rooms');
+        if (eventData?.Location_ID === undefined || 
+            eventData?.Recurring_Pattern === undefined || 
+            eventData?.Event_Date === undefined || 
+            eventData?.Event_Start_Time === undefined || 
+            eventData?.Event_End_Time === undefined || 
+            eventData?.Setup_Time === undefined || 
+            eventData?.Cleanup_Time === undefined) {
+          console.error('Error retrieving blocked rooms: missing required data');
           return;
         };
 
         const eventStart = new Date(eventData.Event_Date.toISOString().split("T")[0] + "T" + getISOTime(eventData.Event_Start_Time!));
         const eventEnd = new Date(eventData.Event_Date.toISOString().split("T")[0] + "T" + getISOTime(eventData.Event_End_Time!));
-
+        
         const pattern = eventData.Recurring_Pattern.length > 0 ? eventData.Recurring_Pattern : [eventData.Event_Date];
-        const PatternString = pattern.map(date => date?.toISOString().split("T")[0] + "T" + getISOTime(eventData.Event_Start_Time!)).join(",");
-        const EventLengthMinutes = (eventEnd.getTime() - eventStart.getTime()) / 60000;
+        const patternString = pattern.map(date => date?.toISOString().split("T")[0] + "T" + getISOTime(eventData.Event_Start_Time!)).join(",");
+        const eventLengthMinutes = (eventEnd.getTime() - eventStart.getTime()) / 60000;
+        const setupTime = eventData.Setup_Time;
+        const cleanupTime = eventData.Cleanup_Time;
+        const locationId = eventData.Location_ID;
 
+        // Check if any of the relevant values have changed
+        if (
+          prevValues.current.locationId === locationId &&
+          prevValues.current.patternString === patternString &&
+          prevValues.current.eventLengthMinutes === eventLengthMinutes &&
+          prevValues.current.setupTime === setupTime &&
+          prevValues.current.cleanupTime === cleanupTime
+        ) {
+          console.log('No relevant data changed, skipping getBlockedRooms call');
+          return;
+        }
+
+        // Update the reference values
+        prevValues.current = {
+          locationId,
+          patternString,
+          eventLengthMinutes,
+          setupTime,
+          cleanupTime
+        };
+
+        console.log('Retrieving blocked rooms with new data');
         const { data: blockedRoomsData } = await axios.get<BlockedRoom[]>(`/api/events/blocked-rooms`, {
           params: {
-            LocationID: eventData.Location_ID,
-            PatternString,
-            EventLengthMinutes,
-            SetupTime: eventData.Setup_Time,
-            CleanupTime: eventData.Cleanup_Time
+            LocationID: locationId,
+            PatternString: patternString,
+            EventLengthMinutes: eventLengthMinutes,
+            SetupTime: setupTime,
+            CleanupTime: cleanupTime
           }
         });
 
@@ -109,12 +144,7 @@ const FormPage3 = ({ isActive, allLocations, openAccordionID, setOpenAccordionID
         }
         setBlockedRooms(blockedRoomsData);
       } catch (error) {
-        console.error('Error retrieving blocked rooms');
-        // addToast({
-        //   title: "Something went wrong",
-        //   description: "Error retrieving blocked rooms",
-        //   variant: "destructive"
-        // });
+        console.error('Error retrieving blocked rooms', error);
       }
     }
 
