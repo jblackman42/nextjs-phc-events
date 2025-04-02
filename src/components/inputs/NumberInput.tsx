@@ -11,18 +11,18 @@ const NumberInput = ({ value = 0, setValue, min = 0, max = 100, label = "", disa
   const [keyboardFocus, setKeyboardFocus] = useState(false);
   const [mouseDown, setMouseDown] = useState(false);
 
-  const formatToTwoDecimals = (num: number) => num.toFixed(2);
+  const formatToTwoDecimals = (num: number) => (type === "currency" ? num.toFixed(2) : num.toString());
 
   const handleBlur = () => {
-    let validNumber = Number(value);
+    let validNumber = Number(valueString);
     if (validNumber < min) {
       validNumber = min;
     }
     if (validNumber > max) {
       validNumber = max;
     }
-    setValue(validNumber);
-    setValueString(formatToTwoDecimals(validNumber)); // Format with two decimals
+    setValue(validNumber); // Ensure the value remains a number
+    setValueString(formatToTwoDecimals(validNumber)); // Format with .00 only for currency
     setKeyboardFocus(false);
     setMouseDown(false);
   };
@@ -31,13 +31,13 @@ const NumberInput = ({ value = 0, setValue, min = 0, max = 100, label = "", disa
     let newValue = Number(valueString);
     if (newValue < min) {
       newValue = min;
-      setValueString(formatToTwoDecimals(min)); // Format with two decimals
+      setValueString(formatToTwoDecimals(min)); // Format with .00 only for currency
     }
     if (newValue > max) {
       newValue = max;
-      setValueString(formatToTwoDecimals(max)); // Format with two decimals
+      setValueString(formatToTwoDecimals(max)); // Format with .00 only for currency
     }
-    setValue(newValue);
+    setValue(newValue); // Ensure the value remains a number
   }, [valueString, min, max]);
 
   return <div>
@@ -47,7 +47,7 @@ const NumberInput = ({ value = 0, setValue, min = 0, max = 100, label = "", disa
         id={id}
         value={valueString}
         onChange={(e) => {
-          const inputValue = e.target.value;
+          const inputValue = e.target.value.replace(/[^0-9.]/g, ""); // Remove non-numeric characters
           if (!isNaN(Number(inputValue))) {
             setValueString(inputValue); // Allow user to type freely
           }
@@ -77,8 +77,8 @@ const NumberInput = ({ value = 0, setValue, min = 0, max = 100, label = "", disa
         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-primary-foreground">$</span>
       )}
       {showButtons && !disabled && <div className="absolute flex flex-col right-2.5 top-1/2 -translate-y-1/2">
-        <button onClick={() => setValueString((Number(valueString) + 1).toString())} className="h-3 p-0.5 py-1 flex justify-center items-center text-primary-foreground opacity-50 hover:text-accent hover:opacity-100" tabIndex={-1}><FontAwesomeIcon icon={faCaretUp} /></button>
-        <button onClick={() => setValueString((Number(valueString) - 1).toString())} className="h-3 p-0.5 py-1 flex justify-center items-center text-primary-foreground opacity-50 hover:text-accent hover:opacity-100" tabIndex={-1}><FontAwesomeIcon icon={faCaretDown} /></button>
+        <button onClick={() => setValueString(formatToTwoDecimals(Number(valueString) + 1))} className="h-3 p-0.5 py-1 flex justify-center items-center text-primary-foreground opacity-50 hover:text-accent hover:opacity-100" tabIndex={-1}><FontAwesomeIcon icon={faCaretUp} /></button>
+        <button onClick={() => setValueString(formatToTwoDecimals(Number(valueString) - 1))} className="h-3 p-0.5 py-1 flex justify-center items-center text-primary-foreground opacity-50 hover:text-accent hover:opacity-100" tabIndex={-1}><FontAwesomeIcon icon={faCaretDown} /></button>
       </div>}
     </div>
   </div>
