@@ -72,6 +72,7 @@ const RegistrationPopup = () => {
         label="Cost:"
         value={Registration_Cost}
         setValue={(value: number) => updateEventData({ Registration_Cost: value })}
+        type="currency"
       />
 
       <DateInput
