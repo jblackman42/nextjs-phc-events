@@ -28,7 +28,6 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (toasts.length > 0) {
       const { title, description, variant, action, actionText } = toasts[0];
-      console.log(variant);
       showToast({
         title: title,
         description: description,

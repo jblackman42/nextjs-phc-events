@@ -84,14 +84,14 @@ const FormPage3 = ({ isActive, allLocations, openAccordionID, setOpenAccordionID
   useEffect(() => {
     const getBlockedRooms = async () => {
       try {
-        if (eventData?.Location_ID === undefined || 
-            eventData?.Recurring_Pattern === undefined || 
-            eventData?.Event_Date === undefined || 
-            eventData?.Event_Start_Time === undefined || 
-            eventData?.Event_End_Time === undefined || 
-            eventData?.Setup_Time === undefined || 
+        if (eventData?.Location_ID === undefined ||
+            eventData?.Recurring_Pattern === undefined ||
+            eventData?.Event_Date === undefined ||
+            eventData?.Event_Start_Time === undefined ||
+            eventData?.Event_End_Time === undefined ||
+            eventData?.Setup_Time === undefined ||
             eventData?.Cleanup_Time === undefined) {
-          console.error('Error retrieving blocked rooms: missing required data');
+          // console.error('Error retrieving blocked rooms: missing required data');
           return;
         };
 
@@ -113,7 +113,7 @@ const FormPage3 = ({ isActive, allLocations, openAccordionID, setOpenAccordionID
           prevValues.current.setupTime === setupTime &&
           prevValues.current.cleanupTime === cleanupTime
         ) {
-          console.log('No relevant data changed, skipping getBlockedRooms call');
+          // console.log('No relevant data changed, skipping getBlockedRooms call');
           return;
         }
 
@@ -126,7 +126,7 @@ const FormPage3 = ({ isActive, allLocations, openAccordionID, setOpenAccordionID
           cleanupTime
         };
 
-        console.log('Retrieving blocked rooms with new data');
+        // console.log('Retrieving blocked rooms with new data');
         const { data: blockedRoomsData } = await axios.get<BlockedRoom[]>(`/api/events/blocked-rooms`, {
           params: {
             LocationID: locationId,
@@ -138,7 +138,7 @@ const FormPage3 = ({ isActive, allLocations, openAccordionID, setOpenAccordionID
         });
 
         if (!Array.isArray(blockedRoomsData)) {
-          console.error('Invalid blocked rooms data received');
+          // console.error('Invalid blocked rooms data received');
           setBlockedRooms([]);
           return;
         }

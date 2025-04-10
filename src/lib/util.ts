@@ -110,8 +110,6 @@ export const createEvent = async (eventData: CreateEventData, user: User, setLoa
       }
     })
   
-    console.log(eventData.Recurring_Pattern)
-  
     setLoading(false);
   
     addToast({

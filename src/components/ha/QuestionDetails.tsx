@@ -35,9 +35,9 @@ const getSelectedQuestion = async (
   grabAllData: boolean,
   congregationID: number
 ): Promise<any[]> => {
-  console.log('input data:')
-  console.log(questionID, grabAllData, congregationID);
-  console.log('result data:')
+  // console.log('input data:')
+  // console.log(questionID, grabAllData, congregationID);
+  // console.log('result data:')
 
   let result: any[] = [];
   try {
@@ -65,7 +65,7 @@ const getSelectedQuestion = async (
   } catch (error) {
     console.error(error);
   }
-  console.log(result);
+  // console.log(result);
   return result;
   // return await axios({
   //   method: "post",
@@ -108,7 +108,7 @@ const Question = ({ id }: QuestionProps) => {
         setQuestionMonthNumbers(monthNumbers);
         setQuestionDetails(questionDetailsData[0]);
         setCongregations(congregationsData);
-        console.log(data)
+        // console.log(data)
       })
   }, [id, congregationID]);
 
