@@ -18,22 +18,10 @@ jobs:
         with:
           node-version: 18
 
-      - name: 🔍 Confirm secrets exist
-        run: echo ${{ secrets.HOST }} | sed -e 's/\(.\)/\1 /g'
-        env:
-          HOST: ${{ secrets.HOST }}
-          USERNAME: ${{ secrets.USERNAME }}
-          SSHKEY_ESCAPED: ${{ secrets.SSHKEY_ESCAPED }}
-
       - name: Build App
         run: |
           npm install
           npm run build
-
-      - name: Write SSH key from escaped string
-        run: |
-          echo -e "${{ secrets.SSHKEY_ESCAPED }}" > deploy_key
-          chmod 600 deploy_key
 
       - name: Upload to VPS
         uses: appleboy/scp-action@v0.1.4
@@ -44,6 +32,10 @@ jobs:
           source: ".next,public,package.json,package-lock.json,next.config.js"
           target: "/root/nextjs-phc-events"
           debug: true
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          SSHKEY_ESCAPED: ${{ secrets.SSHKEY_ESCAPED }}
 
       - name: Restart server
         uses: appleboy/ssh-action@v1.0.0
@@ -55,3 +47,7 @@ jobs:
             cd /root/nextjs-phc-events
             npm install --omit=dev
             pm2 restart phc-events || pm2 start npm --name phc-events -- run start
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          SSHKEY_ESCAPED: ${{ secrets.SSHKEY_ESCAPED }}
