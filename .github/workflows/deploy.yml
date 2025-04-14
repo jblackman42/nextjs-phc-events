@@ -2,8 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches:
-      - master
+    branches: [master]
 
 jobs:
   deploy:
@@ -13,47 +12,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: 🔍 Confirm secrets exist
-        run: |
-          echo "HOST:       ${HOST:-missing}"
-          echo "USERNAME:   ${USERNAME:-missing}"
-          echo "SSHKEY_ESCAPED: ${SSHKEY_ESCAPED:+[present]}"
-        env:
-          HOST: ${{ secrets.HOST }}
-          USERNAME: ${{ secrets.USERNAME }}
-          SSHKEY_ESCAPED: ${{ secrets.SSHKEY_ESCAPED }}\
-
-      - name: Build App
+      - name: Install and Build
         run: |
           npm install
           npm run build
 
-      - name: Write SSH key from escaped string
+      - name: Parse secrets from JSON
         run: |
-          echo -e "${{ secrets.SSHKEY_ESCAPED }}" > deploy_key
-          chmod 600 deploy_key
+          echo "${{ secrets.DEPLOY_CONFIG }}" > config.json
+          cat config.json | jq -r '.sshkey' > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+          echo "HOST=$(cat config.json | jq -r '.host')" >> $GITHUB_ENV
+          echo "USERNAME=$(cat config.json | jq -r '.username')" >> $GITHUB_ENV
 
       - name: Upload to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key_path: deploy_key
+          host: ${{ env.HOST }}
+          username: ${{ env.USERNAME }}
+          key_path: /tmp/deploy_key
           source: ".next,public,package.json,package-lock.json,next.config.js"
           target: "/root/nextjs-phc-events"
           debug: true
 
-      - name: Restart server
+      - name: SSH Restart
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key_path: deploy_key
+          host: ${{ env.HOST }}
+          username: ${{ env.USERNAME }}
+          key_path: /tmp/deploy_key
           script: |
             cd /root/nextjs-phc-events
             npm install --omit=dev
