@@ -27,6 +27,11 @@ jobs:
           echo "${{ secrets.DEPLOY_KEY_B64 }}" | base64 --decode > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
 
+      - name: 🕵️ Debug: Show host secret exists
+        run: |
+          echo "DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}"
+          test -n "${{ secrets.DEPLOY_HOST }}" || (echo "DEPLOY_HOST is empty!" && exit 1)
+
       - name: 📤 Upload to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
