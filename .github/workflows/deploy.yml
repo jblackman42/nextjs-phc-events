@@ -28,19 +28,27 @@ jobs:
           echo "${{ secrets.DEPLOY_KEY_B64 }}" | base64 --decode > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
 
+      # Set DEPLOY_HOST as an environment variable
+      - name: Set deploy host env var
+        run: echo "DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}" >> $GITHUB_ENV
+
+      - name: Debug: Print deploy host
+        run: echo "Deploy host is $DEPLOY_HOST"
+
       - name: Upload build to server
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
+          host: ${{ env.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key_path: /tmp/deploy_key
           source: ".next,public,package.json,package-lock.json,next.config.js"
           target: "/root/nextjs-phc-events"
+          debug: true
 
       - name: Restart app on server
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
+          host: ${{ env.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key_path: /tmp/deploy_key
           script: |
