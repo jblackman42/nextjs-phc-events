@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -25,32 +25,25 @@ jobs:
 
       - name: Decode SSH key
         run: |
-          echo "${{ secrets.DEPLOY_KEY_B64 }}" | base64 --decode > /tmp/deploy_key
-          chmod 600 /tmp/deploy_key
+          echo "${{ secrets.DEPLOY_KEY_B64 }}" | base64 -d > deploy_key
+          chmod 600 deploy_key
 
-      - name: Set deploy host env var
-        run: echo "DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}" >> $GITHUB_ENV
-
-      - name: Debug: Print deploy host
-        run: echo "Deploy host is $DEPLOY_HOST"
-
-      - name: Upload build to server
+      - name: Upload to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ env.DEPLOY_HOST }}
+          host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key_path: /tmp/deploy_key
+          key_path: deploy_key
           source: ".next,public,package.json,package-lock.json,next.config.js"
           target: "/root/nextjs-phc-events"
-          debug: true
 
-      - name: Restart app on server
+      - name: SSH restart
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ env.DEPLOY_HOST }}
+          host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key_path: /tmp/deploy_key
+          key_path: deploy_key
           script: |
             cd /root/nextjs-phc-events
             npm install --omit=dev
-            pm2 restart phc-events || pm2 start npm --name "phc-events" -- run start
+            pm2 restart phc-events || pm2 start npm --name phc-events -- run start
