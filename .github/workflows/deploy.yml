@@ -1,42 +1,34 @@
-name: 🚀 Deploy to VPS
+name: Deploy
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📦 Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: 🔧 Set up Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: 📥 Install and Build
+      - name: Install dependencies and build
         run: |
           npm install
           npm run build
 
-      - name: 🔓 Decode SSH key
+      - name: Decode SSH key
         run: |
           echo "${{ secrets.DEPLOY_KEY_B64 }}" | base64 --decode > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
 
-      - name: 🕵️ Debug: Show host secret exists
-        shell: bash
-        run: |
-          echo "DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}"
-          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
-            echo "❌ DEPLOY_HOST is empty!"
-            exit 1
-          fi
-
-      - name: 📤 Upload to VPS
+      - name: Upload build to server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -44,9 +36,8 @@ jobs:
           key_path: /tmp/deploy_key
           source: ".next,public,package.json,package-lock.json,next.config.js"
           target: "/root/nextjs-phc-events"
-          debug: true
 
-      - name: 🔁 SSH & Restart App
+      - name: Restart app on server
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.DEPLOY_HOST }}
