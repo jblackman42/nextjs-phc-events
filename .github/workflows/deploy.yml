@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup Node
@@ -18,27 +18,32 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies and build
+      - name: Build App
         run: |
           npm install
           npm run build
+
+      - name: Write SSH key from escaped string
+        run: |
+          echo -e "${{ secrets.SSHKEY_ESCAPED }}" > deploy_key
+          chmod 600 deploy_key
 
       - name: Upload to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSHKEY }}
+          key_path: deploy_key
           source: ".next,public,package.json,package-lock.json,next.config.js"
           target: "/root/nextjs-phc-events"
           debug: true
 
-      - name: Restart app on server
+      - name: Restart server
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSHKEY }}
+          key_path: deploy_key
           script: |
             cd /root/nextjs-phc-events
             npm install --omit=dev
