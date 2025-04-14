@@ -18,6 +18,16 @@ jobs:
         with:
           node-version: 18
 
+      - name: 🔍 Confirm secrets exist
+        run: |
+          echo "HOST:       ${HOST:-missing}"
+          echo "USERNAME:   ${USERNAME:-missing}"
+          echo "SSHKEY_ESCAPED: ${SSHKEY_ESCAPED:+[present]}"
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          SSHKEY_ESCAPED: ${{ secrets.SSHKEY_ESCAPED }}\
+
       - name: Build App
         run: |
           npm install
