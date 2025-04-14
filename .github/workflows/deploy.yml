@@ -2,7 +2,8 @@ name: Deploy
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
 
 jobs:
   deploy:
@@ -12,40 +13,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install and Build
+      - name: 🔍 Confirm secrets exist
+        run: echo ${{ secrets.HOST }} | sed -e 's/\(.\)/\1 /g'
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          SSHKEY_ESCAPED: ${{ secrets.SSHKEY_ESCAPED }}
+
+      - name: Build App
         run: |
           npm install
           npm run build
 
-      - name: Parse secrets from JSON
+      - name: Write SSH key from escaped string
         run: |
-          echo "${{ secrets.DEPLOY_CONFIG }}" > config.json
-          cat config.json | jq -r '.sshkey' > /tmp/deploy_key
-          chmod 600 /tmp/deploy_key
-          echo "HOST=$(cat config.json | jq -r '.host')" >> $GITHUB_ENV
-          echo "USERNAME=$(cat config.json | jq -r '.username')" >> $GITHUB_ENV
+          echo -e "${{ secrets.SSHKEY_ESCAPED }}" > deploy_key
+          chmod 600 deploy_key
 
       - name: Upload to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ env.HOST }}
-          username: ${{ env.USERNAME }}
-          key_path: /tmp/deploy_key
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key_path: deploy_key
           source: ".next,public,package.json,package-lock.json,next.config.js"
           target: "/root/nextjs-phc-events"
           debug: true
 
-      - name: SSH Restart
+      - name: Restart server
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ env.HOST }}
-          username: ${{ env.USERNAME }}
-          key_path: /tmp/deploy_key
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key_path: deploy_key
           script: |
             cd /root/nextjs-phc-events
             npm install --omit=dev
