@@ -30,7 +30,10 @@ jobs:
       - name: 🕵️ Debug: Show host secret exists
         run: |
           echo "DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}"
-          test -n "${{ secrets.DEPLOY_HOST }}" || (echo "DEPLOY_HOST is empty!" && exit 1)
+          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
+            echo "❌ DEPLOY_HOST is empty!"
+            exit 1
+          fi
 
       - name: 📤 Upload to VPS
         uses: appleboy/scp-action@v0.1.4
