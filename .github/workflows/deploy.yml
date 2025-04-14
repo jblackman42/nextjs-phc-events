@@ -30,7 +30,7 @@ jobs:
       - name: 🕵️ Debug: Show host secret exists
         run: |
           echo "DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}"
-          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then
+          if [[ -z "${{ secrets.DEPLOY_HOST }}" ]]; then
             echo "❌ DEPLOY_HOST is empty!"
             exit 1
           fi
