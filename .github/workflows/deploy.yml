@@ -28,7 +28,6 @@ jobs:
           echo "${{ secrets.DEPLOY_KEY_B64 }}" | base64 --decode > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
 
-      # Set DEPLOY_HOST as an environment variable
       - name: Set deploy host env var
         run: echo "DEPLOY_HOST=${{ secrets.DEPLOY_HOST }}" >> $GITHUB_ENV
 
