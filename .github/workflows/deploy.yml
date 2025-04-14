@@ -22,21 +22,27 @@ jobs:
           npm install
           npm run build
 
+      - name: 🔓 Decode SSH key
+        run: |
+          echo "${{ secrets.DEPLOY_KEY_B64 }}" | base64 --decode > /tmp/deploy_key
+          chmod 600 /tmp/deploy_key
+
       - name: 📤 Upload to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
+          key_path: /tmp/deploy_key
           source: ".next,public,package.json,package-lock.json,next.config.js"
           target: "/root/nextjs-phc-events"
+          debug: true
 
       - name: 🔁 SSH & Restart App
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
+          key_path: /tmp/deploy_key
           script: |
             cd /root/nextjs-phc-events
             npm install --omit=dev
