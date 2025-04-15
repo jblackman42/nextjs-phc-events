@@ -5,8 +5,25 @@ import path from 'path';
 export const db = {
   pool: null as ConnectionPool | null,
   connect: async function (): Promise<void> {
-    // this.pool = await sql.connect(`Server=${process.env.DB_SERVER},1433;Database=${process.env.DB_NAME};User Id=${process.env.DB_USER};Password=${process.env.DB_PWD};trustServerCertificate=${process.env.NODE_ENV === 'development'}`);
-    this.pool = await sql.connect(`Server=${process.env.DB_SERVER},1433;Database=${process.env.DB_NAME};User Id=${process.env.DB_USER};Password=${process.env.DB_PWD};trustServerCertificate=true`);
+    // For VPN connections where server is accessed via IP:
+    // 1. Add the IP and hostname to your hosts file (/etc/hosts or C:\Windows\System32\drivers\etc\hosts)
+    // Example: 10.0.0.100 sql-server.internal
+    // 2. Use that hostname in your DB_SERVER environment variable
+    const config = {
+      server: process.env.DB_SERVER || '',
+      port: 1433,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PWD,
+      options: {
+        trustServerCertificate: true,
+        encrypt: true,
+        enableArithAbort: true,
+        connectionTimeout: 30000,
+        requestTimeout: 30000
+      }
+    };
+    this.pool = await sql.connect(config);
   },
   readSqlFile: function (filePath: string): string | null {
     const fullPath = path.join('src', 'app', 'queries', `${filePath}.sql`);
