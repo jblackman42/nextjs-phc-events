@@ -10,7 +10,7 @@ export default function Login() {
     (async () => {
       const { authorization_endpoint } = await getOAuthConfig()
       const loginConfig = encodeUrlForm({
-        client_id: 'dev_testing',
+        client_id: process.env.NEXT_PUBLIC_CLIENT_ID || process.env.CLIENT_ID,
         redirect_uri: `${window.location.origin}/callback`,
         response_type: 'code',
         scope: 'http://www.thinkministry.com/dataplatform/scopes/all openid offline_access'
