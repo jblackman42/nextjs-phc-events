@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Navbar } from '@/components';
 import { SettingsPopup, AccountPopup } from '@/components/popups';
 import { NavLink } from "@/lib/types";
-import { faCalendar, faGear, faRightToBracket, faBrightness, faMoon, faUser, faFileExcel, faSquarePlus, faBan } from '@awesome.me/kit-10a739193a/icons/classic/light';
+import { faCalendar, faGear, faRightToBracket, faBrightness, faMoon, faUser, faFileExcel, faSquarePlus } from '@awesome.me/kit-10a739193a/icons/classic/light';
+import { faPray, faHandsPraying } from '@awesome.me/kit-10a739193a/icons/classic/solid';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -33,6 +34,13 @@ const PageDefaults = () => {
       label: "Health Assessment",
       icon: faFileExcel,
       link: "/ha",
+      action: null
+    },
+    {
+      variant: "link",
+      label: "Prayer Wall",
+      icon: faPray,
+      link: "/prayerwall",
       action: null
     },
     {

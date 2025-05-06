@@ -11,7 +11,7 @@ import { LineChart } from '@/components/charts'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@awesome.me/kit-10a739193a/icons/classic/solid';
 import { cn } from '@/lib/util';
-import { getQuestionInformation } from '@/app/actions';
+import { getQuestionAnswers } from '@/app/actions';
 import { Congregation, HaQuestion, HaQuestionData } from '@/lib/types';
 import { ChartData, ChartDataset } from 'chart.js';
 
@@ -28,7 +28,7 @@ function MinistryQuestionPopup({ congregations, QuestionData, QuestionID }: { co
       setQuestion(undefined);
       setLoading(true);
       // await new Promise((resolve) => setTimeout(resolve, 2000));
-      const newQuestion = await getQuestionInformation(QuestionID);
+      const newQuestion = await getQuestionAnswers(QuestionID);
       setQuestion(newQuestion);
       setLoading(false);
     })()

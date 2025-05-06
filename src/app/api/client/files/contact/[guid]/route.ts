@@ -5,7 +5,7 @@ import axios from "axios";
 export async function GET(request: NextRequest, { params }: { params: { guid: string } }) {
   try {
     const { guid } = params;
-    const queryResult = await db.query(`SELECT TOP 1 Unique_Name FROM dp_Files WHERE Table_Name ='Contacts' AND Record_ID = (SELECT TOP 1 Contact_ID FROM Contacts WHERE Contact_GUID = '${guid}')`);
+    const queryResult = await db.query(`SELECT TOP 1 Unique_Name FROM dp_Files WHERE Table_Name ='Contacts' AND Default_Image = 1 AND Record_ID = (SELECT TOP 1 Contact_ID FROM Contacts WHERE Contact_GUID = '${guid}')`);
 
     // Destructure from the recordset
     const [{ Unique_Name }] = queryResult.recordset;

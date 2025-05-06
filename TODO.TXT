@@ -1,7 +1,5 @@
 To Do:
  - finish forms for registration, promotion, facilities, a/v, and heart crews
- - Make NumberInput have a variant for currency
- - check if any data has changed before running the blocked rooms query a second time
  - Prayer wall manager
  - New Guide manager
  - move widget hosting from phc.events to local web server

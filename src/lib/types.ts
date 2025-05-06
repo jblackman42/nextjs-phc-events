@@ -13,8 +13,8 @@ export interface HaQuestionValueBreakdown {
   Congregation_Name: string;
 }
 export interface HaQuestionAnswers {
-  Fiscal_Period_ID: number;
-  Fiscal_Period_Start: string;
+  ID: number;
+  Start_Date: string;
   Period_Total: number;
   Period_Breakdown: HaQuestionValueBreakdown[]
 }
@@ -27,7 +27,8 @@ export interface HaQuestion {
   Answer_Format: string;
   Question_Section: string;
   Question_Category: string;
-  Question_Answers: HaQuestionAnswers[];
+  Period_Answers: HaQuestionAnswers[];
+  Week_Answers: HaQuestionAnswers[];
 }
 
 export interface HaQuestionData {
@@ -41,11 +42,6 @@ export interface HaQuestionData {
   Previous_Total: number;
   Current_Year: number;
   Previous_Year: number;
-}
-export interface HaQuestion {
-  Question_Category_ID: number;
-  Question_Category: string;
-  Question_Data: HaQuestionData[];
 }
 export interface HaSection {
   Question_Section_ID: number;
@@ -207,6 +203,14 @@ export interface MPService {
   Service_Name: string;
   Service_Contact: string;
   Approved: boolean;
+}
+export interface EquipmentType {
+  Equipment_ID: number;
+  Equipment_Name: string;
+  Date_Acquired: Date;
+  Equipment_Type_ID: number;
+  Equipment_Type: string;
+  Quantity: number;
 }
 export interface MPEquipment {
   Equipment_Name: string;
